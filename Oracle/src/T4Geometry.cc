@@ -63,20 +63,20 @@ void T4Geometry::readT4input() {
   this->compos->read(c_tmpfilename);
 }
 
-bool T4Geometry::materialInMap(int materialID){
-  return (equivalenceMap.find(materialID) != equivalenceMap.end());
+bool T4Geometry::materialInMap(string matDens){
+  return (equivalenceMap.find(matDens) != equivalenceMap.end());
 }
 
-void T4Geometry::addEquivalence(int materialID, string compo){
-  if (!materialInMap(materialID)){
-    equivalenceMap[materialID] = compo;
+void T4Geometry::addEquivalence(string matDens, string compo){
+  if (!materialInMap(matDens)){
+    equivalenceMap[matDens] = compo;
   }
 }
 
-bool T4Geometry::weakEquivalence(int materialID, string compo){
-  if (!materialInMap(materialID)){
+bool T4Geometry::weakEquivalence(string matDens, string compo){
+  if (!materialInMap(matDens)){
     cerr << "ERROR : Testing weak equivalence on non-registered material" << endl;
     return false;
   }
-  return (equivalenceMap[materialID] == compo);
+  return (equivalenceMap[matDens] == compo);
 }

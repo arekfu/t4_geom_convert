@@ -100,11 +100,11 @@ void MCNPGeometry::readMaterialDensity(){
 	if (iss >> cellNum){
 		iss >> matNum;
 		if(matNum == 0){
-			cell2Density[cellNum] = "void";
+			addCell2Density(cellNum, "void");
 		}
 		else{
 			iss >> density;
-			cell2Density[cellNum] = density;
+			addCell2Density(cellNum, density);
 		}
 	//	to_return = 1;
 	}
@@ -114,7 +114,11 @@ void MCNPGeometry::readMaterialDensity(){
 //	return to_return;
 }
 
-
+void MCNPGeometry::addCell2Density(int key, string value){
+	if (cell2Density.find(key) == cell2Density.end()){
+		cell2Density[key] = value;
+	}
+}
 
 
 

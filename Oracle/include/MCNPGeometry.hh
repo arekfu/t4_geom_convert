@@ -142,6 +142,13 @@ public:
 		return cell2Density;
 	}
 
+	void addCell2Density(int key, string value);
+
+	string getMaterialDensity(){
+		string density = cell2Density[cellID];
+		return (to_string(materialID)+density);
+	}
+
 	int finishedReadingCells();
 
 	int isLineAComment(string lineContent);

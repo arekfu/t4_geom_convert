@@ -41,9 +41,16 @@ TEST_F(T4test, CreationAndCompo)
 	ASSERT_EQ(compo, "ALU1");
 }
 
+TEST_F(T4test, AddEquivalence)
+{
+	ASSERT_FALSE(t4Geom->materialInMap("5-6.2"));
+	t4Geom->addEquivalence("5-6.2", "ZINC");
+	ASSERT_TRUE(t4Geom->materialInMap("5-6.2"));
+}
+
 TEST_F(T4test, WeakEquivalenceNOK)
 {
-	ASSERT_FALSE(t4Geom->weakEquivalence(9999, "ALU2"));
+	ASSERT_FALSE(t4Geom->weakEquivalence("9999-3.9", "ALU2"));
 }
 
 TEST_F(T4test, WeakEquivalenceOK)
@@ -53,19 +60,21 @@ TEST_F(T4test, WeakEquivalenceOK)
 	string compo;
 	vector<double> point(3);
 
-	t4Geom->addEquivalence(1, "ALU1");
+	t4Geom->addEquivalence("1-2.7", "ALU1");
 	point = {12.024, -72.882,  1.0883};
 
 	rank = t4Geom->getVolumes()->which_volume(point);
 	compo = t4Geom->getCompos()->get_name_from_volume(rank);
 	mcnpGeom.setCellMaterial({3001, 1});
-	ASSERT_TRUE(t4Geom->weakEquivalence(mcnpGeom.getMaterialID(), compo));
+	mcnpGeom.addCell2Density(3001, "-2.7");
+	ASSERT_TRUE(t4Geom->weakEquivalence(mcnpGeom.getMaterialDensity(), compo));
 
-	t4Geom->addEquivalence(2, "ALU3");
+	t4Geom->addEquivalence("2-2.7", "ALU3"); //should be ALU2 and test will give false.
 	point = {0.43281, -1.3670, -0.096474};
 
 	rank = t4Geom->getVolumes()->which_volume(point);
 	compo = t4Geom->getCompos()->get_name_from_volume(rank);
 	mcnpGeom.setCellMaterial({2001, 2});
-	ASSERT_FALSE(t4Geom->weakEquivalence(mcnpGeom.getMaterialID(), compo));
+	mcnpGeom.addCell2Density(2001, "-2.7");
+	ASSERT_FALSE(t4Geom->weakEquivalence(mcnpGeom.getMaterialDensity(), compo));
 }

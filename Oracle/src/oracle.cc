@@ -27,7 +27,7 @@
 #include "T4Geometry.hh"
 using namespace std;
 int strictness_level = 3;
-int npoints = 2; // TODO : remove this
+int npoints = 100; // TODO : remove this
 
 
 void compare_geoms(const OptionsCompare &options){

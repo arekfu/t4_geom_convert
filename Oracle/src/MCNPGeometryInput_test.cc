@@ -43,3 +43,14 @@ TEST_F(MCNPtestInput, ReadMaterialDensity)
 	ASSERT_EQ(MCNPg1->getCell2Density()[2001], "-2.7");
 	ASSERT_EQ(MCNPg1->getCell2Density()[3001], "-2.7");
 }
+
+TEST_F(MCNPtestInput, AssociateMaterialDensity)
+{
+	MCNPg1->parseINP();
+	MCNPg1->goThroughHeaderPTRAC(8);
+	MCNPg1->readNextPtracData();
+	ASSERT_EQ(MCNPg1->getMaterialDensity(),"1-2.7");
+
+	MCNPg1->readNextPtracData();
+	ASSERT_EQ(MCNPg1->getMaterialDensity(),"2-2.7");
+}

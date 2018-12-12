@@ -27,7 +27,7 @@ class T4Geometry {
   Volumes* volumes;
   Compos* compos;
   string t4Filename;
-  map<int, string> equivalenceMap;
+  map<string, string> equivalenceMap;
 
 public:
   T4Geometry();
@@ -47,11 +47,11 @@ public:
     return compos;
   }
 
-  bool materialInMap(int materialID);
+  bool materialInMap(string matDens);
 
-  void addEquivalence(int materialID, string compo);
+  void addEquivalence(string matDens, string compo);
 
-  bool weakEquivalence(int materialID, string compo);
+  bool weakEquivalence(string matDens, string compo);
 
 };
 
