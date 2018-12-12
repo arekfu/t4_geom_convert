@@ -51,7 +51,7 @@ OptionsCompare::OptionsCompare() :
  */
 void OptionsCompare::get_opts(int argc, char **argv){
 
-  if(argc!=3){
+  if(argc!=4){
     // not allowed
     help = true;
     return;

@@ -78,14 +78,18 @@ vector<float> MCNPGeometry::readPoint() {
 /**
     If the maximum number of read points has not been reached: reads the next particle, event, volume, material, position in PTRAC file
 
-	@returns
+	@returns 1 if successful, 0 otherwise
  */
-void MCNPGeometry::readNextPtracData(int maxReadPoint) {
+int MCNPGeometry::readNextPtracData(int maxReadPoint) {
 	if(ptracFile && !ptracFile.eof() && getNpoints() < maxReadPoint){
 		incrementNpoints();
 		setPointEvent(readPointEvent());
 		setCellMaterial(readCellMaterial());
 		setPointXyz(readPoint());
+		return 1;
+	}
+	else{
+		return 0;
 	}
 }
 

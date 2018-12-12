@@ -40,7 +40,7 @@ public:
 	pair<int, int> readPointEvent();
 	pair<int, int> readCellMaterial();
 	vector<float> readPoint();
-	void readNextPtracData(int maxReadPoint=1000000000);
+	int readNextPtracData(int maxReadPoint=1000000000);
 
 	void readMaterialDensity();
 	void parseINP();
