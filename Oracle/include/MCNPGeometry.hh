@@ -1,5 +1,5 @@
 /*
- * MCNPGeometry.h
+ * MCNPGeometry.hh
  *
  *  Created on: 7 d�c. 2018
  *      Author: jofausti
@@ -17,8 +17,10 @@
 using namespace std;
 
 class MCNPGeometry {
-	pair<int, int> pointEvent;
-	pair<int, int> volumeMat;
+	int pointID;
+	int eventID;
+	int cellID;
+	int materialID;
 	vector<float> pointXYZ;
 
 	map<int, string> cell2Density;
@@ -27,22 +29,20 @@ class MCNPGeometry {
 	int npoints;
 	string ptracPath;
 	string inputPath;
-	string currentLine;
+
 	ifstream ptracFile;
 	ifstream inputFile;
-
-
-
+	string currentLine;
 public:
 	MCNPGeometry();
 	MCNPGeometry(string ptracPath, string inputPath);
 	virtual ~MCNPGeometry();
 	pair<int, int> readPointEvent();
-	pair<int, int> readVolumeMaterial();
+	pair<int, int> readCellMaterial();
 	vector<float> readPoint();
 	void readNextPtracData(int maxReadPoint=1000000000);
 
-	int readMaterialDensity();
+	void readMaterialDensity();
 	void parseINP();
 
 	void goThroughHeaderPTRAC(int nHeaderLines);
@@ -51,7 +51,7 @@ public:
 		return inputFile;
 	}
 
-	const string& getInputPath() const{
+	const string& getInputPath(){
 		return inputPath;
 	}
 
@@ -59,7 +59,7 @@ public:
 		this->inputPath = inputPath;
 	}
 
-	int getNpoints() const {
+	int getNpoints() {
 		return npoints;
 	}
 
@@ -71,7 +71,7 @@ public:
 		return ptracFile;
 	}
 
-	const string& getPtracPath() const {
+	const string& getPtracPath() {
 		return ptracPath;
 	}
 
@@ -79,7 +79,7 @@ public:
 		this->ptracPath = ptracPath;
 	}
 
-	const vector<int>& getVolumeList() const {
+	const vector<int>& getVolumeList() {
 		return volumeList;
 	}
 
@@ -100,12 +100,17 @@ public:
 		}
 	}
 
-	const pair<int, int>& getPointEvent() const {
-		return pointEvent;
+	int getPointID() {
+		return pointID;
+	}
+
+	int getEventID() {
+		return eventID;
 	}
 
 	void setPointEvent(const pair<int, int>& pointEvent) {
-		this->pointEvent = pointEvent;
+		this->pointID = pointEvent.first;
+		this->eventID = pointEvent.second;
 	}
 
 	const vector<float>& getPointXyz() const {
@@ -116,12 +121,17 @@ public:
 		pointXYZ = pointXyz;
 	}
 
-	const pair<int, int>& getVolumeMaterial() const {
-		return volumeMat;
+	int getCellID() {
+		return cellID;
 	}
 
-	void setVolumeMaterial(const pair<int, int>& volumeMat) {
-		this->volumeMat = volumeMat;
+	int getMaterialID() {
+		return materialID;
+	}
+
+	void setCellMaterial(const pair<int, int>& cellMat) {
+		this->cellID = cellMat.first;
+		this->materialID = cellMat.second;
 	}
 
 	void incrementNpoints(){

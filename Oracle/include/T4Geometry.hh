@@ -1,9 +1,9 @@
 /*
- * T4Geometry.hh
- *
- *  Created on: 11 dec. 2018
- *      Author: jofausti
- */
+* T4Geometry.hh
+*
+*  Created on: 11 dec. 2018
+*      Author: jofausti
+*/
 
 #ifndef T4GEOMETRY_H_
 #define T4GEOMETRY_H_
@@ -25,15 +25,16 @@ using namespace std;
 
 class T4Geometry {
   Volumes* volumes;
-	Compos* compos;
-	string t4Filename;
+  Compos* compos;
+  string t4Filename;
+  map<int, string> equivalenceMap;
 
 public:
   T4Geometry();
   T4Geometry(string t4Filename);
   ~T4Geometry();
 
-  void readT4input(const string t4Filename);
+  void readT4input();
   string getFilename(){
     return t4Filename;
   }
@@ -45,6 +46,13 @@ public:
   Compos* const & getCompos(){
     return compos;
   }
+
+  bool materialInMap(int materialID);
+
+  void addEquivalence(int materialID, string compo);
+
+  bool weakEquivalence(int materialID, string compo);
+
 };
 
 #endif /* T4GEOMETRY_H_ */

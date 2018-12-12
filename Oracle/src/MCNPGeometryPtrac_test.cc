@@ -17,13 +17,18 @@ public:
 	MCNPGeometry *MCNPg1;
 	void SetUp( ){
 		// code here will execute just before the test ensues
-		MCNPg1 = new MCNPGeometry("../mcnp/slabp", "../mcnp/input_slab");
+		MCNPg1 = new MCNPGeometry("../data/slabp", "../data/input_slab");
 		MCNPg1->goThroughHeaderPTRAC(8);
 	}
 
 	void TearDown( ){}
 };
 
+TEST_F(MCNPtestPtrac, createObject)
+{
+  ASSERT_EQ(MCNPg1->getPtracPath(), "../data/slabp");
+	ASSERT_EQ(MCNPg1->getInputPath(), "../data/input_slab");
+}
 
 TEST_F(MCNPtestPtrac, ReadFirstData)
 {
@@ -31,9 +36,9 @@ TEST_F(MCNPtestPtrac, ReadFirstData)
 	ASSERT_EQ(pointEvent.first,1);
 	ASSERT_EQ(pointEvent.second,1000);
 
-	pair<int, int> volumeMaterial = MCNPg1->readVolumeMaterial();
-	ASSERT_EQ(volumeMaterial.first,3001);
-	ASSERT_EQ(volumeMaterial.second,1);
+	pair<int, int> cellMaterial = MCNPg1->readCellMaterial();
+	ASSERT_EQ(cellMaterial.first,3001);
+	ASSERT_EQ(cellMaterial.second,1);
 
 	vector<float> pointCoords = MCNPg1->readPoint();
 	ASSERT_FLOAT_EQ(pointCoords[0], 12.024);
@@ -49,11 +54,11 @@ TEST_F(MCNPtestPtrac, ReadAll)
 		ii++;
 	}
 
-	ASSERT_EQ(MCNPg1->getPointEvent().first, 1000);
-	ASSERT_EQ(MCNPg1->getPointEvent().second, 1000);
+	ASSERT_EQ(MCNPg1->getPointID(), 1000);
+	ASSERT_EQ(MCNPg1->getEventID(), 1000);
 
-	ASSERT_EQ(MCNPg1->getVolumeMaterial().first, 1001);
-	ASSERT_EQ(MCNPg1->getVolumeMaterial().second, 3);
+	ASSERT_EQ(MCNPg1->getCellID(), 1001);
+	ASSERT_EQ(MCNPg1->getMaterialID(), 3);
 
 	ASSERT_FLOAT_EQ(MCNPg1->getPointXyz()[0], -2.2580);
 	ASSERT_FLOAT_EQ(MCNPg1->getPointXyz()[1], 18.880);

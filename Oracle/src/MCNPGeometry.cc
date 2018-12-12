@@ -8,6 +8,12 @@
 #include "MCNPGeometry.hh"
 #include <cctype>
 
+/**
+	Class constructor
+
+	@param ptracPath MCNP ptrac file path
+	@param inputPath MCNP inp file path
+*/
 MCNPGeometry::MCNPGeometry(string ptracPath, string inputPath) {
 	npoints = 0;
 	volumeList = {};
@@ -48,7 +54,7 @@ pair<int, int> MCNPGeometry::readPointEvent() {
 
     @return a pair containing the volume ID and material ID
  */
-pair<int, int> MCNPGeometry::readVolumeMaterial() {
+pair<int, int> MCNPGeometry::readCellMaterial() {
 	getline(ptracFile, currentLine);
 	istringstream iss(currentLine);
 	int dummy1, dummy2, dummy3, dummy4, volumeID, materialID;
@@ -78,7 +84,7 @@ void MCNPGeometry::readNextPtracData(int maxReadPoint) {
 	if(ptracFile && !ptracFile.eof() && getNpoints() < maxReadPoint){
 		incrementNpoints();
 		setPointEvent(readPointEvent());
-		setVolumeMaterial(readVolumeMaterial());
+		setCellMaterial(readCellMaterial());
 		setPointXyz(readPoint());
 	}
 }
@@ -86,13 +92,11 @@ void MCNPGeometry::readNextPtracData(int maxReadPoint) {
 /**
 	Reads and stores the materials density
 
-	@returns 1 if reading and storing were successful, 0 otherwise
  */
-int MCNPGeometry::readMaterialDensity(){
+void MCNPGeometry::readMaterialDensity(){
 	istringstream iss(currentLine);
 	int cellNum, matNum;
 	string density;
-	int to_return;
 	if (iss >> cellNum){
 		iss >> matNum;
 		if(matNum == 0){
@@ -102,12 +106,12 @@ int MCNPGeometry::readMaterialDensity(){
 			iss >> density;
 			cell2Density[cellNum] = density;
 		}
-		to_return = 1;
+	//	to_return = 1;
 	}
-	else{
-		to_return = 0;
-	}
-	return to_return;
+//	else{
+	//	to_return = 0;
+//	}
+//	return to_return;
 }
 
 
