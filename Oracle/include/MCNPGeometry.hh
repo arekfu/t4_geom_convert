@@ -35,7 +35,8 @@ class MCNPGeometry {
 	map<int, string> cell2Density;
 
 	vector<int> volumeList;
-	int npoints;
+	int nPointsRead;
+	int nps;
 	string ptracPath;
 	string inputPath;
 
@@ -99,6 +100,13 @@ public:
 	 */
 	void parseINP();
 
+
+	/**
+	 * Searches the INP file for the total number of particle NPS.
+	 *
+	 */
+	void readNPS();
+
 	/**
 	 * Sets the current line at the last header line of PTRAC file.
 	 *
@@ -111,8 +119,8 @@ public:
 	 *
 	 *
 	 */
-	void incrementNpoints(){
-		setNpoints(npoints+1);
+	void incrementnPointsRead(){
+		setnPointsRead(nPointsRead+1);
 	}
 
 	/**
@@ -135,7 +143,7 @@ public:
 	/**
 	 * Determines whether we have read all the cells definition in the INP file
 	 * based on blank line block separator.
-	 *
+	 * Caution : blank line separator is identified as string of length 1...
 	 *
 	 * @returns 1 if all cells have been read, 0 otherwise
 	 */
@@ -162,12 +170,16 @@ public:
 		this->inputPath = inputPath;
 	}
 
-	int getNpoints() {
-		return npoints;
+	int getNPS(){
+		return nps;
 	}
 
-	void setNpoints(int npoints){
-		this->npoints = npoints;
+	int getnPointsRead() {
+		return nPointsRead;
+	}
+
+	void setnPointsRead(int nPointsRead){
+		this->nPointsRead = nPointsRead;
 	}
 
 	ifstream& getPtracFile() {

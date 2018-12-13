@@ -64,5 +64,5 @@ TEST_F(MCNPtestPtrac, ReadAll)
 	ASSERT_FLOAT_EQ(MCNPg1->getPointXyz()[1], 18.880);
 	ASSERT_FLOAT_EQ(MCNPg1->getPointXyz()[2], -1.2856);
 
-	ASSERT_EQ(MCNPg1->getNpoints(), 1000);
+	ASSERT_EQ(MCNPg1->getnPointsRead(), 1000);
 }

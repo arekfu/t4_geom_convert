@@ -29,7 +29,7 @@
 #include "T4Geometry.hh"
 using namespace std;
 int strictness_level = 3;
-int npoints = 1000; // TODO : remove this
+int npoints = 10; // TODO : remove this
 
 
 void compare_geoms(const OptionsCompare &options){
@@ -42,8 +42,11 @@ void compare_geoms(const OptionsCompare &options){
 	std::vector<double> point(3);
 	int n_inside = 0;
 
-	std::cout << "Starting comparison..." << std::endl;
 	mcnpGeom.parseINP();
+
+	std::cout << "Starting comparison on "
+						<< min(npoints, mcnpGeom.getNPS()) << " points..."
+	          << std::endl;
 	mcnpGeom.goThroughHeaderPTRAC(8);
 
 	int ii=0;

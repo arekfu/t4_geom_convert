@@ -9,10 +9,9 @@
 */
 
 #include "MCNPGeometry.hh"
-#include <cctype>
 
 MCNPGeometry::MCNPGeometry(string ptracPath, string inputPath) {
-	npoints = 0;
+	nPointsRead = 0;
 	volumeList = {};
 
 	this->ptracPath=ptracPath;
@@ -30,7 +29,8 @@ MCNPGeometry::MCNPGeometry(string ptracPath, string inputPath) {
 }
 
 MCNPGeometry::~MCNPGeometry() {
-	// TODO Auto-generated destructor stub
+	ptracFile.close();
+	inputFile.close();	
 }
 
 pair<int, int> MCNPGeometry::readPointEvent() {
@@ -60,8 +60,8 @@ vector<float> MCNPGeometry::readPoint() {
 
 
 int MCNPGeometry::readNextPtracData(int maxReadPoint) {
-	if(ptracFile && !ptracFile.eof() && getNpoints() < maxReadPoint){
-		incrementNpoints();
+	if(ptracFile && !ptracFile.eof() && getnPointsRead() < maxReadPoint){
+		incrementnPointsRead();
 		setPointEvent(readPointEvent());
 		setCellMaterial(readCellMaterial());
 		setPointXyz(readPoint());
@@ -98,14 +98,32 @@ void MCNPGeometry::addCell2Density(int key, string value){
 
 void MCNPGeometry::parseINP() {
 	if (inputFile){
-		while(getline(inputFile, currentLine)){
+		while(getline(inputFile, currentLine, '\n')){
+			if (finishedReadingCells()){
+				break;
+			}
 			if (!isLineAComment(currentLine) && isdigit(currentLine[0])){
 				readMaterialDensity();
 			}
 		}
 	}
+	readNPS();
 }
 
+void MCNPGeometry::readNPS() {
+	string dummy;
+	int nps;
+	if (inputFile){
+		while(getline(inputFile, currentLine)){
+			if (currentLine.find("NPS") != string::npos){
+				istringstream iss(currentLine);
+				iss >> dummy >> nps;
+				this->nps = nps;
+				break;
+			}
+		}
+	}
+}
 
 void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
 	for (int ii=0; ii<nHeaderLines; ii++){
@@ -115,12 +133,7 @@ void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
 
 
 int MCNPGeometry::finishedReadingCells(){
-	if(getline(inputFile, currentLine)){
-		return currentLine.length() == 0;
-	}
-	else{
-		return 0;
-	}
+	return currentLine.length() == 1 || currentLine.empty();
 }
 
 
