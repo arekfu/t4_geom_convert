@@ -17,7 +17,7 @@ help()
     << "\n  A point is assumed to match by checking the name of the composition at"
     << "\n  that point in each geometry."
     << "\n\nUSAGE"
-    << "\n\toracle [options] jdd.t4 jdd.inp" << endl <<
+    << "\n\toracle [options] jdd.t4 jdd.inp ptrac" << endl <<
     endl;
 
   std::cout << "INPUT FILES" << endl;
@@ -28,6 +28,7 @@ help()
   std::cout << endl << "OPTIONS" << endl;
   edit_help_option("-V, --verbose", "Increase output verbosity.");
   edit_help_option("-h, --help", "Displays this help message.");
+  edit_help_option("-n, --npts", "Maximum number of tested points.");
 
   std::cout << endl;
 }
@@ -36,22 +37,20 @@ help()
 /** \brief Constructor of the class
 */
 OptionsCompare::OptionsCompare() :
-  //lang(0), // 0->english, 1->french, 2->old
   help(false),
-  //n_points(1000),
-  //sampling_method(SobolSampling),
-  verbosity(0)
+  verbosity(0),
+  npoints(1000)
   {
 
   }
 
 /** \brief Get the options set in the command line
- * \param argc The number of arguments in the command line
- * \param argv The splitted command line
+ * @param[in] argc The number of arguments in the command line
+ * @param[in] argv The splitted command line
  */
 void OptionsCompare::get_opts(int argc, char **argv){
 
-  if(argc!=4){
+  if(argc<=3){
     // not allowed
     help = true;
     return;
@@ -65,6 +64,15 @@ void OptionsCompare::get_opts(int argc, char **argv){
         return;
       } else if(opt.compare("--verbose")==0 || opt.compare("-V") == 0) {
         ++verbosity;
+      } else if(opt.compare("--npts")==0 || opt.compare("-n") ==0){
+        int nv = 1;
+        check_argv(argc, i+nv);
+        npoints = int_of_string(argv[i+1]);
+        if(npoints<=0) {
+          std::cout << "Warning: npoints<=0. Setting npoints=100." << std::endl;
+          npoints=100;
+        }
+        i+=nv;
       } else {
         filenames.push_back(opt);
       }

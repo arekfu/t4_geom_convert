@@ -20,6 +20,7 @@ class OptionsCompare {
     vector<string>      filenames;
     bool                help;
     int                 verbosity;
+    int                 npoints;
 
     OptionsCompare();
     void get_opts(int, char **);

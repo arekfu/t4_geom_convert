@@ -11,6 +11,7 @@
 #ifndef STASTISTICS_H_
 #define STASTISTICS_H_
 
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -64,8 +65,28 @@ public:
   */
   void recordFailurePosition(vector<float> position);
 
+  /**
+  * Reports in the terminal the comparison statistics
+  *
+  *
+  */
+  void report();
+
+  /**
+  * Get the vector of failure positions.
+  *
+  * @return failurePositions
+  */
   vector<vector<float> >& getFailurePositions(){
     return failurePositions;
+  }
+
+  int getNbSuccess(){
+    return nbSuccess;
+  }
+
+  int getNbFailure(){
+    return nbFailure;
   }
 };
 

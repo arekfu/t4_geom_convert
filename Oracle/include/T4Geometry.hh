@@ -45,7 +45,7 @@ public:
    *
    * @param[in] t4Filename The Tripoli-4 geometry file to be compared.
    */
-  T4Geometry(string t4Filename);
+  explicit T4Geometry(const string& t4Filename);
 
   /**
    *  Class destructor.
@@ -62,18 +62,9 @@ public:
    */
   void readT4input();
 
-
-  string getFilename(){
-    return t4Filename;
-  }
-
-  Volumes* const & getVolumes(){
-    return volumes;
-  }
-
-  Compos* const & getCompos(){
-    return compos;
-  }
+  string getFilename();
+  Volumes* const & getVolumes();
+  Compos* const & getCompos();
 
   /**
    * Check if the input material as already been mapped to T4 composition.
@@ -87,7 +78,7 @@ public:
    *
    *
    */
-  void addEquivalence(string matDens, string compo);
+   void addEquivalence(string matDens, const string& compo);
 
   /**
    * Checks if the weak equivalence tests is passed, i.e. if MCNP and T4 see
@@ -96,7 +87,7 @@ public:
    * @param[in] compo A T4 composition.
    * @return True if the weak equivalence test passes, False otherwise.
    */
-  bool weakEquivalence(string matDens, string compo);
+  bool weakEquivalence(string matDens, const string& compo);
 
 };
 

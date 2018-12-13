@@ -27,66 +27,73 @@
 #include "t4random.hh"
 #include "MCNPGeometry.hh"
 #include "T4Geometry.hh"
+#include "Statistics.hh"
+
 using namespace std;
 int strictness_level = 3;
-int npoints = 10; // TODO : remove this
 
+Statistics compare_geoms(const OptionsCompare &options){
+  T4Geometry t4Geom(options.filenames[0]);
+  MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
+  Statistics stats;
+  std::vector<double> point;
 
-void compare_geoms(const OptionsCompare &options){
-	T4Geometry t4Geom(options.filenames[0]);
-	MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
+  mcnpGeom.parseINP();
+  int nbSampledPts = min(options.npoints, mcnpGeom.getNPS());
 
-	std::vector<double> point(3);
-	int n_inside = 0;
+  std::cout << "Starting comparison on "
+            <<  nbSampledPts << " points..."
+            << std::endl;
+  mcnpGeom.goThroughHeaderPTRAC(8);
 
-	mcnpGeom.parseINP();
+  while (mcnpGeom.readNextPtracData(nbSampledPts)) {
+    long rank;
+    std::string compo;
 
-	std::cout << "Starting comparison on "
-						<< min(npoints, mcnpGeom.getNPS()) << " points..."
-	          << std::endl;
-	mcnpGeom.goThroughHeaderPTRAC(8);
+    point = mcnpGeom.getPointXyz();
+    rank = t4Geom.getVolumes()->which_volume(point);
+    compo = t4Geom.getCompos()->get_name_from_volume(rank);
 
-	int ii=0;
-	while (mcnpGeom.readNextPtracData(npoints)) {
-		ii++;
-		long rank;
-		std::string compo;
+    if (rank<0){
+      cout << "rank = " << rank << endl;
+      cout << "point is outside geometry" << endl;
+      exit(EXIT_FAILURE);
+    }
 
-		rank = t4Geom.getVolumes()->which_volume(point);
-		compo = t4Geom.getCompos()->get_name_from_volume(rank);
-
-		if (!t4Geom.materialInMap(mcnpGeom.getMaterialDensity())){
-				t4Geom.addEquivalence(mcnpGeom.getMaterialDensity(), compo);
-				cout << ii << "  adding to equivalence map  " << endl;
-		}
-		else{
-			if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
-				//cout << ii << "      match"  <<endl;
-			}
-			else{
-				cout << ii << "   NO match !!"  <<endl;
-			}
-		}
-	}
+    if (!t4Geom.materialInMap(mcnpGeom.getMaterialDensity())){
+        t4Geom.addEquivalence(mcnpGeom.getMaterialDensity(), compo);
+        stats.IncrementSuccess();
+    }
+    else{
+      if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
+        stats.IncrementSuccess();
+      }
+      else{
+        stats.IncrementFailure();
+      }
+    }
+  }
+  return stats;
 }
 
 int main(int argc, char ** argv){
-	// tracability
-	std::cout << "*** Tripoli-4 geometry comparison ***" << endl;
-	// std::cout << "Tripoli-4 Version is $Name:  $\n" << endl;
-	// std::cout << "File Version is $Id: visutripoli4.cc,v 1.20 2016/07/26 09:09:13 dm232107 Exp $\n" << endl;
-	t4_output_stream = &cout;
-	t4_language = (T4_language) 0;
+  // tracability
+  std::cout << "*** Tripoli-4 geometry comparison ***" << endl;
+  // std::cout << "Tripoli-4 Version is $Name:  $\n" << endl;
+  // std::cout << "File Version is $Id: visutripoli4.cc,v 1.20 2016/07/26 09:09:13 dm232107 Exp $\n" << endl;
+  t4_output_stream = &cout;
+  t4_language = (T4_language) 0;
 
-	// ---- Read options ----
-	OptionsCompare options;
-	options.get_opts(argc, argv);
-	if (options.help){
-		help();
-		exit(EXIT_SUCCESS);
-	}
+  // ---- Read options ----
+  OptionsCompare options;
+  options.get_opts(argc, argv);
+  if (options.help){
+    help();
+    exit(EXIT_SUCCESS);
+  }
 
-	compare_geoms(options);
+  Statistics stats = compare_geoms(options);
+  stats.report();
 
-	return 0;
+  return 0;
 }

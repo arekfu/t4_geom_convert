@@ -10,8 +10,7 @@
 
 #include "T4Geometry.hh"
 
-T4Geometry::T4Geometry(string t4Filename){
-  this->t4Filename = t4Filename;
+T4Geometry::T4Geometry(const string& t4Filename) : t4Filename(t4Filename){
   readT4input();
 }
 
@@ -65,16 +64,28 @@ bool T4Geometry::materialInMap(string matDens){
   return (equivalenceMap.find(matDens) != equivalenceMap.end());
 }
 
-void T4Geometry::addEquivalence(string matDens, string compo){
+void T4Geometry::addEquivalence(string matDens, const string& compo){
   if (!materialInMap(matDens)){
     equivalenceMap[matDens] = compo;
   }
 }
 
-bool T4Geometry::weakEquivalence(string matDens, string compo){
+bool T4Geometry::weakEquivalence(string matDens, const string& compo){
   if (!materialInMap(matDens)){
     cerr << "ERROR : Testing weak equivalence on non-registered material" << endl;
     return false;
   }
   return (equivalenceMap[matDens] == compo);
+}
+
+string T4Geometry::getFilename(){
+  return t4Filename;
+}
+
+Volumes* const & T4Geometry::getVolumes(){
+  return volumes;
+}
+
+Compos* const & T4Geometry::getCompos(){
+  return compos;
 }
