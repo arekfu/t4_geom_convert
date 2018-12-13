@@ -1,10 +1,12 @@
-//============================================================================
-// Name        : oracle.cpp
-// Author      : J. Faustin
-// Version     :
-// Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
-//============================================================================
+/**
+ * @file oracle.cc
+ * This is the main file for the test Oracle of the converter.
+ *
+ * @brief contains the main functions of the Oracle program
+ *
+ * @author J. Faustin
+ * @version 1.0
+ */
 
 #include <iostream>
 #include <fstream>

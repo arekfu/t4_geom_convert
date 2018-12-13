@@ -1,10 +1,12 @@
-/*
-* T4Geometry.hh
-*
-*  Created on: 11 dec. 2018
-*      Author: jofausti
-*/
-
+/**
+ * @file T4Geometry.hh
+ *
+ *
+ * @brief T4Geometry class header file
+ *
+ * @author J. Faustin
+ * @version 1.0
+ */
 #ifndef T4GEOMETRY_H_
 #define T4GEOMETRY_H_
 
@@ -23,6 +25,12 @@
 
 using namespace std;
 
+/** \class T4Geometry
+ *  \brief Class for dealing with Tripoli-4 geometry
+ *
+ *  This class reads the T4 input file, retrieves the composition at a given
+ *  point and calls the weak equivalence test.
+ */
 class T4Geometry {
   Volumes* volumes;
   Compos* compos;
@@ -31,10 +39,30 @@ class T4Geometry {
 
 public:
   T4Geometry();
+
+  /**
+   *  Class constructor
+   *
+   * @param[in] t4Filename The Tripoli-4 geometry file to be checked
+   */
   T4Geometry(string t4Filename);
+
+  /**
+   *  Class destructor
+   *
+   *
+   */
   ~T4Geometry();
 
+
+  /**
+   * Reads the T4 input file and stores the volumes and compositions information.
+   *
+   *
+   */
   void readT4input();
+
+
   string getFilename(){
     return t4Filename;
   }
@@ -47,10 +75,27 @@ public:
     return compos;
   }
 
+  /**
+   * Check if the input material as already been mapped to T4 composition.
+   * @param[in] matDens An MCNP materialID-density key to be checked.
+   * @returns True if already been mapped, False otherwise.
+   */
   bool materialInMap(string matDens);
 
+  /**
+   * Adds the association MCNP materialID-density -> T4 composition.
+   *
+   *
+   */
   void addEquivalence(string matDens, string compo);
 
+  /**
+   * Checks if the weak equivalence tests is passed, i.e. if MCNP and T4 see
+   * the same material at the considered point.
+   * @param[in] matDens An MCNP materialID-density.
+   * @param[in] compo A T4 composition.
+   * @return True if the weak equivalence test passes, False otherwise.
+   */
   bool weakEquivalence(string matDens, string compo);
 
 };

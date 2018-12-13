@@ -1,28 +1,26 @@
-/*
-* T4Geometry.cc
-*
-*  Created on: 11 dec. 2018
-*      Author: jofausti
-*/
+/**
+ * @file T4Geometry.cc
+ *
+ *
+ * @brief T4Geometry class
+ *
+ * @author J. Faustin
+ * @version 1.0
+ */
 
 #include "T4Geometry.hh"
-/**
-Class constructor
 
-@param t4Filename The Tripoli-4 geometry file to be checked
-*/
 T4Geometry::T4Geometry(string t4Filename){
   this->t4Filename = t4Filename;
   readT4input();
 }
 
+
 T4Geometry::~T4Geometry() {
   // TODO Auto-generated destructor stub
 }
 
-/**
-Reads the T4 input file and stores the volumes and compositions information
-*/
+
 void T4Geometry::readT4input() {
   std::cout << "\n--- Reading : " << t4Filename << std::endl;
 

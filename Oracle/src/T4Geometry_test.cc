@@ -1,9 +1,12 @@
-/*
-* T4Geometry_test.cc
-*
-*  Created on: 11 dec. 2018
-*      Author: jofausti
-*/
+/**
+ * @file T4Geometry_test.cc
+ *
+ *
+ * @brief unit testing for the T4Geometry class
+ *
+ * @author J. Faustin
+ * @version 1.0
+ */
 
 #include "T4Geometry.hh"
 #include "MCNPGeometry.hh"

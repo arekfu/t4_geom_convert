@@ -1,19 +1,16 @@
-/*
- * MCNPGeometry.cpp
- *
- *  Created on: 7 d�c. 2018
- *      Author: jofausti
- */
+/**
+* @file MCNPGeometry.cc
+*
+*
+* @brief MCNPGeometry class
+*
+* @author J. Faustin
+* @version 1.0
+*/
 
 #include "MCNPGeometry.hh"
 #include <cctype>
 
-/**
-	Class constructor
-
-	@param ptracPath MCNP ptrac file path
-	@param inputPath MCNP inp file path
-*/
 MCNPGeometry::MCNPGeometry(string ptracPath, string inputPath) {
 	npoints = 0;
 	volumeList = {};
@@ -36,11 +33,6 @@ MCNPGeometry::~MCNPGeometry() {
 	// TODO Auto-generated destructor stub
 }
 
-/**
-    Returns the point ID number and the event ID number
-
-    @return a pair containing the point ID and event ID
- */
 pair<int, int> MCNPGeometry::readPointEvent() {
 	getline(ptracFile, currentLine);
 	istringstream iss(getCurrentLine());
@@ -49,11 +41,6 @@ pair<int, int> MCNPGeometry::readPointEvent() {
 	return {pointID, eventID};
 }
 
-/**
-    Returns the volume ID number and the material ID number
-
-    @return a pair containing the volume ID and material ID
- */
 pair<int, int> MCNPGeometry::readCellMaterial() {
 	getline(ptracFile, currentLine);
 	istringstream iss(currentLine);
@@ -62,11 +49,7 @@ pair<int, int> MCNPGeometry::readCellMaterial() {
 	return {volumeID, materialID};
 }
 
-/**
-    Returns the point coordinates (x,y,z)
 
-    @return the point coordinates as a vector of 3 floats
- */
 vector<float> MCNPGeometry::readPoint() {
 	getline(ptracFile, currentLine);
 	istringstream iss(currentLine);
@@ -75,11 +58,7 @@ vector<float> MCNPGeometry::readPoint() {
 	return {pointX, pointY, pointZ};
 }
 
-/**
-    If the maximum number of read points has not been reached: reads the next particle, event, volume, material, position in PTRAC file
 
-	@returns 1 if successful, 0 otherwise
- */
 int MCNPGeometry::readNextPtracData(int maxReadPoint) {
 	if(ptracFile && !ptracFile.eof() && getNpoints() < maxReadPoint){
 		incrementNpoints();
@@ -93,10 +72,7 @@ int MCNPGeometry::readNextPtracData(int maxReadPoint) {
 	}
 }
 
-/**
-	Reads and stores the materials density
 
- */
 void MCNPGeometry::readMaterialDensity(){
 	istringstream iss(currentLine);
 	int cellNum, matNum;
@@ -110,12 +86,7 @@ void MCNPGeometry::readMaterialDensity(){
 			iss >> density;
 			addCell2Density(cellNum, density);
 		}
-	//	to_return = 1;
 	}
-//	else{
-	//	to_return = 0;
-//	}
-//	return to_return;
 }
 
 void MCNPGeometry::addCell2Density(int key, string value){
@@ -125,12 +96,6 @@ void MCNPGeometry::addCell2Density(int key, string value){
 }
 
 
-
-/**
-    Parses the INP file, looking for the material densities
-
-	@returns
- */
 void MCNPGeometry::parseINP() {
 	if (inputFile){
 		while(getline(inputFile, currentLine)){
@@ -141,11 +106,14 @@ void MCNPGeometry::parseINP() {
 	}
 }
 
-/**
-	Determines whether we have read all the cells definition in the INP file based on blank line block separator
 
-	@returns 1 if all cells have been read, 0 otherwise
- */
+void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
+	for (int ii=0; ii<nHeaderLines; ii++){
+		getline(ptracFile, currentLine);
+	}
+}
+
+
 int MCNPGeometry::finishedReadingCells(){
 	if(getline(inputFile, currentLine)){
 		return currentLine.length() == 0;
@@ -155,24 +123,7 @@ int MCNPGeometry::finishedReadingCells(){
 	}
 }
 
-/**
-	Determines whether the current is a comment
 
-	@returns 1 if current line is a comment, 0 otherwise
- */
 int MCNPGeometry::isLineAComment(string lineContent){
 	return lineContent[0] == 'c' || lineContent[0] == 'C';
-	//size_t found = lineContent.find_first_not_of(" \t");
-	//if(found != string::npos) && (line[found])
-}
-
-/**
- 	 Sets the current line at the last header line of PTRAC file
-
-	@returns
- */
-void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
-	for (int ii=0; ii<nHeaderLines; ii++){
-		getline(ptracFile, currentLine);
-	}
 }
