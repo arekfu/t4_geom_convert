@@ -41,14 +41,14 @@ public:
   T4Geometry();
 
   /**
-   *  Class constructor
+   *  Class constructor.
    *
-   * @param[in] t4Filename The Tripoli-4 geometry file to be checked
+   * @param[in] t4Filename The Tripoli-4 geometry file to be compared.
    */
   T4Geometry(string t4Filename);
 
   /**
-   *  Class destructor
+   *  Class destructor.
    *
    *
    */

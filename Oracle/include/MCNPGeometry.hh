@@ -55,7 +55,11 @@ public:
 	*/
 	MCNPGeometry(string ptracPath, string inputPath);
 
-
+	/**
+  * Class destructor.
+  *
+  *
+  */
 	virtual ~MCNPGeometry();
 
 	/**
