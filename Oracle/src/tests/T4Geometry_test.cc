@@ -11,6 +11,8 @@
 #include "T4Geometry.hh"
 #include "MCNPGeometry.hh"
 #include "gtest/gtest.h"
+#include "volumes.hh"
+#include "anyvolumes.hh"
 
 using namespace std;
 
@@ -20,7 +22,7 @@ protected:
   static void SetUpTestCase( ){
     t4_output_stream = &cout;
     t4_language = (T4_language) 0;
-    t4Geom = new T4Geometry("../data/slab.t4");
+    t4Geom = new T4Geometry("../data/slab.t4",  1.0e-7);
   }
 
   static void TearDownTestCase(){
@@ -80,4 +82,28 @@ TEST_F(T4test, WeakEquivalenceOK)
   mcnpGeom.setCellMaterial({2001, 2});
   mcnpGeom.addCell2Density(2001, "-2.7");
   ASSERT_FALSE(t4Geom->weakEquivalence(mcnpGeom.getMaterialDensity(), compo));
+}
+
+TEST_F(T4test, DistanceToBoundary)
+{
+  vector<double> point1 = {3.0, -1.0, -0.5}; // on boundary between blue and green
+  vector<double> point1a = {3.0, -1.0, -0.5+2.0e-8}; // within margin of error
+  vector<double> point1b = {3.0, -1.0, -0.5-2.0e-8}; // within margin of error
+  vector<double> point2 = {3.0, -1.0, -1.44}; // in blue, far for boundary
+  long rank;
+
+  Volumes* volumes = t4Geom->getVolumes();
+
+  rank = volumes->which_volume(point1);
+  ASSERT_TRUE(t4Geom->isPointNearBoundary(point1, rank));
+
+  rank = volumes->which_volume(point1a);
+  ASSERT_TRUE(t4Geom->isPointNearBoundary(point1a, rank));
+
+  rank = volumes->which_volume(point1b);
+  ASSERT_TRUE(t4Geom->isPointNearBoundary(point1b, rank));
+
+  rank = volumes->which_volume(point2);
+  ASSERT_FALSE(t4Geom->isPointNearBoundary(point2, rank));
+
 }

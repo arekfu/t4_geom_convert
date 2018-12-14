@@ -33,7 +33,7 @@ using namespace std;
 int strictness_level = 3;
 
 Statistics compare_geoms(const OptionsCompare &options){
-  T4Geometry t4Geom(options.filenames[0]);
+  T4Geometry t4Geom(options.filenames[0], 0.0);
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
   std::vector<double> point;
@@ -68,8 +68,13 @@ Statistics compare_geoms(const OptionsCompare &options){
       if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
         stats.IncrementSuccess();
       }
-      else{
-        stats.IncrementFailure();
+      else {
+        if(t4Geom.isPointNearBoundary(point, rank)){
+            stats.IncrementIgnoreBoundary();
+        }
+        else{
+          stats.IncrementFailure();
+        }
       }
     }
   }

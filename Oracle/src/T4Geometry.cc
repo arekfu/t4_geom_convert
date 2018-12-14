@@ -10,7 +10,8 @@
 
 #include "T4Geometry.hh"
 
-T4Geometry::T4Geometry(const string& t4Filename) : t4Filename(t4Filename){
+T4Geometry::T4Geometry(const string& t4Filename, double delta) : t4Filename(t4Filename){
+  this->delta = delta;
   readT4input();
 }
 
@@ -88,4 +89,21 @@ Volumes* const & T4Geometry::getVolumes(){
 
 Compos* const & T4Geometry::getCompos(){
   return compos;
+}
+
+bool T4Geometry::isPointNearBoundary(const vector<double>& point, long rank){
+  double shortestDist=1.0e+10;
+  pair<double, long> result;
+  vector<vector<double> >directions = { { 0.0, 0.0, 1.0},
+                                        { 0.0, 0.0,-1.0},
+                                        { 0.0, 1.0, 0.0},
+                                        { 0.0,-1.0, 0.0},
+                                        { 1.0, 0.0, 0.0},
+                                        {-1.0, 0.0, 0.0} };
+  for(vector<vector<double> >::iterator idir=directions.begin(), edir=directions.end();
+      idir!=edir; ++idir){
+        result = volumes->next_surface_in_direction(rank, point, *idir);
+        shortestDist = min(result.first, shortestDist);
+      }
+  return shortestDist <= delta;
 }

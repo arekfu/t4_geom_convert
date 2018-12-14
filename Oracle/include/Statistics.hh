@@ -25,6 +25,7 @@ using namespace std;
 class Statistics {
   int nbSuccess;
   int nbFailure;
+  int nbIgnored;
   vector<vector<float> > failurePositions;
 
 public:
@@ -57,6 +58,12 @@ public:
   */
   void IncrementFailure();
 
+  /**
+  * Increments the number of points considered too closed to the boundary.
+  *
+  *
+  */
+  void IncrementIgnoreBoundary();
 
   /**
   * Add a new position to list of positions where the weak equivalence failed.
@@ -72,6 +79,16 @@ public:
   */
   void report();
 
+
+  /**
+  * Auxiliary method to report on successful, failed and ignored tests.
+  *
+  * @param[in] status The status of the displayed data.
+  * @param[in] data   The data to be displayed, i.e. number of tests
+  * @param[in] total  The total number of tests
+  */
+  void reportOn(string status, int data, int total);
+
   /**
   * Get the vector of failure positions.
   *
@@ -81,13 +98,13 @@ public:
     return failurePositions;
   }
 
-  int getNbSuccess(){
-    return nbSuccess;
-  }
-
-  int getNbFailure(){
-    return nbFailure;
-  }
+  // int getNbSuccess(){
+  //   return nbSuccess;
+  // }
+  //
+  // int getNbFailure(){
+  //   return nbFailure;
+  // }
 };
 
 #endif /* STATISTICS_H_ */

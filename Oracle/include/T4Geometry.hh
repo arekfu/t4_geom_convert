@@ -36,7 +36,7 @@ class T4Geometry {
   Compos* compos;
   string t4Filename;
   map<string, string> equivalenceMap;
-
+  double delta;
 public:
   T4Geometry();
 
@@ -44,8 +44,10 @@ public:
    *  Class constructor.
    *
    * @param[in] t4Filename The Tripoli-4 geometry file to be compared.
+   * @param[in] delta The distance to the closest boundary below which a mismatch
+   * is ignored.
    */
-  explicit T4Geometry(const string& t4Filename);
+  T4Geometry(const string& t4Filename, double delta);
 
   /**
    *  Class destructor.
@@ -88,6 +90,15 @@ public:
    * @return True if the weak equivalence test passes, False otherwise.
    */
   bool weakEquivalence(string matDens, const string& compo);
+
+  /**
+   * Checks if the considered point distance to the closest boundary is below
+   * a pre-defined threshold delta.
+   * @param[in] point the coordinates of the considered point.
+   * @param[in] long the volume number where the considered point is.
+   * @return True if the point distance to the boundary is too small, False otherwise.
+   */
+  bool isPointNearBoundary(const vector<double>& point, long rank);
 
 };
 

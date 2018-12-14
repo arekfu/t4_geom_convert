@@ -13,6 +13,7 @@
 Statistics::Statistics(){
   nbSuccess = 0;
   nbFailure = 0;
+  nbIgnored = 0;
 }
 
 Statistics::~Statistics(){ }
@@ -25,6 +26,10 @@ void Statistics::IncrementFailure(){
   nbFailure+=1;
 }
 
+void Statistics::IncrementIgnoreBoundary(){
+  nbIgnored+=1;
+}
+
 void Statistics::recordFailurePosition(vector<float> position){
   failurePositions.push_back(position);
 }
@@ -34,15 +39,16 @@ void Statistics::report(){
   cout << "Reporting on MCNP/T4 geometry comparison" << endl ;
   cout << "-----------------------------" << endl ;
 
-  int totalPt = nbSuccess + nbFailure;
+  int totalPt = nbSuccess + nbFailure + nbIgnored;
   cout << "Number of SAMPLED points:     " << totalPt << endl;
-  cout << "Number of SUCCESSFUL tests:  " << nbSuccess
-                                      << " -> "
-                                      << 100.*float(nbSuccess)/float(totalPt)
-                                      << "%" << endl;
+  reportOn("SUCCESSFUL", nbSuccess, totalPt);
+  reportOn("FAILED    ", nbFailure, totalPt);
+  reportOn("IGNORED   ", nbIgnored, totalPt);
+}
 
-  cout << "Number of FAILED tests:      " << nbFailure
-                                      << " -> "
-                                      << 100.*float(nbFailure)/float(totalPt)
-                                      << "%" << endl;
+void Statistics::reportOn(string status, int data, int total){
+  cout << "Number of " << status << ":  " << data
+                                          << " -> "
+                                          << 100.*float(data)/float(total)
+                                          << "%" << endl;
 }
