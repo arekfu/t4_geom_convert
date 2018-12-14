@@ -59,11 +59,11 @@ public:
   void IncrementFailure();
 
   /**
-  * Increments the number of points considered too closed to the boundary.
+  * Increments the number of points considered too closed to the next surface.
   *
   *
   */
-  void IncrementIgnoreBoundary();
+  void IncrementIgnore();
 
   /**
   * Add a new position to list of positions where the weak equivalence failed.
@@ -87,7 +87,7 @@ public:
   * @param[in] data   The data to be displayed, i.e. number of tests
   * @param[in] total  The total number of tests
   */
-  void reportOn(string status, int data, int total);
+  void reportOn(const string& status, int data, int total);
 
   /**
   * Get the vector of failure positions.
@@ -105,6 +105,14 @@ public:
   // int getNbFailure(){
   //   return nbFailure;
   // }
+
+  /**
+  * Writes out the position of the points which fail the weak equivalence test
+  * AND are too close to the next surface.
+  *
+  * @param[in] fname The output file name.
+  */
+  void writeOutForVisu(const string& fname);
 };
 
 #endif /* STATISTICS_H_ */

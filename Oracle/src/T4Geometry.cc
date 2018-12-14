@@ -91,7 +91,7 @@ Compos* const & T4Geometry::getCompos(){
   return compos;
 }
 
-bool T4Geometry::isPointNearBoundary(const vector<double>& point, long rank){
+bool T4Geometry::isPointNearSurface(const vector<double>& point, long rank){
   double shortestDist=1.0e+10;
   pair<double, long> result;
   vector<vector<double> >directions = { { 0.0, 0.0, 1.0},

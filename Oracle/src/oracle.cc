@@ -36,7 +36,7 @@ Statistics compare_geoms(const OptionsCompare &options){
   T4Geometry t4Geom(options.filenames[0], 0.0);
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
-  std::vector<double> point;
+  vector<double> point;
 
   mcnpGeom.parseINP();
   int nbSampledPts = min(options.npoints, mcnpGeom.getNPS());
@@ -69,8 +69,8 @@ Statistics compare_geoms(const OptionsCompare &options){
         stats.IncrementSuccess();
       }
       else {
-        if(t4Geom.isPointNearBoundary(point, rank)){
-            stats.IncrementIgnoreBoundary();
+        if(t4Geom.isPointNearSurface(point, rank)){
+            stats.IncrementIgnore();
         }
         else{
           stats.IncrementFailure();
@@ -99,6 +99,6 @@ int main(int argc, char ** argv){
 
   Statistics stats = compare_geoms(options);
   stats.report();
-
+  stats.writeOutForVisu("outputViz.txt");
   return 0;
 }

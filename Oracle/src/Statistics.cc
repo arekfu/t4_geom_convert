@@ -26,7 +26,7 @@ void Statistics::IncrementFailure(){
   nbFailure+=1;
 }
 
-void Statistics::IncrementIgnoreBoundary(){
+void Statistics::IncrementIgnore(){
   nbIgnored+=1;
 }
 
@@ -46,9 +46,14 @@ void Statistics::report(){
   reportOn("IGNORED   ", nbIgnored, totalPt);
 }
 
-void Statistics::reportOn(string status, int data, int total){
+void Statistics::reportOn(const string& status, int data, int total){
   cout << "Number of " << status << ":  " << data
                                           << " -> "
                                           << 100.*float(data)/float(total)
                                           << "%" << endl;
+}
+
+void Statistics::writeOutForVisu(const string& fname){
+  //TODO : implement this
+  cout << "Please implement visualization output..." << endl;
 }

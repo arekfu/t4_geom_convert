@@ -84,26 +84,26 @@ TEST_F(T4test, WeakEquivalenceOK)
   ASSERT_FALSE(t4Geom->weakEquivalence(mcnpGeom.getMaterialDensity(), compo));
 }
 
-TEST_F(T4test, DistanceToBoundary)
+TEST_F(T4test, DistanceToSurface)
 {
-  vector<double> point1 = {3.0, -1.0, -0.5}; // on boundary between blue and green
+  vector<double> point1 = {3.0, -1.0, -0.5}; // on Surface between blue and green
   vector<double> point1a = {3.0, -1.0, -0.5+2.0e-8}; // within margin of error
   vector<double> point1b = {3.0, -1.0, -0.5-2.0e-8}; // within margin of error
-  vector<double> point2 = {3.0, -1.0, -1.44}; // in blue, far for boundary
+  vector<double> point2 = {3.0, -1.0, -1.44}; // in blue, far for Surface
   long rank;
 
   Volumes* volumes = t4Geom->getVolumes();
 
   rank = volumes->which_volume(point1);
-  ASSERT_TRUE(t4Geom->isPointNearBoundary(point1, rank));
+  ASSERT_TRUE(t4Geom->isPointNearSurface(point1, rank));
 
   rank = volumes->which_volume(point1a);
-  ASSERT_TRUE(t4Geom->isPointNearBoundary(point1a, rank));
+  ASSERT_TRUE(t4Geom->isPointNearSurface(point1a, rank));
 
   rank = volumes->which_volume(point1b);
-  ASSERT_TRUE(t4Geom->isPointNearBoundary(point1b, rank));
+  ASSERT_TRUE(t4Geom->isPointNearSurface(point1b, rank));
 
   rank = volumes->which_volume(point2);
-  ASSERT_FALSE(t4Geom->isPointNearBoundary(point2, rank));
+  ASSERT_FALSE(t4Geom->isPointNearSurface(point2, rank));
 
 }

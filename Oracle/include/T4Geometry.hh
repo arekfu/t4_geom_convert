@@ -92,13 +92,13 @@ public:
   bool weakEquivalence(string matDens, const string& compo);
 
   /**
-   * Checks if the considered point distance to the closest boundary is below
+   * Checks if the considered point distance to the nearest surface is below
    * a pre-defined threshold delta.
    * @param[in] point the coordinates of the considered point.
    * @param[in] long the volume number where the considered point is.
-   * @return True if the point distance to the boundary is too small, False otherwise.
+   * @return True if the point distance to the next surface is too small, False otherwise.
    */
-  bool isPointNearBoundary(const vector<double>& point, long rank);
+  bool isPointNearSurface(const vector<double>& point, long rank);
 
 };
 
