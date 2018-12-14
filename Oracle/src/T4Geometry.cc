@@ -91,6 +91,10 @@ Compos* const & T4Geometry::getCompos(){
   return compos;
 }
 
+double T4Geometry::getDelta(){
+  return delta;
+}
+
 bool T4Geometry::isPointNearSurface(const vector<double>& point, long rank){
   double shortestDist=1.0e+10;
   pair<double, long> result;

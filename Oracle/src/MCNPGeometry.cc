@@ -119,12 +119,15 @@ void MCNPGeometry::readNPS() {
   string dummy;
   if (inputFile){
     while(getline(inputFile, currentLine)){
-      if (currentLine.find("NPS") != string::npos){
-        istringstream iss(currentLine);
-        int nps;
-        iss >> dummy >> nps;
-        this->nps = nps;
-        break;
+      if (!isLineAComment(currentLine)){
+        if (currentLine.find("NPS") != string::npos
+        || currentLine.find("nps") != string::npos){
+          istringstream iss(currentLine);
+          int nps;
+          iss >> dummy >> nps;
+          this->nps = nps;
+          break;
+        }
       }
     }
   }

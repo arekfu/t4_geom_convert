@@ -26,6 +26,7 @@ class Statistics {
   int nbSuccess;
   int nbFailure;
   int nbIgnored;
+  int nbOutside;
   vector<vector<float> > failurePositions;
 
 public:
@@ -64,6 +65,13 @@ public:
   *
   */
   void IncrementIgnore();
+
+  /**
+  * Increments the number of points found outside the geometry (rank=-1).
+  *
+  *
+  */
+  void IncrementOutside();
 
   /**
   * Add a new position to list of positions where the weak equivalence failed.

@@ -67,7 +67,8 @@ public:
   string getFilename();
   Volumes* const & getVolumes();
   Compos* const & getCompos();
-
+  double getDelta();
+  
   /**
    * Check if the input material as already been mapped to T4 composition.
    * @param[in] matDens An MCNP materialID-density key to be checked.

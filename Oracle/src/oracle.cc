@@ -33,7 +33,8 @@ using namespace std;
 int strictness_level = 3;
 
 Statistics compare_geoms(const OptionsCompare &options){
-  T4Geometry t4Geom(options.filenames[0], 0.0);
+  T4Geometry t4Geom(options.filenames[0], 1.0e-7);
+  cout << "delta is " << t4Geom.getDelta() << endl;
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
   vector<double> point;
@@ -55,25 +56,23 @@ Statistics compare_geoms(const OptionsCompare &options){
     compo = t4Geom.getCompos()->get_name_from_volume(rank);
 
     if (rank<0){
-      cout << "rank = " << rank << endl;
-      cout << "point is outside geometry" << endl;
-      exit(EXIT_FAILURE);
-    }
-
-    if (!t4Geom.materialInMap(mcnpGeom.getMaterialDensity())){
-        t4Geom.addEquivalence(mcnpGeom.getMaterialDensity(), compo);
-        stats.IncrementSuccess();
-    }
-    else{
-      if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
-        stats.IncrementSuccess();
+      stats.IncrementOutside();
+    }else{
+      if (!t4Geom.materialInMap(mcnpGeom.getMaterialDensity())){
+          t4Geom.addEquivalence(mcnpGeom.getMaterialDensity(), compo);
+          stats.IncrementSuccess();
       }
-      else {
-        if(t4Geom.isPointNearSurface(point, rank)){
-            stats.IncrementIgnore();
+      else{
+        if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
+          stats.IncrementSuccess();
         }
-        else{
-          stats.IncrementFailure();
+        else {
+          if(t4Geom.isPointNearSurface(point, rank)){
+              stats.IncrementIgnore();
+          }
+          else{
+            stats.IncrementFailure();
+          }
         }
       }
     }
