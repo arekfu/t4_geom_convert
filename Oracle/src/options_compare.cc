@@ -29,6 +29,7 @@ help()
   edit_help_option("-V, --verbose", "Increase output verbosity.");
   edit_help_option("-h, --help", "Displays this help message.");
   edit_help_option("-n, --npts", "Maximum number of tested points.");
+  edit_help_option("-d, --delta", "Distance to the nearest surface below which a failed test is ignored.");
 
   std::cout << endl;
 }
@@ -39,9 +40,9 @@ help()
 OptionsCompare::OptionsCompare() :
   help(false),
   verbosity(0),
-  npoints(1000)
+  npoints(2000000)
   {
-
+    delta = 1.0E-7;
   }
 
 /** \brief Get the options set in the command line
@@ -71,6 +72,16 @@ void OptionsCompare::get_opts(int argc, char **argv){
         if(npoints<=0) {
           std::cout << "Warning: npoints<=0. Setting npoints=100." << std::endl;
           npoints=100;
+        }
+        i+=nv;
+      } else if(opt.compare("--delta")==0 || opt.compare("-d") ==0){
+        int nv = 1;
+        check_argv(argc, i+nv);
+        istringstream os(argv[i+1]);
+        os >> delta;
+        if(delta<=0) {
+          std::cout << "Warning: delta<=0. Setting delta=1.0e-7" << std::endl;
+          delta = 1.0e-7;
         }
         i+=nv;
       } else {

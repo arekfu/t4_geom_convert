@@ -48,10 +48,10 @@ TEST_F(MCNPtestInput, AssociateMaterialDensity)
 {
   MCNPg1->parseINP();
   MCNPg1->goThroughHeaderPTRAC(8);
-  MCNPg1->readNextPtracData();
+  MCNPg1->readNextPtracData(20000);
   ASSERT_EQ(MCNPg1->getMaterialDensity(),"1-2.7");
 
-  MCNPg1->readNextPtracData();
+  MCNPg1->readNextPtracData(20000);
   ASSERT_EQ(MCNPg1->getMaterialDensity(),"2-2.7");
 }
 

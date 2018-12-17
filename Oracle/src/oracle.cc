@@ -33,14 +33,14 @@ using namespace std;
 int strictness_level = 3;
 
 Statistics compare_geoms(const OptionsCompare &options){
-  T4Geometry t4Geom(options.filenames[0], 1.0e-7);
+  T4Geometry t4Geom(options.filenames[0], options.delta);
   cout << "delta is " << t4Geom.getDelta() << endl;
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
   vector<double> point;
 
   mcnpGeom.parseINP();
-  int nbSampledPts = min(options.npoints, mcnpGeom.getNPS());
+  long nbSampledPts = min(options.npoints, mcnpGeom.getNPS());
 
   std::cout << "Starting comparison on "
             <<  nbSampledPts << " points..."
@@ -55,15 +55,37 @@ Statistics compare_geoms(const OptionsCompare &options){
     rank = t4Geom.getVolumes()->which_volume(point);
     compo = t4Geom.getCompos()->get_name_from_volume(rank);
 
+
     if (rank<0){
       stats.IncrementOutside();
     }else{
-      if (!t4Geom.materialInMap(mcnpGeom.getMaterialDensity())){
-          t4Geom.addEquivalence(mcnpGeom.getMaterialDensity(), compo);
+
+      // if(t4Geom.isPointNearSurface(point, rank)){
+      //     stats.IncrementIgnore();
+      // }else{
+      //   if (!t4Geom.materialInMap(mcnpGeom.getMaterialDensity())){
+      //       t4Geom.addEquivalence(mcnpGeom.getMaterialDensity(), compo);
+      //       stats.IncrementSuccess();
+      //   }
+      //   else{
+      //     if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
+      //       stats.IncrementSuccess();
+      //     }
+      //     else{
+      //       stats.IncrementFailure();
+      //     }
+      //   }
+      // }
+
+
+      string materialDensityKey = mcnpGeom.getMaterialDensity();
+
+      if (!t4Geom.materialInMap(materialDensityKey)){
+          t4Geom.addEquivalence(materialDensityKey, compo);
           stats.IncrementSuccess();
       }
       else{
-        if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
+        if (t4Geom.weakEquivalence(materialDensityKey, compo)){
           stats.IncrementSuccess();
         }
         else {
@@ -75,6 +97,10 @@ Statistics compare_geoms(const OptionsCompare &options){
           }
         }
       }
+
+
+
+
     }
   }
   return stats;
@@ -82,7 +108,7 @@ Statistics compare_geoms(const OptionsCompare &options){
 
 int main(int argc, char ** argv){
   // tracability
-  std::cout << "*** Tripoli-4 geometry comparison ***" << endl;
+  std::cout << "*** MCNP / Tripoli-4 geometry comparison ***" << endl;
   // std::cout << "Tripoli-4 Version is $Name:  $\n" << endl;
   // std::cout << "File Version is $Id: visutripoli4.cc,v 1.20 2016/07/26 09:09:13 dm232107 Exp $\n" << endl;
   t4_output_stream = &cout;

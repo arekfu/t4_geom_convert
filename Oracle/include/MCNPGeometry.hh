@@ -35,8 +35,8 @@ class MCNPGeometry {
   map<int, string> cell2Density;
 
   vector<int> volumeList;
-  int nPointsRead;
-  int nps;
+  long nPointsRead;
+  long nps;
   string ptracPath;
   string inputPath;
 
@@ -89,7 +89,7 @@ public:
   *
   * @returns 1 if successful, 0 otherwise.
   */
-  int readNextPtracData(int maxReadPoint=1000000000);
+  int readNextPtracData(long maxReadPoint);
 
   /**
   * Reads and stores the materials density.
@@ -160,9 +160,9 @@ public:
   ifstream& getInputFile();
   const string& getInputPath();
   void setInputPath(const string& inputPath);
-  int getNPS();
-  int getnPointsRead();
-  void setnPointsRead(int nPointsRead);
+  long getNPS();
+  long getnPointsRead();
+  void setnPointsRead(long nPointsRead);
   ifstream& getPtracFile();
   const string& getPtracPath();
   void setPtracPath(const string& ptracPath);

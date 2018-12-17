@@ -9,6 +9,11 @@
 */
 
 #include "MCNPGeometry.hh"
+#include <cstdlib>
+#include <cstdio>
+#include <unistd.h>
+#include "help.hh"
+using namespace std;
 
 MCNPGeometry::MCNPGeometry(string ptracPath, string inputPath) :
 volumeList({}), ptracPath(ptracPath), inputPath(inputPath) {
@@ -63,7 +68,7 @@ vector<double> MCNPGeometry::readPoint() {
 }
 
 
-int MCNPGeometry::readNextPtracData(int maxReadPoint) {
+int MCNPGeometry::readNextPtracData(long maxReadPoint) {
   if(ptracFile && !ptracFile.eof() && getnPointsRead() < maxReadPoint){
     incrementnPointsRead();
     setPointEvent(readPointEvent());
@@ -123,9 +128,9 @@ void MCNPGeometry::readNPS() {
         if (currentLine.find("NPS") != string::npos
         || currentLine.find("nps") != string::npos){
           istringstream iss(currentLine);
-          int nps;
+          double nps;
           iss >> dummy >> nps;
-          this->nps = nps;
+          this->nps = long(nps);          
           break;
         }
       }
@@ -171,15 +176,15 @@ void MCNPGeometry::setInputPath(const string& inputPath) {
   this->inputPath = inputPath;
 }
 
-int MCNPGeometry::getNPS(){
+long MCNPGeometry::getNPS(){
   return nps;
 }
 
-int MCNPGeometry::getnPointsRead() {
+long MCNPGeometry::getnPointsRead() {
   return nPointsRead;
 }
 
-void MCNPGeometry::setnPointsRead(int nPointsRead){
+void MCNPGeometry::setnPointsRead(long nPointsRead){
   this->nPointsRead = nPointsRead;
 }
 

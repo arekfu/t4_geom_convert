@@ -50,7 +50,7 @@ TEST_F(MCNPtestPtrac, ReadAll)
 {
   int ii=1;
   while(ii<=1000){
-    MCNPg1->readNextPtracData();
+    MCNPg1->readNextPtracData(2000);
     ii++;
   }
 
