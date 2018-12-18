@@ -17,7 +17,7 @@ public:
   MCNPGeometry *MCNPg1;
   void SetUp( ){
     // code here will execute just before the test ensues
-    MCNPg1 = new MCNPGeometry("../data/slabp", "../data/input_slab");
+    MCNPg1 = new MCNPGeometry("slabp", "input_slab");
     MCNPg1->goThroughHeaderPTRAC(8);
   }
 
@@ -26,8 +26,8 @@ public:
 
 TEST_F(MCNPtestPtrac, createObject)
 {
-  ASSERT_EQ(MCNPg1->getPtracPath(), "../data/slabp");
-  ASSERT_EQ(MCNPg1->getInputPath(), "../data/input_slab");
+  ASSERT_EQ(MCNPg1->getPtracPath(), "slabp");
+  ASSERT_EQ(MCNPg1->getInputPath(), "input_slab");
 }
 
 TEST_F(MCNPtestPtrac, ReadFirstData)

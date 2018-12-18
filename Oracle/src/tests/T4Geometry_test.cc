@@ -22,7 +22,7 @@ protected:
   static void SetUpTestCase( ){
     t4_output_stream = &cout;
     t4_language = (T4_language) 0;
-    t4Geom = new T4Geometry("../data/slab.t4",  1.0e-7);
+    t4Geom = new T4Geometry("slab.t4",  1.0e-7);
   }
 
   static void TearDownTestCase(){
@@ -36,7 +36,7 @@ T4Geometry* T4test::t4Geom = NULL;
 
 TEST_F(T4test, CreationAndCompo)
 {
-  ASSERT_EQ(t4Geom->getFilename(), "../data/slab.t4");
+  ASSERT_EQ(t4Geom->getFilename(), "slab.t4");
 
   long rank;
   string compo;
@@ -60,7 +60,7 @@ TEST_F(T4test, WeakEquivalenceNOK)
 
 TEST_F(T4test, WeakEquivalenceOK)
 {
-  MCNPGeometry mcnpGeom("../data/slabp", "../data/input_slab");
+  MCNPGeometry mcnpGeom("slabp", "input_slab");
   long rank;
   string compo;
   vector<double> point(3);

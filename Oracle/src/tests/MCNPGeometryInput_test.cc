@@ -17,7 +17,7 @@ public:
   MCNPGeometry *MCNPg1;
   void SetUp( ){
     // code here will execute just before the test ensues
-    MCNPg1 = new MCNPGeometry("../data/slabp", "../data/input_slab");
+    MCNPg1 = new MCNPGeometry("slabp", "input_slab");
   }
 
   void TearDown( ){}

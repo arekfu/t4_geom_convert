@@ -31,6 +31,7 @@ pipeline {
     SRC = "${env.WORKSPACE}/src"
     VENV = "${env.WORKSPACE}/venv"
     ORACLE_BUILD = "${env.WORKSPACE}/oracle-build"
+    DATA = "${SRC}/Oracle/data"
   }
 
   stages {
@@ -96,7 +97,8 @@ pipeline {
         echo 'Running unit tests...'
         dir("${ORACLE_BUILD}") {
           sh """
-             # insert unit tests here
+						 cp ${DATA}/* ${ORACLE_BUILD}
+						 ./tests --gtest_output=xml:gtestresults.xml
              """
 //          step([$class: 'CoberturaPublisher',
 //                autoUpdateHealth: false,
@@ -119,7 +121,7 @@ pipeline {
     failure {
         notifyTuleap(false)
     }
-//    always {
+    always {
 //      warnings(parserConfigurations: [[parserName: 'pep8', pattern: "**/flake8.out"],
 //                                      [parserName: 'pylint', pattern: "**/pylint.out"],
 //                                      [parserName: 'sphinx-build', pattern: "**/sphinx-html.out"],
@@ -138,8 +140,8 @@ pipeline {
 //                   reportFiles: 'index.html',
 //                   reportName: "Sphinx documentation"
 //      ])
-//      junit "**/pytest.xml"
-//    }
+      junit "**/gtestresults.xml"
+    }
     cleanup {
       cleanWs()
     }
