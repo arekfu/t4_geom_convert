@@ -88,10 +88,11 @@ void Statistics::reportOn(const string& status, int data, int total){
                                           << "%" << endl;
 }
 
-void Statistics::writeOutForVisu(const string& fname){
+void Statistics::writeOutForVisu(string& fname){
   T4_event_storing<failedPoint> t4_store;
-  char *cstr = new char[fname.length() + 1];
-  strcpy(cstr, fname.c_str());
+  string rawname = getRawFileName(fname);
+  rawname += ".points";
+  char* cstr = getCstrFileName(rawname);
   t4_store.initialize(cstr,
                       T4_OUTPUT,
                       ASCII,
@@ -105,4 +106,17 @@ void Statistics::writeOutForVisu(const string& fname){
   }
 
   t4_store.finalize();
+}
+
+
+string Statistics::getRawFileName(string& fname){
+  size_t lastindex = fname.find_last_of(".");
+  string rawname = fname.substr(0, lastindex);
+  return rawname;
+}
+
+char* Statistics::getCstrFileName(string& rawname){
+  char *cstr = new char[rawname.length() + 1];
+  strcpy(cstr, rawname.c_str());
+  return cstr;
 }

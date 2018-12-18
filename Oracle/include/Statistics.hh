@@ -148,9 +148,24 @@ public:
   * Writes out the position of the points which fail the weak equivalence test
   * AND are too close to the next surface.
   *
-  * @param[in] fname The output file name.
+  * @param[in] fname The input file name on which will be based the output file name.
   */
-  void writeOutForVisu(const string& fname);
+  void writeOutForVisu(string& fname);
+
+  /**
+  * Returns the raw file name, i.e. without file extension.
+  *
+  * @return The raw file name.
+  */
+  string getRawFileName(string& fname);
+
+  /**
+  * Converts the output file rawname to the file name expected by T4G
+  *
+  * @returns the file name.
+  */
+  char* getCstrFileName(string& rawname);
+
 };
 
 #endif /* STATISTICS_H_ */
