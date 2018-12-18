@@ -65,7 +65,7 @@ Statistics compare_geoms(const OptionsCompare &options){
       stats.recordCoveredRank(rank);
 
       string materialDensityKey = mcnpGeom.getMaterialDensity();
-      if (!t4Geom.materialInMap(materialDensityKey)){          
+      if (!t4Geom.materialInMap(materialDensityKey)){
           t4Geom.addEquivalence(materialDensityKey, compo);
           stats.incrementSuccess();
       }
@@ -109,7 +109,7 @@ int main(int argc, char ** argv){
 
   Statistics stats = compare_geoms(options);
   stats.report();
-  stats.writeOutForVisu("outputViz.txt");
+  stats.writeOutForVisu("data_set.points");
 
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end-start;

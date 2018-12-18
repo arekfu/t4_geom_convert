@@ -17,8 +17,7 @@
 using namespace std;
 
 struct failedPoint {
-  //array<double, 3> position;
-  vector<double> position;
+  array<double, 3> position;
   long volumeID;
 };
 
@@ -113,11 +112,11 @@ public:
   void recordFailure(vector<double> position, long rank);
 
   /**
-  * Get the vector of failure positions.
+  * Get the list of failed tests.
   *
-  * @return failurePositions
+  * @return failures
   */
-  vector<vector<double> > getFailurePositions();
+  vector<failedPoint> getFailures();
 
 
   /**
