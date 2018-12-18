@@ -36,7 +36,7 @@ TEST_F(MCNPtestInput, isComment)
 }
 
 
-TEST_F(MCNPtestInput, ReadMaterialDensity)
+TEST_F(MCNPtestInput, AssociateCell2Density)
 {
   MCNPg1->parseINP();
   ASSERT_EQ(MCNPg1->getCell2Density()[1001], "-2.7");

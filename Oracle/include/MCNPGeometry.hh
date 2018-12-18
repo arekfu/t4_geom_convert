@@ -93,10 +93,10 @@ public:
   int readNextPtracData(long maxReadPoint);
 
   /**
-  * Reads and stores the materials density.
+  * Reads and associates the current material to its density in the cell2Density map.
   *
   */
-  void readMaterialDensity();
+  void associateCell2Density();
 
   /**
    * Parses the INP file, looking for the material densities.

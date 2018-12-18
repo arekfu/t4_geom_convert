@@ -86,7 +86,7 @@ int MCNPGeometry::readNextPtracData(long maxReadPoint) {
 }
 
 
-void MCNPGeometry::readMaterialDensity(){
+void MCNPGeometry::associateCell2Density(){
   istringstream iss(currentLine);
   int cellNum;
   string density;
@@ -112,12 +112,12 @@ void MCNPGeometry::addCell2Density(int key, const string& value){
 
 void MCNPGeometry::parseINP() {
   if (inputFile){
-    while(getline(inputFile, currentLine, '\n')){
+    while(getline(inputFile, currentLine)){
       if (finishedReadingCells()){
         break;
       }
       if (!isLineAComment(currentLine) && isdigit(currentLine[0])){
-        readMaterialDensity();
+        associateCell2Density();
       }
     }
   }
