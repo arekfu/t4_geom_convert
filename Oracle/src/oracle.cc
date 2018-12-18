@@ -28,6 +28,7 @@
 #include "MCNPGeometry.hh"
 #include "T4Geometry.hh"
 #include "Statistics.hh"
+#include <chrono>
 
 using namespace std;
 int strictness_level = 3;
@@ -38,6 +39,8 @@ Statistics compare_geoms(const OptionsCompare &options){
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
   vector<double> point;
+
+  stats.setNbT4Volumes(t4Geom.getVolumes()->get_nb_vol());
 
   mcnpGeom.parseINP();
   long nbSampledPts = min(options.npoints, mcnpGeom.getNPS());
@@ -57,48 +60,29 @@ Statistics compare_geoms(const OptionsCompare &options){
 
 
     if (rank<0){
-      stats.IncrementOutside();
+      stats.incrementOutside();
     }else{
-
-      // if(t4Geom.isPointNearSurface(point, rank)){
-      //     stats.IncrementIgnore();
-      // }else{
-      //   if (!t4Geom.materialInMap(mcnpGeom.getMaterialDensity())){
-      //       t4Geom.addEquivalence(mcnpGeom.getMaterialDensity(), compo);
-      //       stats.IncrementSuccess();
-      //   }
-      //   else{
-      //     if (t4Geom.weakEquivalence(mcnpGeom.getMaterialDensity(), compo)){
-      //       stats.IncrementSuccess();
-      //     }
-      //     else{
-      //       stats.IncrementFailure();
-      //     }
-      //   }
-      // }
-
+      stats.recordCoveredRank(rank);
 
       string materialDensityKey = mcnpGeom.getMaterialDensity();
-
-      if (!t4Geom.materialInMap(materialDensityKey)){
+      if (!t4Geom.materialInMap(materialDensityKey)){          
           t4Geom.addEquivalence(materialDensityKey, compo);
-          stats.IncrementSuccess();
+          stats.incrementSuccess();
       }
       else{
         if (t4Geom.weakEquivalence(materialDensityKey, compo)){
-          stats.IncrementSuccess();
+          stats.incrementSuccess();
         }
         else {
           if(t4Geom.isPointNearSurface(point, rank)){
-              stats.IncrementIgnore();
+              stats.incrementIgnore();
           }
           else{
-            stats.IncrementFailure();
+            stats.incrementFailure();
+            stats.recordFailure(point, rank);
           }
         }
       }
-
-
 
 
     }
@@ -108,6 +92,7 @@ Statistics compare_geoms(const OptionsCompare &options){
 
 int main(int argc, char ** argv){
   // tracability
+  auto start = std::chrono::system_clock::now();
   std::cout << "*** MCNP / Tripoli-4 geometry comparison ***" << endl;
   // std::cout << "Tripoli-4 Version is $Name:  $\n" << endl;
   // std::cout << "File Version is $Id: visutripoli4.cc,v 1.20 2016/07/26 09:09:13 dm232107 Exp $\n" << endl;
@@ -125,5 +110,10 @@ int main(int argc, char ** argv){
   Statistics stats = compare_geoms(options);
   stats.report();
   stats.writeOutForVisu("outputViz.txt");
+
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::cout << "Elapsed time: " << elapsed_seconds.count() << "s\n";
+  std::cout << "Time per point: "<< elapsed_seconds.count()/stats.getTotalPts() << "s\n";
   return 0;
 }

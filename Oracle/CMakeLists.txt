@@ -7,130 +7,21 @@ message(STATUS "********** OracleMCNPT4 ********** ")
 # Path for cmake files shipped with the project
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
+include(LibUtils)
+include(FindMEDFile)
+include(DetectOS)
+
+set(CMAKE_CXX_STANDARD 11)
 find_package(T4 REQUIRED)
 
-# helper function to define imported libraries
-function(define_imported_target TARGET_NAME)
-  if(TARGET ${TARGET_NAME})
-    return()
-  endif()
-
-  cmake_parse_arguments(TARGET
-    ""
-    "VERSION"
-    "INCLUDE_DIRS;COMPILE_DEFINITIONS;COMPILE_OPTIONS;LINK_LIBRARIES"
-    ${ARGN})
-
-  # create the library
-  add_library(${TARGET_NAME} INTERFACE IMPORTED)
-
-  message(STATUS "${TARGET_NAME} dependency found:")
-  if(TARGET_VERSION)
-    message(STATUS "  ... version: ${TARGET_VERSION}")
-  endif()
-  if(TARGET_INCLUDE_DIRS)
-    message(STATUS "  ... include dirs: ${TARGET_INCLUDE_DIRS}")
-    set_target_properties(${TARGET_NAME}
-      PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${TARGET_INCLUDE_DIRS}"
-      INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${TARGET_INCLUDE_DIRS}"
-      )
-  endif()
-  if(TARGET_COMPILE_DEFINITIONS)
-    message(STATUS "  ... definitions: ${TARGET_COMPILE_DEFINITIONS}")
-    set_target_properties(${TARGET_NAME}
-      PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${TARGET_COMPILE_DEFINITIONS}"
-      )
-  endif()
-  if(TARGET_COMPILE_OPTIONS)
-    message(STATUS "  ... compile options: ${TARGET_COMPILE_OPTIONS}")
-    set_target_properties(${TARGET_NAME}
-      PROPERTIES INTERFACE_COMPILE_OPTIONS "${TARGET_COMPILE_OPTIONS}"
-      )
-  endif()
-  if(TARGET_LINK_LIBRARIES)
-    message(STATUS "  ... link libraries: ${TARGET_LINK_LIBRARIES}")
-    set_target_properties(${TARGET_NAME}
-      PROPERTIES INTERFACE_LINK_LIBRARIES "${TARGET_LINK_LIBRARIES}"
-      )
-  endif()
-endfunction()
-
-function(import_ROOT_library VAR)
-  # try in Config mode first
-  find_package(ROOT ${ARGN}
-    QUIET
-    HINTS "$ENV{ROOTSYS}/cmake")
-  if(NOT ROOT_FOUND)
-    # fall back to module mode if necessary
-    if(EXISTS $ENV{ROOTSYS})
-      list(APPEND CMAKE_MODULE_PATH "$ENV{ROOTSYS}/etc/cmake")
-    endif()
-
-    find_package(ROOT ${ROOT_VERSION_REQUIRED} ${ARGN})
-  endif()
-  if(ROOT_FOUND)
-    mark_as_advanced(ROOT_DIR)
-  else()
-    return()
-  endif()
-
-  message(STATUS "ROOT_CXX_FLAGS: ${ROOT_CXX_FLAGS}")
-  message(STATUS "ROOT_DEFINITIONS: ${ROOT_DEFINITIONS}")
-  # extract the real macro definitions from the list
-  separate_arguments(ROOT_DEFINITIONS)
-  string(REGEX MATCHALL "(^|;)-D[^;]*" ROOT_DEFINITIONS "${ROOT_DEFINITIONS}")
-  string(REGEX REPLACE "(^|;)-D" "\\1" ROOT_DEFINITIONS "${ROOT_DEFINITIONS}")
-  string(REGEX REPLACE " +" " " ROOT_CXX_FLAGS "${ROOT_CXX_FLAGS}")
-  string(REGEX REPLACE "^ +" "" ROOT_CXX_FLAGS "${ROOT_CXX_FLAGS}")
-  separate_arguments(ROOT_CXX_FLAGS)
-
-  if(ROOT_rootcint_CMD)
-    set(ROOTCINT_EXECUTABLE ${ROOT_rootcint_CMD} CACHE FILEPATH "Path to the rootcint executable" FORCE)
-  elseif(ROOT_EXECUTABLE)
-    set(ROOTCINT_EXECUTABLE ${ROOTCINT_EXECUTABLE} CACHE FILEPATH "Path to the rootcint executable" FORCE)
-  endif()
-  mark_as_advanced(ROOTCINT_EXECUTABLE)
-
-  if(ROOT_FOUND)
-    define_imported_target(ROOT
-      VERSION "${ROOT_VERSION}"
-      INCLUDE_DIRS "${ROOT_INCLUDE_DIRS}"
-      COMPILE_DEFINITIONS "HAS_ROOT;${ROOT_DEFINITIONS}"
-      COMPILE_OPTIONS "${ROOT_CXX_FLAGS}"
-      LINK_LIBRARIES "${ROOT_LIBRARIES}"
-      )
-    message(STATUS "  ... rootcint: ${ROOTCINT_EXECUTABLE}")
-  else()
-    message(STATUS "ROOT: not found")
-  endif()
-  set(${VAR} ${ROOT_FOUND} PARENT_SCOPE)
-endfunction()
-
-function(import_dl_library VAR)
-  cmake_parse_arguments(T4 "REQUIRED" "" "" ${ARGN})
-
-  find_library(DL_LIB dl)
-  if(NOT DL_LIB)
-    if(T4_REQUIRED)
-      message(FATAL_ERROR "libdl was required, but could not be found")
-    else()
-      message(WARNING "libdl was required, but could not be found")
-    endif()
-  endif()
-
-  if(DL_LIB)
-    define_imported_target(DL
-      COMPILE_DEFINITIONS "HAS_DL"
-      LINK_LIBRARIES "${DL_LIB}"
-      )
-    set(${VAR} TRUE PARENT_SCOPE)
-  else()
-    message(STATUS "dl: not found")
-    set(${VAR} FALSE PARENT_SCOPE)
-  endif()
-
-endfunction()
+# LAPACK/BLAS
+import_LAPACK_library(LAPACK_FOUND REQUIRED)
+# MEDFile
+set(HDF5_VERSION_REQUIRED 1.8.14)
+set(MEDFile_VERSION_REQUIRED 3.2.0)
+import_MEDFile23_library(MEDFile23_FOUND REQUIRED)
+# Boost
+import_Boost_library(Boost_FOUND REQUIRED)
 
 
 function(compilation_info TARGET)
@@ -207,6 +98,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
+
 ###############
 # executables #
 ###############
@@ -218,7 +110,7 @@ file(GLOB oracle_SRC "src/*.cc")
 add_executable(oracle ${oracle_SRC})
 target_include_directories(oracle PUBLIC "${ORACLE_INCLUDE_DIR}")
 target_compile_options(oracle PUBLIC -Wall -Wextra -pedantic -Wuninitialized)
-target_link_libraries(oracle visutripoli4 t4random t4core)
+target_link_libraries(oracle visutripoli4 t4core t4)
 compilation_info(oracle)
 
 file(GLOB test_SRC "src/tests/*.cc")
@@ -226,5 +118,5 @@ file(GLOB test_SRC "src/tests/*.cc")
 add_executable(tests ${test_SRC} src/Statistics.cc src/T4Geometry.cc src/MCNPGeometry.cc)
 target_include_directories(tests PUBLIC "${ORACLE_INCLUDE_DIR}")
 target_compile_options(tests PUBLIC -Wall -Wextra -pedantic -Wuninitialized )
-target_link_libraries(tests visutripoli4 t4random t4core gtest_main)
+target_link_libraries(tests visutripoli4 t4core t4 gtest_main)
 compilation_info(tests)

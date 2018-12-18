@@ -22,12 +22,13 @@ public:
   void TearDown( ){}
 };
 
-TEST_F(StatisticsTest, addPosition)
+TEST_F(StatisticsTest, addFailed)
 {
-  vector<float> position = {0.0, 0.0, 0.0};
-  vector<vector<float> > failures = Stats->getFailurePositions();
-  ASSERT_FALSE(std::find(failures.begin(), failures.end(), position) != failures.end());
-  Stats->recordFailurePosition(position);
-  failures = Stats->getFailurePositions();
-  ASSERT_TRUE(std::find(failures.begin(), failures.end(), position) != failures.end());
+  vector<double> position = {0.0, 0.0, 0.0};
+  vector<vector<double> > failPos = Stats->getFailurePositions();
+  ASSERT_FALSE(std::find(failPos.begin(), failPos.end(), position) != failPos.end());
+
+  Stats->recordFailure(position, 3);
+  failPos = Stats->getFailurePositions();
+  ASSERT_TRUE(std::find(failPos.begin(), failPos.end(), position) != failPos.end());
 }

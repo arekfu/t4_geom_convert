@@ -13,13 +13,19 @@
 
 #include <iostream>
 #include <vector>
-
+#include <array>
 using namespace std;
+
+struct failedPoint {
+  //array<double, 3> position;
+  vector<double> position;
+  long volumeID;
+};
 
 /** \class Statistics.
 *  \brief Class for dealing with comparison statistics.
 *
-*  This class records the comparison sucesses and fails, the points of failure
+*  This class records the comparison sucesses and failures, the points of failure
 *  and write report and output data file.
 */
 class Statistics {
@@ -27,7 +33,10 @@ class Statistics {
   int nbFailure;
   int nbIgnored;
   int nbOutside;
-  vector<vector<float> > failurePositions;
+  long nbT4Volumes;
+  vector<long> coveredRanks;
+  vector<failedPoint> failures;
+
 
 public:
 
@@ -50,35 +59,66 @@ public:
   *
   *
   */
-  void IncrementSuccess();
+  void incrementSuccess();
 
   /**
   * Increments the number of failure.
   *
   *
   */
-  void IncrementFailure();
+  void incrementFailure();
 
   /**
   * Increments the number of points considered too closed to the next surface.
   *
   *
   */
-  void IncrementIgnore();
+  void incrementIgnore();
 
   /**
   * Increments the number of points found outside the geometry (rank=-1).
   *
   *
   */
-  void IncrementOutside();
+  void incrementOutside();
 
   /**
-  * Add a new position to list of positions where the weak equivalence failed.
+  * Gets the total number of investigated points.
+  *
+  * @returns the sum of sum of successes, failures,
+  * ignore and outside points.
+  */
+  int getTotalPts();
+
+  /**
+  * If the rank is being explored for the first time, add it to the list of covered ranks.
+  *
+  * @param[in] rank The volume ID to be added to the list.
+  */
+  void recordCoveredRank(long rank);
+
+  /**
+  * Sets the number of volumes defined in T4 input file.
   *
   *
   */
-  void recordFailurePosition(vector<float> position);
+  void setNbT4Volumes(long nbVolumes);
+
+  /**
+  * Add a new failed test info to the list of failed weak equivalence tests.
+  *
+  * @param[in] position The position of the point where the test failedPoint.
+  * @param[in] rank The volumeID where this point is located according to T4.
+  */
+  void recordFailure(vector<double> position, long rank);
+
+  /**
+  * Get the vector of failure positions.
+  *
+  * @return failurePositions
+  */
+  vector<vector<double> > getFailurePositions();
+
 
   /**
   * Reports in the terminal the comparison statistics
@@ -96,15 +136,6 @@ public:
   * @param[in] total  The total number of tests
   */
   void reportOn(const string& status, int data, int total);
-
-  /**
-  * Get the vector of failure positions.
-  *
-  * @return failurePositions
-  */
-  vector<vector<float> >& getFailurePositions(){
-    return failurePositions;
-  }
 
   // int getNbSuccess(){
   //   return nbSuccess;

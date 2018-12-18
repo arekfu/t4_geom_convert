@@ -1,0 +1,1 @@
+cppcheck --cppcheck-build-dir=checks --enable=all --config-exclude=src/tests  -I include --output-file=report.txt src

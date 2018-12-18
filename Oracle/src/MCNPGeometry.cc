@@ -22,6 +22,7 @@ volumeList({}), ptracPath(ptracPath), inputPath(inputPath) {
   cellID = -1;
   nps = -1;
   materialID = -1;
+  nbDataCellMaterialLine = 0;
   nPointsRead = 0;
 
 
@@ -53,8 +54,11 @@ pair<int, int> MCNPGeometry::readPointEvent() {
 pair<int, int> MCNPGeometry::readCellMaterial() {
   getline(ptracFile, currentLine);
   istringstream iss(currentLine);
-  int dummy1, dummy2, dummy3, dummy4, volumeID, materialID;
-  iss >> dummy1 >> dummy2 >> dummy3 >> dummy4 >> volumeID >> materialID;
+  int dummy, volumeID, materialID;
+  for (int ii=1; ii<=nbDataCellMaterialLine-2; ii++){
+    iss >> dummy;
+  }
+  iss >> volumeID >> materialID;
   return {volumeID, materialID};
 }
 
@@ -130,7 +134,7 @@ void MCNPGeometry::readNPS() {
           istringstream iss(currentLine);
           double nps;
           iss >> dummy >> nps;
-          this->nps = long(nps);          
+          this->nps = long(nps);
           break;
         }
       }
@@ -139,8 +143,13 @@ void MCNPGeometry::readNPS() {
 }
 
 void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
+  int dummy;
   for (int ii=0; ii<nHeaderLines; ii++){
     getline(ptracFile, currentLine);
+    if (ii==5){
+      istringstream iss(currentLine);
+      iss >> dummy >> nbDataCellMaterialLine;
+    }
   }
 }
 

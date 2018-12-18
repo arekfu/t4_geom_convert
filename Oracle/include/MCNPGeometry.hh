@@ -35,6 +35,7 @@ class MCNPGeometry {
   map<int, string> cell2Density;
 
   vector<int> volumeList;
+  int nbDataCellMaterialLine;
   long nPointsRead;
   long nps;
   string ptracPath;
@@ -112,7 +113,8 @@ public:
   void readNPS();
 
   /**
-   * Sets the current line at the last header line of PTRAC file.
+   * Reads the header lines. Gets the number of data expected on 2nd line of each
+   * particle event. Sets the current line at the last header line of PTRAC file.
    *
    * @param[in] nHeaderLines The number of header lines in the PTRAC file.
    */
