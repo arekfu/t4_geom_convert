@@ -150,16 +150,39 @@ void MCNPGeometry::readNPS() {
 }
 
 void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
-  int dummy;
+  istringstream *issLine5, *issLine6;
   for (int ii=0; ii<nHeaderLines; ii++){
     getline(ptracFile, currentLine);
     if (ii==5){
-      istringstream iss(currentLine);
-      iss >> dummy >> nbDataCellMaterialLine;
+      issLine5 = new istringstream(currentLine);
+    }
+    if (ii==6){
+      issLine6 = new istringstream(currentLine);
     }
   }
+  int nbData = getDataFromLine5Ptrac(issLine5);
+  checkDataFromLine6Ptrac(issLine6, nbData);
 }
 
+int MCNPGeometry::getDataFromLine5Ptrac(istringstream *iss){
+  int nbDataPointEventLine;
+  *iss >> nbDataPointEventLine >> nbDataCellMaterialLine;
+  int nbData = nbDataPointEventLine+nbDataCellMaterialLine;
+  return nbData;
+}
+
+void MCNPGeometry::checkDataFromLine6Ptrac(istringstream *iss, int nbData){
+  vector<int> data(nbData);
+  int cellIDPtracCode = 17;
+  int materialIDPtracCode = 18;
+  for (int jj=0; jj<nbData; jj++){
+    *iss >> data[jj];
+  }
+  if ((data[nbData-2]!=cellIDPtracCode) && (data[nbData-1]!=materialIDPtracCode)){
+    cerr << "PTRAC file format not suitable. Please see Oracle/data/slapb file for example..." << endl;
+    exit(EXIT_FAILURE);
+  }
+}
 
 int MCNPGeometry::finishedReading(){
   return currentLine.length() == 1 || currentLine.empty();

@@ -50,6 +50,7 @@ Statistics compare_geoms(const OptionsCompare &options){
     cout << "delta is " << t4Geom.getDelta() << endl;
   }
 
+  // The number of header lines must be 8 !!
   mcnpGeom.goThroughHeaderPTRAC(8);
 
   while (mcnpGeom.readNextPtracData(maxSampledPts)) {

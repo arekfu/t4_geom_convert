@@ -113,12 +113,33 @@ public:
   void readNPS();
 
   /**
-   * Reads the header lines. Gets the number of data expected on 2nd line of each
-   * particle event. Sets the current line at the last header line of PTRAC file.
+   * Reads the header lines. Sets the current line at the last header line of PTRAC file.
    *
    * @param[in] nHeaderLines The number of header lines in the PTRAC file.
    */
   void goThroughHeaderPTRAC(int nHeaderLines);
+
+  /**
+  * Gets the number of data expected on 2nd line of each particle event data block.
+  * If the PTRAC has the correct format, this information is found in the 5th
+  * header line.
+  *
+  * @param[in] *iss The pointer to the stringstream constructed from header line.
+  * @return the number of integer data stored on the 2nd of each particle event
+  * data block.
+  */
+  int getDataFromLine5Ptrac(istringstream *iss);
+
+  /**
+  * Checks that the 2nd line of each particle event data block does contain the
+  * cell ID and the material ID. These information are respectively identified as
+  * 17 and 18 by the PTRAC writer. The program exits if it is not the case.
+  *
+  * @param[in] iss The pointer to the stringstream constructed from header line.
+  * @param[in] nbData The number of data expected on 2nd line of each particle
+  * event data block (given by getDataFromLine5Ptrac function).
+  */
+  void checkDataFromLine6Ptrac(istringstream *iss, int nbData);
 
   /**
    * Increments the number of points read so far.
