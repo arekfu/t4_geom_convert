@@ -24,19 +24,26 @@ public:
 
 TEST_F(StatisticsTest, addFailed)
 {
-  vector<double> position = {0.0, 0.0, 0.0};
-  array<double, 3> pos = {0.0, 0.0, 0.0};
-  failedPoint fail;
-  fail.position = pos;
-  //fail.volumeID = 3;
+  vector<double> position = {1.0, 2.5, 4.0};
+  array<double, 3> pos = {1.0, 2.5, 4.0};
+  failedPoint fail{pos,
+                  double(1),
+                  double(4),
+                  double(2),
+                  pos[0],
+                  3.0};
   vector<failedPoint> failures = Stats->getFailures();
   ASSERT_EQ(failures.size(), 0);
 
-  Stats->recordFailure(position, 3);
+  Stats->recordFailure(position, 3.0, 1, 4, 2);
   failures = Stats->getFailures();
   ASSERT_EQ(failures.size(), 1);
   ASSERT_EQ(failures[0].position[0], fail.position[0]);
   ASSERT_EQ(failures[0].position[1], fail.position[1]);
   ASSERT_EQ(failures[0].position[2], fail.position[2]);
-  //ASSERT_EQ(failures[0].volumeID, fail.volumeID);
+  ASSERT_EQ(failures[0].mcnpParticleID, fail.mcnpParticleID);
+  ASSERT_EQ(failures[0].mcnpCellID, fail.mcnpCellID);
+  ASSERT_EQ(failures[0].mcnpMaterialID, fail.mcnpMaterialID);
+  ASSERT_EQ(failures[0].color, fail.color);
+  ASSERT_EQ(failures[0].rank, fail.rank);
 }

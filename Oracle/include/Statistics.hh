@@ -22,7 +22,11 @@ using namespace std;
 */
 struct failedPoint {
   array<double, 3> position;
-  //long volumeID;
+  double mcnpParticleID;
+  double mcnpCellID;
+  double mcnpMaterialID;
+  double color;
+  double rank;
 };
 
 /** \class Statistics.
@@ -111,9 +115,12 @@ public:
   * Add a new failed test info to the list of failed weak equivalence tests.
   *
   * @param[in] position The position of the point where the test failedPoint.
-  * @param[in] rank The volumeID where this point is located according to T4.
+  * @param[in] rank The volume number where this point is located according to T4.
+  * @param[in] pointID The point number as listed by MCNP in the PTRAC file
+  * @param[in] cellID The volume number where the point is located according to MCNP.
+  * @param[in] materialID The material number where the point is located according to MCNP.
   */
-  void recordFailure(vector<double> position, long rank);
+  void recordFailure(vector<double> position, long rank, int pointID, int cellID, int materialID);
 
   /**
   * Get the list of failed tests.
@@ -156,12 +163,7 @@ public:
   */
   string getRawFileName(string& fname);
 
-  /**
-  * Converts the output file rawname to the file name expected by T4G
-  *
-  * @returns the file name.
-  */
-  char* getCstrFileName(string& rawname);
+  void writePointsFile(string& rawname);
 
 };
 

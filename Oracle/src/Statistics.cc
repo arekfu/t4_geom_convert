@@ -55,10 +55,13 @@ void Statistics::setNbT4Volumes(long nbVolumes){
   nbT4Volumes = nbVolumes;
 }
 
-void Statistics::recordFailure(vector<double> position, long rank){
-  failedPoint failed;
-  failed.position = {position[0], position[1], position[2]};
-  //failed.volumeID = rank;
+void Statistics::recordFailure(vector<double> position, long rank, int pointID, int cellID, int materialID){
+  failedPoint failed{{position[0], position[1], position[2]},
+                      double(pointID),
+                      double(cellID),
+                      double(materialID),
+                      position[0],
+                      double(rank)};
   failures.push_back(failed);
 }
 
@@ -91,21 +94,25 @@ void Statistics::reportOn(const string& status, int data, int total){
 void Statistics::writeOutForVisu(string& fname){
   T4_event_storing<failedPoint> t4_store;
   string rawname = getRawFileName(fname);
-  rawname += ".points";
-  char* cstr = getCstrFileName(rawname);
-  t4_store.initialize(cstr,
+  string datFile = rawname+".failedpoints.dat";
+  t4_store.initialize(const_cast<char*>(datFile.c_str()),
                       T4_OUTPUT,
                       ASCII,
                       T4_TYPE_DOUBLE, "x",
                       T4_TYPE_DOUBLE, "y",
                       T4_TYPE_DOUBLE, "z",
-//                      T4_TYPE_INT, "rank",.
+                      T4_TYPE_DOUBLE, "pointID",
+                      T4_TYPE_DOUBLE, "cellID",
+                      T4_TYPE_DOUBLE, "materialID",
+                      T4_TYPE_DOUBLE, "color",
+                      T4_TYPE_DOUBLE, "rank",
                       T4_NO_TYPE);
-  t4_store.write_header_dx();
+
   for (int iFail=0; iFail<nbFailure; iFail++){
     t4_store.store(&failures[iFail]);
   }
-
+  t4_store.write_header_dx();
+  writePointsFile(rawname);
   t4_store.finalize();
 }
 
@@ -116,8 +123,8 @@ string Statistics::getRawFileName(string& fname){
   return rawname;
 }
 
-char* Statistics::getCstrFileName(string& rawname){
-  char *cstr = new char[rawname.length() + 1];
-  strcpy(cstr, rawname.c_str());
-  return cstr;
+void Statistics::writePointsFile(string& rawname){
+  ofstream fout(rawname+".points");
+  fout << "name " << rawname+".failedpoints.general\n";
+  fout.close();
 }

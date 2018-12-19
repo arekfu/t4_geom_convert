@@ -80,8 +80,11 @@ Statistics compare_geoms(const OptionsCompare &options){
               stats.incrementIgnore();
           }
           else{
+            int pID = mcnpGeom.getPointID();
+            int cID = mcnpGeom.getCellID();
+            int mID = mcnpGeom.getMaterialID();
             stats.incrementFailure();
-            stats.recordFailure(point, rank);
+            stats.recordFailure(point, rank, pID, cID, mID);
             if (options.verbosity>0){
               cout << "Failed tests at position: " << endl
                    << "x = " << point[0] << endl
