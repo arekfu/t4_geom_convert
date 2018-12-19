@@ -23,19 +23,16 @@
 #include "composfromgeom.hh"
 #include "t4coreglob.hh"
 #include "t4convert.hh"
-#include "t4sobol.hh"
-#include "t4random.hh"
 #include "MCNPGeometry.hh"
 #include "T4Geometry.hh"
 #include "Statistics.hh"
 #include <chrono>
 
 using namespace std;
-int strictness_level = 3;
+int strictness_level = 3;  //Global variable required by T4 libraries
 
 Statistics compare_geoms(const OptionsCompare &options){
   T4Geometry t4Geom(options.filenames[0], options.delta);
-  cout << "delta is " << t4Geom.getDelta() << endl;
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
   vector<double> point;
@@ -43,14 +40,19 @@ Statistics compare_geoms(const OptionsCompare &options){
   stats.setNbT4Volumes(t4Geom.getVolumes()->get_nb_vol());
 
   mcnpGeom.parseINP();
-  long nbSampledPts = min(options.npoints, mcnpGeom.getNPS());
+  long maxSampledPts = min(options.npoints, mcnpGeom.getNPS());
 
   std::cout << "Starting comparison on "
-            <<  nbSampledPts << " points..."
+            <<  maxSampledPts << " points..."
             << std::endl;
+
+  if(options.verbosity>0){
+    cout << "delta is " << t4Geom.getDelta() << endl;
+  }
+
   mcnpGeom.goThroughHeaderPTRAC(8);
 
-  while (mcnpGeom.readNextPtracData(nbSampledPts)) {
+  while (mcnpGeom.readNextPtracData(maxSampledPts)) {
     long rank;
     std::string compo;
 
@@ -80,22 +82,26 @@ Statistics compare_geoms(const OptionsCompare &options){
           else{
             stats.incrementFailure();
             stats.recordFailure(point, rank);
+            if (options.verbosity>0){
+              cout << "Failed tests at position: " << endl
+                   << "x = " << point[0] << endl
+                   << "y = " << point[1] << endl
+                   << "z = " << point[2] << endl;
+              cout << "T4 rank: " << rank << "   T4 compo: " << compo << endl;
+              cout << "MCNP cellID: " << mcnpGeom.getCellID() <<
+                      "   MCNP compo: " << materialDensityKey << endl;
+            }
           }
         }
       }
-
-
     }
   }
   return stats;
 }
 
 int main(int argc, char ** argv){
-  // tracability
   auto start = std::chrono::system_clock::now();
   std::cout << "*** MCNP / Tripoli-4 geometry comparison ***" << endl;
-  // std::cout << "Tripoli-4 Version is $Name:  $\n" << endl;
-  // std::cout << "File Version is $Id: visutripoli4.cc,v 1.20 2016/07/26 09:09:13 dm232107 Exp $\n" << endl;
   t4_output_stream = &cout;
   t4_language = (T4_language) 0;
 

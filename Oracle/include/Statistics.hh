@@ -16,15 +16,19 @@
 #include <array>
 using namespace std;
 
+/**
+* A structure to represent the points where the weak equivalence test failed.
+*
+*/
 struct failedPoint {
   array<double, 3> position;
-  long volumeID;
+  //long volumeID;
 };
 
 /** \class Statistics.
 *  \brief Class for dealing with comparison statistics.
 *
-*  This class records the comparison sucesses and failures, the points of failure
+*  This class records the successful and failed comparisons, the points of failure
 *  and write report and output data file.
 */
 class Statistics {
@@ -84,8 +88,8 @@ public:
   /**
   * Gets the total number of investigated points.
   *
-  * @returns the sum of sum of successes, failures,
-  * ignore and outside points.
+  * @returns the sum of successful, failed,
+  * ignored and outside points.
   */
   int getTotalPts();
 
@@ -136,13 +140,6 @@ public:
   */
   void reportOn(const string& status, int data, int total);
 
-  // int getNbSuccess(){
-  //   return nbSuccess;
-  // }
-  //
-  // int getNbFailure(){
-  //   return nbFailure;
-  // }
 
   /**
   * Writes out the position of the points which fail the weak equivalence test

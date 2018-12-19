@@ -58,7 +58,7 @@ void Statistics::setNbT4Volumes(long nbVolumes){
 void Statistics::recordFailure(vector<double> position, long rank){
   failedPoint failed;
   failed.position = {position[0], position[1], position[2]};
-  failed.volumeID = rank;
+  //failed.volumeID = rank;
   failures.push_back(failed);
 }
 
@@ -99,6 +99,7 @@ void Statistics::writeOutForVisu(string& fname){
                       T4_TYPE_DOUBLE, "x",
                       T4_TYPE_DOUBLE, "y",
                       T4_TYPE_DOUBLE, "z",
+//                      T4_TYPE_INT, "rank",.
                       T4_NO_TYPE);
   t4_store.write_header_dx();
   for (int iFail=0; iFail<nbFailure; iFail++){

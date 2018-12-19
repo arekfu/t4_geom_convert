@@ -36,7 +36,7 @@ class MCNPGeometry {
 
   vector<int> volumeList;
   int nbDataCellMaterialLine;
-  long nPointsRead;
+  long nbPointsRead;
   long nps;
   string ptracPath;
   string inputPath;
@@ -125,7 +125,7 @@ public:
    *
    *
    */
-   void incrementnPointsRead();
+   void incrementNbPointsRead();
 
 
   /**
@@ -142,14 +142,15 @@ public:
    */
    string getMaterialDensity();
 
+   void getNextLine();
+
   /**
-   * Determines whether we have read all the cells definition in the INP file
-   * based on blank line block separator.
+   * Determines whether we have read the whole block data in the
    * Caution : blank line separator is identified as string of length 1...
    *
-   * @returns 1 if all cells have been read, 0 otherwise
+   * @returns 1 if the whole block data has been read, 0 otherwise
    */
-  int finishedReadingCells();
+  int finishedReading();
 
   /**
    * Determines whether the current is a comment
@@ -163,8 +164,7 @@ public:
   const string& getInputPath();
   void setInputPath(const string& inputPath);
   long getNPS();
-  long getnPointsRead();
-  void setnPointsRead(long nPointsRead);
+  long getNbPointsRead();
   ifstream& getPtracFile();
   const string& getPtracPath();
   void setPtracPath(const string& ptracPath);

@@ -32,14 +32,17 @@ TEST_F(MCNPtestPtrac, createObject)
 
 TEST_F(MCNPtestPtrac, ReadFirstData)
 {
+  MCNPg1->getNextLine();
   pair<int, int> pointEvent = MCNPg1->readPointEvent();
   ASSERT_EQ(pointEvent.first,1);
   ASSERT_EQ(pointEvent.second,1000);
 
+  MCNPg1->getNextLine();
   pair<int, int> cellMaterial = MCNPg1->readCellMaterial();
   ASSERT_EQ(cellMaterial.first,3001);
   ASSERT_EQ(cellMaterial.second,1);
 
+  MCNPg1->getNextLine();
   vector<double> pointCoords = MCNPg1->readPoint();
   ASSERT_DOUBLE_EQ(pointCoords[0], 12.024);
   ASSERT_DOUBLE_EQ(pointCoords[1], -72.882);
@@ -64,5 +67,5 @@ TEST_F(MCNPtestPtrac, ReadAll)
   ASSERT_DOUBLE_EQ(MCNPg1->getPointXyz()[1], 18.880);
   ASSERT_DOUBLE_EQ(MCNPg1->getPointXyz()[2], -1.2856);
 
-  ASSERT_EQ(MCNPg1->getnPointsRead(), 1000);
+  ASSERT_EQ(MCNPg1->getNbPointsRead(), 1000);
 }

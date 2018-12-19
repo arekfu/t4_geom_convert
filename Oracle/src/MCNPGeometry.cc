@@ -23,7 +23,7 @@ volumeList({}), ptracPath(ptracPath), inputPath(inputPath) {
   nps = -1;
   materialID = -1;
   nbDataCellMaterialLine = 0;
-  nPointsRead = 0;
+  nbPointsRead = 0;
 
 
   ptracFile.open(ptracPath);
@@ -44,15 +44,13 @@ MCNPGeometry::~MCNPGeometry() {
 }
 
 pair<int, int> MCNPGeometry::readPointEvent() {
-  getline(ptracFile, currentLine);
-  istringstream iss(getCurrentLine());
+  istringstream iss(currentLine);
   int pointID, eventID;
   iss >> pointID >> eventID;
   return {pointID, eventID};
 }
 
 pair<int, int> MCNPGeometry::readCellMaterial() {
-  getline(ptracFile, currentLine);
   istringstream iss(currentLine);
   int dummy, volumeID, materialID;
   for (int ii=1; ii<=nbDataCellMaterialLine-2; ii++){
@@ -64,7 +62,6 @@ pair<int, int> MCNPGeometry::readCellMaterial() {
 
 
 vector<double> MCNPGeometry::readPoint() {
-  getline(ptracFile, currentLine);
   istringstream iss(currentLine);
   double pointX, pointY, pointZ;
   iss >> pointX >> pointY >> pointZ;
@@ -73,12 +70,22 @@ vector<double> MCNPGeometry::readPoint() {
 
 
 int MCNPGeometry::readNextPtracData(long maxReadPoint) {
-  if(ptracFile && !ptracFile.eof() && getnPointsRead() < maxReadPoint){
-    incrementnPointsRead();
-    setPointEvent(readPointEvent());
-    setCellMaterial(readCellMaterial());
-    setPointXyz(readPoint());
-    return 1;
+  if ((ptracFile && !ptracFile.eof()) && (getNbPointsRead() <= maxReadPoint)){
+    getline(ptracFile, currentLine);
+    if (!finishedReading()){
+      setPointEvent(readPointEvent());
+
+      getline(ptracFile, currentLine);
+      setCellMaterial(readCellMaterial());
+
+      getline(ptracFile, currentLine);
+      setPointXyz(readPoint());
+      incrementNbPointsRead();
+      return 1;
+    }
+    else{
+      return 0;
+    }
   }
   else{
     return 0;
@@ -113,7 +120,7 @@ void MCNPGeometry::addCell2Density(int key, const string& value){
 void MCNPGeometry::parseINP() {
   if (inputFile){
     while(getline(inputFile, currentLine)){
-      if (finishedReadingCells()){
+      if (finishedReading()){
         break;
       }
       if (!isLineAComment(currentLine) && isdigit(currentLine[0])){
@@ -154,7 +161,7 @@ void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
 }
 
 
-int MCNPGeometry::finishedReadingCells(){
+int MCNPGeometry::finishedReading(){
   return currentLine.length() == 1 || currentLine.empty();
 }
 
@@ -163,8 +170,8 @@ int MCNPGeometry::isLineAComment(string lineContent){
   return lineContent[0] == 'c' || lineContent[0] == 'C';
 }
 
-void MCNPGeometry::incrementnPointsRead(){
-  setnPointsRead(nPointsRead+1);
+void MCNPGeometry::incrementNbPointsRead(){
+  nbPointsRead+=1;
 }
 
 string MCNPGeometry::getMaterialDensity(){
@@ -189,12 +196,8 @@ long MCNPGeometry::getNPS(){
   return nps;
 }
 
-long MCNPGeometry::getnPointsRead() {
-  return nPointsRead;
-}
-
-void MCNPGeometry::setnPointsRead(long nPointsRead){
-  this->nPointsRead = nPointsRead;
+long MCNPGeometry::getNbPointsRead() {
+  return nbPointsRead;
 }
 
 const string& MCNPGeometry::getPtracPath() {
@@ -241,4 +244,8 @@ void MCNPGeometry::setCellMaterial(const pair<int, int>& cellMat) {
 
 map<int, string>& MCNPGeometry::getCell2Density(){
   return cell2Density;
+}
+
+void MCNPGeometry::getNextLine(){
+  getline(ptracFile, currentLine);
 }
