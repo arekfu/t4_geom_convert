@@ -1,0 +1,6 @@
+AlwaysBreakAfterReturnType: AllDefinitions
+BreakBeforeBraces: Linux
+BreakConstructorInitializers: AfterColon
+PointerAlignment: Right
+PenaltyBreakComment: 10000
+ColumnLimit: 0
