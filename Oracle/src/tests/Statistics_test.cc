@@ -19,7 +19,9 @@ public:
     Stats = new Statistics();
   }
 
-  void TearDown( ){}
+  void TearDown( ){
+    delete Stats;
+  }
 };
 
 TEST_F(StatisticsTest, addFailed)
@@ -27,11 +29,11 @@ TEST_F(StatisticsTest, addFailed)
   vector<double> position = {1.0, 2.5, 4.0};
   array<double, 3> pos = {1.0, 2.5, 4.0};
   failedPoint fail{pos,
-                  double(1),
-                  double(4),
-                  double(2),
-                  pos[0],
-                  3.0};
+                   1,
+                   4,
+                   2,
+                   pos[0],
+                   3};
   vector<failedPoint> failures = Stats->getFailures();
   ASSERT_EQ(failures.size(), 0);
 

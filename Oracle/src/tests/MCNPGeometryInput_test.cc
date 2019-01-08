@@ -20,7 +20,9 @@ public:
     MCNPg1 = new MCNPGeometry("slabp", "input_slab");
   }
 
-  void TearDown( ){}
+  void TearDown( ){
+    delete MCNPg1;
+  }
 };
 
 TEST_F(MCNPtestInput, isComment)

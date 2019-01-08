@@ -23,8 +23,6 @@
 #include "t4sobol.hh"
 #include "t4random.hh"
 
-using namespace std;
-
 /** \class T4Geometry
  *  \brief Class for dealing with Tripoli-4 geometry
  *
@@ -32,10 +30,11 @@ using namespace std;
  *  point and calls the weak equivalence test.
  */
 class T4Geometry {
+  static const std::vector<std::vector<double> > directions;
   Volumes* volumes;
   Compos* compos;
-  string t4Filename;
-  map<string, string> equivalenceMap;
+  std::string t4Filename;
+  std::map<std::string, std::string> equivalenceMap;
   double delta;
 public:
   T4Geometry();
@@ -47,7 +46,7 @@ public:
    * @param[in] delta The distance to the closest boundary below which a mismatch
    * is ignored.
    */
-  T4Geometry(const string& t4Filename, double delta);
+  T4Geometry(const std::string& t4Filename, double delta);
 
   /**
    *  Class destructor.
@@ -64,24 +63,24 @@ public:
    */
   void readT4input();
 
-  string getFilename();
+  std::string getFilename();
   Volumes* const & getVolumes();
   Compos* const & getCompos();
   double getDelta();
-  
+
   /**
    * Check if the input material as already been mapped to T4 composition.
    * @param[in] matDens An MCNP materialID-density key to be checked.
    * @returns True if already been mapped, False otherwise.
    */
-  bool materialInMap(string matDens);
+  bool materialInMap(const std::string& matDens);
 
   /**
    * Adds the association MCNP materialID-density -> T4 composition.
    *
    *
    */
-   void addEquivalence(string matDens, const string& compo);
+   void addEquivalence(const std::string& matDens, const std::string& compo);
 
   /**
    * Checks if the weak equivalence tests is passed, i.e. if MCNP and T4 see
@@ -90,7 +89,7 @@ public:
    * @param[in] compo A T4 composition.
    * @return True if the weak equivalence test passes, False otherwise.
    */
-  bool weakEquivalence(string matDens, const string& compo);
+  bool weakEquivalence(const std::string& matDens, const std::string& compo);
 
   /**
    * Checks if the considered point distance to the nearest surface is below
@@ -99,7 +98,7 @@ public:
    * @param[in] long the volume number where the considered point is.
    * @return True if the point distance to the next surface is too small, False otherwise.
    */
-  bool isPointNearSurface(const vector<double>& point, long rank);
+  bool isPointNearSurface(const std::vector<double>& point, long rank);
 
 };
 

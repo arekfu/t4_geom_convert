@@ -17,8 +17,6 @@
 #include <sstream>
 #include <map>
 
-using namespace std;
-
 /** \class MCNPGeometry.
  *  \brief Class for dealing with MCNP geometry.
  *
@@ -30,23 +28,21 @@ class MCNPGeometry {
   int eventID;
   int cellID;
   int materialID;
-  vector<double> pointXYZ;
+  std::vector<double> pointXYZ;
 
-  map<int, string> cell2Density;
+  std::map<int, std::string> cell2Density;
 
-  vector<int> volumeList;
+  std::vector<int> volumeList;
   int nbDataCellMaterialLine;
   long nbPointsRead;
   long nps;
-  string ptracPath;
-  string inputPath;
+  std::string ptracPath;
+  std::string inputPath;
 
-  ifstream ptracFile;
-  ifstream inputFile;
-  string currentLine;
+  std::ifstream ptracFile;
+  std::ifstream inputFile;
+  std::string currentLine;
 public:
-
-  MCNPGeometry();
 
   /**
   * Class constructor.
@@ -54,43 +50,36 @@ public:
   * @param[in] ptracPath MCNP ptrac file path.
   * @param[in] inputPath MCNP inp file path.
   */
-  MCNPGeometry(string ptracPath, string inputPath);
-
-  /**
-  * Class destructor.
-  *
-  *
-  */
-  virtual ~MCNPGeometry();
+  MCNPGeometry(const std::string& ptracPath, const std::string& inputPath);
 
   /**
   * Reads the point ID number and the event ID number.
   *
   * @return A pair containing the point ID and event ID.
   */
-  pair<int, int> readPointEvent();
+  std::pair<int, int> readPointEvent();
 
   /**
   * Reads the cell ID number and the material ID number.
   *
   * @return a pair containing the volume ID and material ID.
   */
-  pair<int, int> readCellMaterial();
+  std::pair<int, int> readCellMaterial();
 
   /**
   * Reads the point coordinates (x,y,z).
   *
   * @return the point coordinates as a vector of 3 doubles.
   */
-  vector<double> readPoint();
+  std::vector<double> readPoint();
 
   /**
   * If the maximum number of read points has not been reached: reads the next
   * particle, event, volume, material, position in PTRAC file.
   *
-  * @returns 1 if successful, 0 otherwise.
+  * @returns true if successful, false otherwise.
   */
-  int readNextPtracData(long maxReadPoint);
+  bool readNextPtracData(long maxReadPoint);
 
   /**
   * Reads and associates the current material to its density in the cell2Density map.
@@ -124,22 +113,22 @@ public:
   * If the PTRAC has the correct format, this information is found in the 5th
   * header line.
   *
-  * @param[in] *iss The pointer to the stringstream constructed from header line.
+  * @param[in] line5 The string containing the data of the 5th header line.
   * @return the number of integer data stored on the 2nd of each particle event
   * data block.
   */
-  int getDataFromLine5Ptrac(istringstream *iss);
+  int getDataFromLine5Ptrac(const std::string& line5);
 
   /**
   * Checks that the 2nd line of each particle event data block does contain the
   * cell ID and the material ID. These information are respectively identified as
   * 17 and 18 by the PTRAC writer. The program exits if it is not the case.
   *
-  * @param[in] iss The pointer to the stringstream constructed from header line.
+  * @param[in] line6 The string containing the data of the 6th header line.
   * @param[in] nbData The number of data expected on 2nd line of each particle
   * event data block (given by getDataFromLine5Ptrac function).
   */
-  void checkDataFromLine6Ptrac(istringstream *iss, int nbData);
+  void checkDataFromLine6Ptrac(const std::string& line6, int nbData);
 
   /**
    * Increments the number of points read so far.
@@ -154,24 +143,24 @@ public:
    *
    *
    */
-  void addCell2Density(int key, const string& value);
+  void addCell2Density(int key, const std::string& value);
 
   /**
    * Gives the association material ID - material density.
    *
    * @return the association as a string: materialID-density.
    */
-   string getMaterialDensity();
+   std::string getMaterialDensity();
 
    void getNextLine();
 
   /**
-   * Determines whether we have read the whole block data in the
+   * Determines whether we have read the whole block data in the input file.
    * Caution : blank line separator is identified as string of length 1...
    *
-   * @returns 1 if the whole block data has been read, 0 otherwise
+   * @returns true if the whole block data has been read, false otherwise
    */
-  int finishedReading();
+  bool finishedReading();
 
   /**
    * Determines whether the current is a comment
@@ -179,29 +168,26 @@ public:
    *
    * @returns 1 if current line is a comment, 0 otherwise
    */
-  int isLineAComment(string lineContent);
+  int isLineAComment(std::string lineContent);
 
-  ifstream& getInputFile();
-  const string& getInputPath();
-  void setInputPath(const string& inputPath);
+  const std::string& getInputPath();
   long getNPS();
   long getNbPointsRead();
-  ifstream& getPtracFile();
-  const string& getPtracPath();
-  void setPtracPath(const string& ptracPath);
-  const vector<int>& getVolumeList();
-  void setVolumeList(const vector<int>& volumeList);
-  string getCurrentLine();
-  int setCurrentLine(ifstream& inFile);
+  std::ifstream& getPtracFile();
+  const std::string& getPtracPath();
+  void setPtracPath(const std::string& ptracPath);
+  const std::vector<int>& getVolumeList();
+  void setVolumeList(const std::vector<int>& volumeList);
+  int setCurrentLine(std::ifstream& inFile);
   int getPointID();
   int getEventID();
-  void setPointEvent(const pair<int, int>& pointEvent);
-  vector<double> getPointXyz();
-  void setPointXyz(const vector<double>& pointXyz);
+  void setPointEvent(const std::pair<int, int>& pointEvent);
+  std::vector<double> getPointXyz();
+  void setPointXyz(const std::vector<double>& pointXyz);
   int getCellID();
   int getMaterialID();
-  void setCellMaterial(const pair<int, int>& cellMat);
-  map<int, string>& getCell2Density();
+  void setCellMaterial(const std::pair<int, int>& cellMat);
+  std::map<int, std::string>& getCell2Density();
 
 };
 

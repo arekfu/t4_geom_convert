@@ -14,19 +14,19 @@
 #include <iostream>
 #include <vector>
 #include <array>
-using namespace std;
+#include <set>
 
 /**
 * A structure to represent the points where the weak equivalence test failed.
 *
 */
 struct failedPoint {
-  array<double, 3> position;
-  double mcnpParticleID;
-  double mcnpCellID;
-  double mcnpMaterialID;
+  std::array<double, 3> position;
+  int mcnpParticleID;
+  int mcnpCellID;
+  int mcnpMaterialID;
   double color;
-  double rank;
+  int rank;
 };
 
 /** \class Statistics.
@@ -41,8 +41,8 @@ class Statistics {
   int nbIgnored;
   int nbOutside;
   long nbT4Volumes;
-  vector<long> coveredRanks;
-  vector<failedPoint> failures;
+  std::set<long> coveredRanks;
+  std::vector<failedPoint> failures;
 
 
 public:
@@ -53,13 +53,6 @@ public:
   *
   */
   Statistics();
-
-  /**
-  * Class destructor.
-  *
-  *
-  */
-  virtual ~Statistics();
 
   /**
   * Increments the number of success.
@@ -98,7 +91,8 @@ public:
   int getTotalPts();
 
   /**
-  * If the rank is being explored for the first time, add it to the list of covered ranks.
+  * Insert the rank being explored to set of covered ranked (if it is part of the set,
+  * set.insert() does nothing).
   *
   * @param[in] rank The volume ID to be added to the list.
   */
@@ -120,14 +114,14 @@ public:
   * @param[in] cellID The volume number where the point is located according to MCNP.
   * @param[in] materialID The material number where the point is located according to MCNP.
   */
-  void recordFailure(vector<double> position, long rank, int pointID, int cellID, int materialID);
+  void recordFailure(std::vector<double> position, long rank, int pointID, int cellID, int materialID);
 
   /**
   * Get the list of failed tests.
   *
   * @return failures
   */
-  vector<failedPoint> getFailures();
+  std::vector<failedPoint> getFailures();
 
 
   /**
@@ -145,7 +139,7 @@ public:
   * @param[in] data   The data to be displayed, i.e. number of tests
   * @param[in] total  The total number of tests
   */
-  void reportOn(const string& status, int data, int total);
+  void reportOn(const std::string& status, int data, int total);
 
 
   /**
@@ -154,16 +148,16 @@ public:
   *
   * @param[in] fname The input file name on which will be based the output file name.
   */
-  void writeOutForVisu(string& fname);
+  void writeOutForVisu(std::string& fname);
 
   /**
   * Returns the raw file name, i.e. without file extension.
   *
   * @return The raw file name.
   */
-  string getRawFileName(string& fname);
+  std::string getRawFileName(std::string& fname);
 
-  void writePointsFile(string& rawname);
+  void writePointsFile(std::string& rawname);
 
 };
 

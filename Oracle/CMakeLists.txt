@@ -105,17 +105,13 @@ endif()
 # set include directory
 set(ORACLE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
-file(GLOB oracle_SRC "src/*.cc")
-
-add_executable(oracle ${oracle_SRC})
+add_executable(oracle src/Statistics.cc src/options_compare.cc src/MCNPGeometry.cc src/T4Geometry.cc src/oracle.cc)
 target_include_directories(oracle PUBLIC "${ORACLE_INCLUDE_DIR}")
 target_compile_options(oracle PUBLIC -Wall -Wextra -pedantic -Wuninitialized)
 target_link_libraries(oracle visutripoli4 t4core t4)
 compilation_info(oracle)
 
-file(GLOB test_SRC "src/tests/*.cc")
-
-add_executable(tests ${test_SRC} src/Statistics.cc src/T4Geometry.cc src/MCNPGeometry.cc)
+add_executable(tests src/tests/AllTests.cc src/tests/MCNPGeometryInput_test.cc src/tests/MCNPGeometryPtrac_test.cc src/tests/T4Geometry_test.cc src/tests/Statistics_test.cc src/Statistics.cc src/T4Geometry.cc src/MCNPGeometry.cc)
 target_include_directories(tests PUBLIC "${ORACLE_INCLUDE_DIR}")
 target_compile_options(tests PUBLIC -Wall -Wextra -pedantic -Wuninitialized )
 target_link_libraries(tests visutripoli4 t4core t4 gtest_main)

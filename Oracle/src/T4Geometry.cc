@@ -10,15 +10,23 @@
 
 #include "T4Geometry.hh"
 
-T4Geometry::T4Geometry(const string& t4Filename, double delta) : t4Filename(t4Filename){
-  this->delta = delta;
+using namespace std;
+
+const vector<vector<double> > T4Geometry::directions = {{ 0.0, 0.0, 1.0},
+                                                        { 0.0, 0.0,-1.0},
+                                                        { 0.0, 1.0, 0.0},
+                                                        { 0.0,-1.0, 0.0},
+                                                        { 1.0, 0.0, 0.0},
+                                                        {-1.0, 0.0, 0.0}};
+
+T4Geometry::T4Geometry(const string& t4Filename, double delta) :
+  t4Filename(t4Filename),
+  delta(delta){
   readT4input();
 }
 
 
-T4Geometry::~T4Geometry() {
-  // TODO Auto-generated destructor stub
-}
+T4Geometry::~T4Geometry() { }
 
 
 void T4Geometry::readT4input() {
@@ -61,17 +69,15 @@ void T4Geometry::readT4input() {
   this->compos->read(c_tmpfilename);
 }
 
-bool T4Geometry::materialInMap(string matDens){
+bool T4Geometry::materialInMap(const string& matDens){
   return (equivalenceMap.find(matDens) != equivalenceMap.end());
 }
 
-void T4Geometry::addEquivalence(string matDens, const string& compo){
-  if (!materialInMap(matDens)){
-    equivalenceMap[matDens] = compo;
-  }
+void T4Geometry::addEquivalence(const string& matDens, const string& compo){
+  equivalenceMap.insert(std::pair<string, string>(matDens,compo));
 }
 
-bool T4Geometry::weakEquivalence(string matDens, const string& compo){
+bool T4Geometry::weakEquivalence(const string& matDens, const string& compo){
   if (!materialInMap(matDens)){
     cerr << "ERROR : Testing weak equivalence on non-registered material" << endl;
     return false;
@@ -98,15 +104,8 @@ double T4Geometry::getDelta(){
 bool T4Geometry::isPointNearSurface(const vector<double>& point, long rank){
   double shortestDist=1.0e+10;
   pair<double, long> result;
-  vector<vector<double> >directions = { { 0.0, 0.0, 1.0},
-                                        { 0.0, 0.0,-1.0},
-                                        { 0.0, 1.0, 0.0},
-                                        { 0.0,-1.0, 0.0},
-                                        { 1.0, 0.0, 0.0},
-                                        {-1.0, 0.0, 0.0} };
-  for(vector<vector<double> >::iterator idir=directions.begin(), edir=directions.end();
-      idir!=edir; ++idir){
-        result = volumes->next_surface_in_direction(rank, point, *idir);
+  for(auto const &idir: T4Geometry::directions) {
+        result = volumes->next_surface_in_direction(rank, point, idir);
         shortestDist = min(result.first, shortestDist);
       }
   return shortestDist <= delta;

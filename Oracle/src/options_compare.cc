@@ -40,10 +40,9 @@ help()
 OptionsCompare::OptionsCompare() :
   help(false),
   verbosity(0),
-  npoints(2000000)
-  {
-    delta = 1.0E-7;
-  }
+  npoints(2000000),
+  delta(1.0E-7)
+  { }
 
 /** \brief Get the options set in the command line
  * @param[in] argc The number of arguments in the command line
@@ -52,7 +51,6 @@ OptionsCompare::OptionsCompare() :
 void OptionsCompare::get_opts(int argc, char **argv){
 
   if(argc<=3){
-    // not allowed
     help = true;
     return;
   } else {

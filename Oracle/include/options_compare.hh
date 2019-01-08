@@ -4,8 +4,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-
 void
 help();
 
@@ -17,11 +15,11 @@ enum SamplingMethod { SobolSampling, RandomSampling };
 */
 class OptionsCompare {
   public:
-    vector<string>      filenames;
-    bool                help;
-    int                 verbosity;
-    long                 npoints;
-    double              delta;
+    std::vector<std::string> filenames;
+    bool                     help;
+    int                      verbosity;
+    long                     npoints;
+    double                   delta;
 
     OptionsCompare();
     void get_opts(int, char **);

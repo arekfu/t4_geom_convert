@@ -35,7 +35,6 @@ Statistics compare_geoms(const OptionsCompare &options){
   T4Geometry t4Geom(options.filenames[0], options.delta);
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
-  vector<double> point;
 
   stats.setNbT4Volumes(t4Geom.getVolumes()->get_nb_vol());
 
@@ -54,12 +53,10 @@ Statistics compare_geoms(const OptionsCompare &options){
   mcnpGeom.goThroughHeaderPTRAC(8);
 
   while (mcnpGeom.readNextPtracData(maxSampledPts)) {
-    long rank;
-    std::string compo;
 
-    point = mcnpGeom.getPointXyz();
-    rank = t4Geom.getVolumes()->which_volume(point);
-    compo = t4Geom.getCompos()->get_name_from_volume(rank);
+    vector<double> point = mcnpGeom.getPointXyz();
+    long rank = t4Geom.getVolumes()->which_volume(point);
+    std::string compo = t4Geom.getCompos()->get_name_from_volume(rank);
 
 
     if (rank<0){

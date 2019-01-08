@@ -15,6 +15,9 @@
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
+
+using namespace std;
+
 Statistics::Statistics(){
   nbSuccess = 0;
   nbFailure = 0;
@@ -23,22 +26,20 @@ Statistics::Statistics(){
   nbT4Volumes = 0;
 }
 
-Statistics::~Statistics(){ }
-
 void Statistics::incrementSuccess(){
-  nbSuccess+=1;
+  ++nbSuccess;
 }
 
 void Statistics::incrementFailure(){
-  nbFailure+=1;
+  ++nbFailure;
 }
 
 void Statistics::incrementIgnore(){
-  nbIgnored+=1;
+  ++nbIgnored;
 }
 
 void Statistics::incrementOutside(){
-  nbOutside+=1;
+  ++nbOutside;
 }
 
 int Statistics::getTotalPts(){
@@ -46,9 +47,7 @@ int Statistics::getTotalPts(){
 }
 
 void Statistics::recordCoveredRank(long rank){
-  if (std::find(coveredRanks.begin(), coveredRanks.end(),rank)==coveredRanks.end()){
-    coveredRanks.push_back(rank);
-  }
+  coveredRanks.insert(rank);
 }
 
 void Statistics::setNbT4Volumes(long nbVolumes){
@@ -57,11 +56,11 @@ void Statistics::setNbT4Volumes(long nbVolumes){
 
 void Statistics::recordFailure(vector<double> position, long rank, int pointID, int cellID, int materialID){
   failedPoint failed{{position[0], position[1], position[2]},
-                      double(pointID),
-                      double(cellID),
-                      double(materialID),
+                      pointID,
+                      cellID,
+                      materialID,
                       position[0],
-                      double(rank)};
+                      int(rank)};
   failures.push_back(failed);
 }
 
@@ -101,11 +100,11 @@ void Statistics::writeOutForVisu(string& fname){
                       T4_TYPE_DOUBLE, "x",
                       T4_TYPE_DOUBLE, "y",
                       T4_TYPE_DOUBLE, "z",
-                      T4_TYPE_DOUBLE, "pointID",
-                      T4_TYPE_DOUBLE, "cellID",
-                      T4_TYPE_DOUBLE, "materialID",
+                      T4_TYPE_INT, "pointID",
+                      T4_TYPE_INT, "cellID",
+                      T4_TYPE_INT, "materialID",
                       T4_TYPE_DOUBLE, "color",
-                      T4_TYPE_DOUBLE, "rank",
+                      T4_TYPE_INT, "rank",
                       T4_NO_TYPE);
 
   for (int iFail=0; iFail<nbFailure; iFail++){

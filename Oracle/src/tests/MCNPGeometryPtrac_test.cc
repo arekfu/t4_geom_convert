@@ -21,7 +21,9 @@ public:
     MCNPg1->goThroughHeaderPTRAC(8);
   }
 
-  void TearDown( ){}
+  void TearDown( ){
+    delete MCNPg1;
+  }
 };
 
 TEST_F(MCNPtestPtrac, createObject)

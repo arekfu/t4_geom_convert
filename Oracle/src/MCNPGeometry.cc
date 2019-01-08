@@ -13,34 +13,30 @@
 #include <cstdio>
 #include <unistd.h>
 #include "help.hh"
+
 using namespace std;
 
-MCNPGeometry::MCNPGeometry(string ptracPath, string inputPath) :
-volumeList({}), ptracPath(ptracPath), inputPath(inputPath) {
-  pointID = -1;
-  eventID = -1;
-  cellID = -1;
-  nps = -1;
-  materialID = -1;
-  nbDataCellMaterialLine = 0;
-  nbPointsRead = 0;
-
-
-  ptracFile.open(ptracPath);
+MCNPGeometry::MCNPGeometry(const string& ptracPath, const string& inputPath) :
+  pointID(1),
+  eventID(1),
+  cellID(1),
+  materialID(1),
+  nbDataCellMaterialLine(0),
+  nbPointsRead(0),
+  nps(-1),
+  ptracPath(ptracPath),
+  inputPath(inputPath),
+  ptracFile(ptracPath),
+  inputFile(inputPath)
+{
   if(ptracFile.fail()){
-    cerr << "PTRAC file not found." << endl;
+    std::cerr << "PTRAC file not found." << endl;
     exit(EXIT_FAILURE);
   }
-  inputFile.open(inputPath);
   if(inputFile.fail()){
-    cerr << "INP file not found." << endl;
+    std::cerr << "INP file not found." << endl;
     exit(EXIT_FAILURE);
   }
-}
-
-MCNPGeometry::~MCNPGeometry() {
-  ptracFile.close();
-  inputFile.close();
 }
 
 pair<int, int> MCNPGeometry::readPointEvent() {
@@ -69,7 +65,7 @@ vector<double> MCNPGeometry::readPoint() {
 }
 
 
-int MCNPGeometry::readNextPtracData(long maxReadPoint) {
+bool MCNPGeometry::readNextPtracData(long maxReadPoint) {
   if ((ptracFile && !ptracFile.eof()) && (getNbPointsRead() <= maxReadPoint)){
     getline(ptracFile, currentLine);
     if (!finishedReading()){
@@ -81,14 +77,14 @@ int MCNPGeometry::readNextPtracData(long maxReadPoint) {
       getline(ptracFile, currentLine);
       setPointXyz(readPoint());
       incrementNbPointsRead();
-      return 1;
+      return true;
     }
     else{
-      return 0;
+      return false;
     }
   }
   else{
-    return 0;
+    return false;
   }
 }
 
@@ -105,6 +101,15 @@ void MCNPGeometry::associateCell2Density(){
     }
     else{
       iss >> density;
+      istringstream istest(density);
+      double fdensity;
+      istest >> fdensity;
+      if (istest.fail()){
+        std::cerr << "WRONG DENSITY / CELL Definition" << endl;
+        std::cerr << density << endl;
+        std::cerr << currentLine << endl;
+        exit(EXIT_FAILURE);
+      }
       addCell2Density(cellNum, density);
     }
   }
@@ -113,6 +118,10 @@ void MCNPGeometry::associateCell2Density(){
 void MCNPGeometry::addCell2Density(int key, const string& value){
   if (cell2Density.find(key) == cell2Density.end()){
     cell2Density[key] = value;
+  }
+  else{
+    std::cerr << "This cellID " << key << " already appeared in the MCNP input file." << endl;
+    std::cerr << "Check MCNP input file for errors..." << endl;
   }
 }
 
@@ -135,56 +144,59 @@ void MCNPGeometry::readNPS() {
   string dummy;
   if (inputFile){
     while(getline(inputFile, currentLine)){
-      if (!isLineAComment(currentLine)){
-        if (currentLine.find("NPS") != string::npos
-        || currentLine.find("nps") != string::npos){
-          istringstream iss(currentLine);
-          double nps;
-          iss >> dummy >> nps;
-          this->nps = long(nps);
-          break;
-        }
+      if (isLineAComment(currentLine)){
+        continue;
+      }
+      if (currentLine.find("NPS") != string::npos
+      || currentLine.find("nps") != string::npos){
+        istringstream iss(currentLine);
+        double nps;
+        iss >> dummy >> nps;
+        this->nps = long(nps);
+        break;
       }
     }
   }
 }
 
 void MCNPGeometry::goThroughHeaderPTRAC(int nHeaderLines){
-  istringstream *issLine5, *issLine6;
+  string line5, line6;
   for (int ii=0; ii<nHeaderLines; ii++){
     getline(ptracFile, currentLine);
     if (ii==5){
-      issLine5 = new istringstream(currentLine);
+      line5 = currentLine;
     }
     if (ii==6){
-      issLine6 = new istringstream(currentLine);
+      line6 = currentLine;
     }
   }
-  int nbData = getDataFromLine5Ptrac(issLine5);
-  checkDataFromLine6Ptrac(issLine6, nbData);
+  int nbData = getDataFromLine5Ptrac(line5);
+  checkDataFromLine6Ptrac(line6, nbData);
 }
 
-int MCNPGeometry::getDataFromLine5Ptrac(istringstream *iss){
+int MCNPGeometry::getDataFromLine5Ptrac(const string& line5){
   int nbDataPointEventLine;
-  *iss >> nbDataPointEventLine >> nbDataCellMaterialLine;
+  istringstream iss(line5);
+  iss >> nbDataPointEventLine >> nbDataCellMaterialLine;
   int nbData = nbDataPointEventLine+nbDataCellMaterialLine;
   return nbData;
 }
 
-void MCNPGeometry::checkDataFromLine6Ptrac(istringstream *iss, int nbData){
+void MCNPGeometry::checkDataFromLine6Ptrac(const string& line6, int nbData){
   vector<int> data(nbData);
-  int cellIDPtracCode = 17;
-  int materialIDPtracCode = 18;
+  const int cellIDPtracCode = 17;
+  const int materialIDPtracCode = 18;
+  istringstream iss(line6);
   for (int jj=0; jj<nbData; jj++){
-    *iss >> data[jj];
+    iss >> data[jj];
   }
   if ((data[nbData-2]!=cellIDPtracCode) && (data[nbData-1]!=materialIDPtracCode)){
-    cerr << "PTRAC file format not suitable. Please see Oracle/data/slapb file for example..." << endl;
+    std::cerr << "PTRAC file format not suitable. Please see Oracle/data/slapb file for example..." << endl;
     exit(EXIT_FAILURE);
   }
 }
 
-int MCNPGeometry::finishedReading(){
+bool MCNPGeometry::finishedReading(){
   return currentLine.length() == 1 || currentLine.empty();
 }
 
@@ -194,7 +206,7 @@ int MCNPGeometry::isLineAComment(string lineContent){
 }
 
 void MCNPGeometry::incrementNbPointsRead(){
-  nbPointsRead+=1;
+  ++nbPointsRead;
 }
 
 string MCNPGeometry::getMaterialDensity(){
@@ -202,17 +214,8 @@ string MCNPGeometry::getMaterialDensity(){
   return (to_string(materialID)+density);
 }
 
-
-ifstream& MCNPGeometry::getInputFile() {
-  return inputFile;
-}
-
 const string& MCNPGeometry::getInputPath(){
   return inputPath;
-}
-
-void MCNPGeometry::setInputPath(const string& inputPath) {
-  this->inputPath = inputPath;
 }
 
 long MCNPGeometry::getNPS(){
@@ -225,10 +228,6 @@ long MCNPGeometry::getNbPointsRead() {
 
 const string& MCNPGeometry::getPtracPath() {
   return ptracPath;
-}
-
-string MCNPGeometry::getCurrentLine(){
-  return currentLine;
 }
 
 int MCNPGeometry::getPointID() {

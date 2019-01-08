@@ -14,8 +14,6 @@
 #include "volumes.hh"
 #include "anyvolumes.hh"
 
-using namespace std;
-
 class T4test : public ::testing::Test {
 
 protected:
@@ -27,22 +25,20 @@ protected:
 
   static void TearDownTestCase(){
     delete t4Geom;
-    t4Geom = NULL;
+    t4Geom = nullptr;
   }
   static T4Geometry* t4Geom;
 };
 
-T4Geometry* T4test::t4Geom = NULL;
+T4Geometry* T4test::t4Geom = nullptr;
 
 TEST_F(T4test, CreationAndCompo)
 {
   ASSERT_EQ(t4Geom->getFilename(), "slab.t4");
 
-  long rank;
-  string compo;
   vector<double> point = {12.024, -72.882,  1.0883};
-  rank = t4Geom->getVolumes()->which_volume(point);
-  compo = t4Geom->getCompos()->get_name_from_volume(rank);
+  long rank = t4Geom->getVolumes()->which_volume(point);
+  std::string compo = t4Geom->getCompos()->get_name_from_volume(rank);
   ASSERT_EQ(compo, "ALU1");
 }
 
@@ -61,15 +57,13 @@ TEST_F(T4test, WeakEquivalenceNOK)
 TEST_F(T4test, WeakEquivalenceOK)
 {
   MCNPGeometry mcnpGeom("slabp", "input_slab");
-  long rank;
-  string compo;
   vector<double> point(3);
 
   t4Geom->addEquivalence("1-2.7", "ALU1");
   point = {12.024, -72.882,  1.0883};
 
-  rank = t4Geom->getVolumes()->which_volume(point);
-  compo = t4Geom->getCompos()->get_name_from_volume(rank);
+  long rank = t4Geom->getVolumes()->which_volume(point);
+  std::string compo = t4Geom->getCompos()->get_name_from_volume(rank);
   mcnpGeom.setCellMaterial({3001, 1});
   mcnpGeom.addCell2Density(3001, "-2.7");
   ASSERT_TRUE(t4Geom->weakEquivalence(mcnpGeom.getMaterialDensity(), compo));
