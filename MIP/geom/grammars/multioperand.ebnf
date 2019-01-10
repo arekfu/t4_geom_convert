@@ -1,0 +1,22 @@
+start = s1:union s2:$;
+
+union =
+    | u1:union ':' ~ u3:{o:isect ':'}* u4:isect
+    | u5:isect;
+
+isect =
+    | i1:isect '*' ~ i3:{o:operand '*'}* i4:operand
+    | i5:operand;
+
+operand =
+    | o1:cell
+    | o2:surface
+    | '_(' ~ o4:compl ')' 
+    | '('  ~ o7:union ')'; 
+
+compl = union ; 
+
+surface = /[-+]{0,1}\d+/;
+
+cell = /_\d+/;
+
