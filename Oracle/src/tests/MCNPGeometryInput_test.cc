@@ -11,16 +11,19 @@
 
 using namespace std;
 
-class MCNPtestInput : public ::testing::Test {
+class MCNPtestInput : public ::testing::Test
+{
 
 public:
   MCNPGeometry *MCNPg1;
-  void SetUp( ){
+  void SetUp()
+  {
     // code here will execute just before the test ensues
     MCNPg1 = new MCNPGeometry("slabp", "input_slab");
   }
 
-  void TearDown( ){
+  void TearDown()
+  {
     delete MCNPg1;
   }
 };
@@ -28,15 +31,14 @@ public:
 TEST_F(MCNPtestInput, isComment)
 {
   string lineTest = "c      Test line true";
-  ASSERT_EQ(MCNPg1->isLineAComment(lineTest),1);
+  ASSERT_EQ(MCNPg1->isLineAComment(lineTest), 1);
 
   lineTest = "C      Test line true CAP";
-  ASSERT_EQ(MCNPg1->isLineAComment(lineTest),1);
+  ASSERT_EQ(MCNPg1->isLineAComment(lineTest), 1);
 
   lineTest = "Test line false";
-  ASSERT_EQ(MCNPg1->isLineAComment(lineTest),0);
+  ASSERT_EQ(MCNPg1->isLineAComment(lineTest), 0);
 }
-
 
 TEST_F(MCNPtestInput, AssociateCell2Density)
 {
@@ -51,10 +53,10 @@ TEST_F(MCNPtestInput, AssociateMaterialDensity)
   MCNPg1->parseINP();
   MCNPg1->goThroughHeaderPTRAC(8);
   MCNPg1->readNextPtracData(20000);
-  ASSERT_EQ(MCNPg1->getMaterialDensity(),"1-2.7");
+  ASSERT_EQ(MCNPg1->getMaterialDensity(), "1-2.7");
 
   MCNPg1->readNextPtracData(20000);
-  ASSERT_EQ(MCNPg1->getMaterialDensity(),"2-2.7");
+  ASSERT_EQ(MCNPg1->getMaterialDensity(), "2-2.7");
 }
 
 TEST_F(MCNPtestInput, ReadNPS)

@@ -10,18 +10,15 @@
 #ifndef T4GEOMETRY_H_
 #define T4GEOMETRY_H_
 
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include "volumes.hh"
 #include "anyvolumes.hh"
 #include "compos.hh"
 #include "composfromgeom.hh"
-#include "t4coreglob.hh"
 #include "t4convert.hh"
-#include "t4sobol.hh"
-#include "t4random.hh"
+#include "volumes.hh"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 /** \class T4Geometry
  *  \brief Class for dealing with Tripoli-4 geometry
@@ -29,13 +26,15 @@
  *  This class reads the T4 input file, retrieves the composition at a given
  *  point and calls the weak equivalence test.
  */
-class T4Geometry {
-  static const std::vector<std::vector<double> > directions;
-  Volumes* volumes;
-  Compos* compos;
+class T4Geometry
+{
+  static const std::vector<std::vector<double>> directions;
+  Volumes *volumes;
+  Compos *compos;
   std::string t4Filename;
   std::map<std::string, std::string> equivalenceMap;
   double delta;
+
 public:
   T4Geometry();
 
@@ -46,7 +45,7 @@ public:
    * @param[in] delta The distance to the closest boundary below which a mismatch
    * is ignored.
    */
-  T4Geometry(const std::string& t4Filename, double delta);
+  T4Geometry(const std::string &t4Filename, double delta);
 
   /**
    *  Class destructor.
@@ -54,7 +53,6 @@ public:
    *
    */
   ~T4Geometry();
-
 
   /**
    * Reads the T4 input file and stores the volumes and compositions information.
@@ -64,8 +62,8 @@ public:
   void readT4input();
 
   std::string getFilename();
-  Volumes* const & getVolumes();
-  Compos* const & getCompos();
+  Volumes *const &getVolumes();
+  Compos *const &getCompos();
   double getDelta();
 
   /**
@@ -73,14 +71,14 @@ public:
    * @param[in] matDens An MCNP materialID-density key to be checked.
    * @returns True if already been mapped, False otherwise.
    */
-  bool materialInMap(const std::string& matDens);
+  bool materialInMap(const std::string &matDens);
 
   /**
    * Adds the association MCNP materialID-density -> T4 composition.
    *
    *
    */
-   void addEquivalence(const std::string& matDens, const std::string& compo);
+  void addEquivalence(const std::string &matDens, const std::string &compo);
 
   /**
    * Checks if the weak equivalence tests is passed, i.e. if MCNP and T4 see
@@ -89,7 +87,7 @@ public:
    * @param[in] compo A T4 composition.
    * @return True if the weak equivalence test passes, False otherwise.
    */
-  bool weakEquivalence(const std::string& matDens, const std::string& compo);
+  bool weakEquivalence(const std::string &matDens, const std::string &compo);
 
   /**
    * Checks if the considered point distance to the nearest surface is below
@@ -98,8 +96,7 @@ public:
    * @param[in] long the volume number where the considered point is.
    * @return True if the point distance to the next surface is too small, False otherwise.
    */
-  bool isPointNearSurface(const std::vector<double>& point, long rank);
-
+  bool isPointNearSurface(const std::vector<double> &point, long rank);
 };
 
 #endif /* T4GEOMETRY_H_ */

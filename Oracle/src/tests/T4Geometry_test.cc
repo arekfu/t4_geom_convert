@@ -8,35 +8,38 @@
  * @version 1.0
  */
 
-#include "T4Geometry.hh"
 #include "MCNPGeometry.hh"
-#include "gtest/gtest.h"
-#include "volumes.hh"
+#include "T4Geometry.hh"
 #include "anyvolumes.hh"
+#include "volumes.hh"
+#include "gtest/gtest.h"
 
-class T4test : public ::testing::Test {
+class T4test : public ::testing::Test
+{
 
 protected:
-  static void SetUpTestCase( ){
+  static void SetUpTestCase()
+  {
     t4_output_stream = &cout;
-    t4_language = (T4_language) 0;
-    t4Geom = new T4Geometry("slab.t4",  1.0e-7);
+    t4_language = (T4_language)0;
+    t4Geom = new T4Geometry("slab.t4", 1.0e-7);
   }
 
-  static void TearDownTestCase(){
+  static void TearDownTestCase()
+  {
     delete t4Geom;
     t4Geom = nullptr;
   }
-  static T4Geometry* t4Geom;
+  static T4Geometry *t4Geom;
 };
 
-T4Geometry* T4test::t4Geom = nullptr;
+T4Geometry *T4test::t4Geom = nullptr;
 
 TEST_F(T4test, CreationAndCompo)
 {
   ASSERT_EQ(t4Geom->getFilename(), "slab.t4");
 
-  vector<double> point = {12.024, -72.882,  1.0883};
+  vector<double> point = {12.024, -72.882, 1.0883};
   long rank = t4Geom->getVolumes()->which_volume(point);
   std::string compo = t4Geom->getCompos()->get_name_from_volume(rank);
   ASSERT_EQ(compo, "ALU1");
@@ -60,7 +63,7 @@ TEST_F(T4test, WeakEquivalenceOK)
   vector<double> point(3);
 
   t4Geom->addEquivalence("1-2.7", "ALU1");
-  point = {12.024, -72.882,  1.0883};
+  point = {12.024, -72.882, 1.0883};
 
   long rank = t4Geom->getVolumes()->which_volume(point);
   std::string compo = t4Geom->getCompos()->get_name_from_volume(rank);
@@ -80,13 +83,13 @@ TEST_F(T4test, WeakEquivalenceOK)
 
 TEST_F(T4test, DistanceToSurface)
 {
-  vector<double> point1 = {3.0, -1.0, -0.5}; // on Surface between blue and green
-  vector<double> point1a = {3.0, -1.0, -0.5+2.0e-8}; // within margin of error
-  vector<double> point1b = {3.0, -1.0, -0.5-2.0e-8}; // within margin of error
-  vector<double> point2 = {3.0, -1.0, -1.44}; // in blue, far for Surface
+  vector<double> point1 = {3.0, -1.0, -0.5};           // on Surface between blue and green
+  vector<double> point1a = {3.0, -1.0, -0.5 + 2.0e-8}; // within margin of error
+  vector<double> point1b = {3.0, -1.0, -0.5 - 2.0e-8}; // within margin of error
+  vector<double> point2 = {3.0, -1.0, -1.44};          // in blue, far for Surface
   long rank;
 
-  Volumes* volumes = t4Geom->getVolumes();
+  Volumes *volumes = t4Geom->getVolumes();
 
   rank = volumes->which_volume(point1);
   ASSERT_TRUE(t4Geom->isPointNearSurface(point1, rank));
@@ -99,5 +102,4 @@ TEST_F(T4test, DistanceToSurface)
 
   rank = volumes->which_volume(point2);
   ASSERT_FALSE(t4Geom->isPointNearSurface(point2, rank));
-
 }

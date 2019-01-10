@@ -11,17 +11,20 @@
 
 using namespace std;
 
-class MCNPtestPtrac : public ::testing::Test {
+class MCNPtestPtrac : public ::testing::Test
+{
 
 public:
   MCNPGeometry *MCNPg1;
-  void SetUp( ){
+  void SetUp()
+  {
     // code here will execute just before the test ensues
     MCNPg1 = new MCNPGeometry("slabp", "input_slab");
     MCNPg1->goThroughHeaderPTRAC(8);
   }
 
-  void TearDown( ){
+  void TearDown()
+  {
     delete MCNPg1;
   }
 };
@@ -36,13 +39,13 @@ TEST_F(MCNPtestPtrac, ReadFirstData)
 {
   MCNPg1->getNextLine();
   pair<int, int> pointEvent = MCNPg1->readPointEvent();
-  ASSERT_EQ(pointEvent.first,1);
-  ASSERT_EQ(pointEvent.second,1000);
+  ASSERT_EQ(pointEvent.first, 1);
+  ASSERT_EQ(pointEvent.second, 1000);
 
   MCNPg1->getNextLine();
   pair<int, int> cellMaterial = MCNPg1->readCellMaterial();
-  ASSERT_EQ(cellMaterial.first,3001);
-  ASSERT_EQ(cellMaterial.second,1);
+  ASSERT_EQ(cellMaterial.first, 3001);
+  ASSERT_EQ(cellMaterial.second, 1);
 
   MCNPg1->getNextLine();
   vector<double> pointCoords = MCNPg1->readPoint();
@@ -53,8 +56,8 @@ TEST_F(MCNPtestPtrac, ReadFirstData)
 
 TEST_F(MCNPtestPtrac, ReadAll)
 {
-  int ii=1;
-  while(ii<=1000){
+  int ii = 1;
+  while (ii <= 1000) {
     MCNPg1->readNextPtracData(2000);
     ii++;
   }

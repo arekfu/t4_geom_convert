@@ -11,10 +11,10 @@
 #ifndef STASTISTICS_H_
 #define STASTISTICS_H_
 
-#include <iostream>
-#include <vector>
 #include <array>
+#include <iostream>
 #include <set>
+#include <vector>
 
 /**
 * A structure to represent the points where the weak equivalence test failed.
@@ -35,7 +35,8 @@ struct failedPoint {
 *  This class records the successful and failed comparisons, the points of failure
 *  and write report and output data file.
 */
-class Statistics {
+class Statistics
+{
   int nbSuccess;
   int nbFailure;
   int nbIgnored;
@@ -44,9 +45,7 @@ class Statistics {
   std::set<long> coveredRanks;
   std::vector<failedPoint> failures;
 
-
 public:
-
   /**
   * Class constructor.
   *
@@ -123,14 +122,12 @@ public:
   */
   std::vector<failedPoint> getFailures();
 
-
   /**
   * Reports in the terminal the comparison statistics
   *
   *
   */
   void report();
-
 
   /**
   * Auxiliary method to report on successful, failed and ignored tests.
@@ -139,8 +136,7 @@ public:
   * @param[in] data   The data to be displayed, i.e. number of tests
   * @param[in] total  The total number of tests
   */
-  void reportOn(const std::string& status, int data, int total);
-
+  void reportOn(const std::string &status, int data, int total);
 
   /**
   * Writes out the position of the points which fail the weak equivalence test
@@ -148,17 +144,16 @@ public:
   *
   * @param[in] fname The input file name on which will be based the output file name.
   */
-  void writeOutForVisu(std::string& fname);
+  void writeOutForVisu(std::string &fname);
 
   /**
   * Returns the raw file name, i.e. without file extension.
   *
   * @return The raw file name.
   */
-  std::string getRawFileName(std::string& fname);
+  std::string getRawFileName(std::string &fname);
 
-  void writePointsFile(std::string& rawname);
-
+  void writePointsFile(std::string &rawname);
 };
 
 #endif /* STATISTICS_H_ */

@@ -11,11 +11,11 @@
 #ifndef MCNPGEOMETRY_H_
 #define MCNPGEOMETRY_H_
 
-#include <iostream>
-#include <vector>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 #include <map>
+#include <sstream>
+#include <vector>
 
 /** \class MCNPGeometry.
  *  \brief Class for dealing with MCNP geometry.
@@ -23,7 +23,8 @@
  *  This class reads the MCNP INP and PTRAC files and gives pseudo-random points,
  *  cells and materials information.
  */
-class MCNPGeometry {
+class MCNPGeometry
+{
   int pointID;
   int eventID;
   int cellID;
@@ -42,15 +43,15 @@ class MCNPGeometry {
   std::ifstream ptracFile;
   std::ifstream inputFile;
   std::string currentLine;
-public:
 
+public:
   /**
   * Class constructor.
   *
   * @param[in] ptracPath MCNP ptrac file path.
   * @param[in] inputPath MCNP inp file path.
   */
-  MCNPGeometry(const std::string& ptracPath, const std::string& inputPath);
+  MCNPGeometry(const std::string &ptracPath, const std::string &inputPath);
 
   /**
   * Reads the point ID number and the event ID number.
@@ -94,7 +95,6 @@ public:
    */
   void parseINP();
 
-
   /**
    * Searches the INP file for the total number of particle NPS.
    *
@@ -117,7 +117,7 @@ public:
   * @return the number of integer data stored on the 2nd of each particle event
   * data block.
   */
-  int getDataFromLine5Ptrac(const std::string& line5);
+  int getDataFromLine5Ptrac(const std::string &line5);
 
   /**
   * Checks that the 2nd line of each particle event data block does contain the
@@ -128,31 +128,30 @@ public:
   * @param[in] nbData The number of data expected on 2nd line of each particle
   * event data block (given by getDataFromLine5Ptrac function).
   */
-  void checkDataFromLine6Ptrac(const std::string& line6, int nbData);
+  void checkDataFromLine6Ptrac(const std::string &line6, int nbData);
 
   /**
    * Increments the number of points read so far.
    *
    *
    */
-   void incrementNbPointsRead();
-
+  void incrementNbPointsRead();
 
   /**
    * Attempts to add a new association cell ID -> material density.
    *
    *
    */
-  void addCell2Density(int key, const std::string& value);
+  void addCell2Density(int key, const std::string &value);
 
   /**
    * Gives the association material ID - material density.
    *
    * @return the association as a string: materialID-density.
    */
-   std::string getMaterialDensity();
+  std::string getMaterialDensity();
 
-   void getNextLine();
+  void getNextLine();
 
   /**
    * Determines whether we have read the whole block data in the input file.
@@ -170,26 +169,24 @@ public:
    */
   int isLineAComment(std::string lineContent);
 
-  const std::string& getInputPath();
+  const std::string &getInputPath();
   long getNPS();
   long getNbPointsRead();
-  std::ifstream& getPtracFile();
-  const std::string& getPtracPath();
-  void setPtracPath(const std::string& ptracPath);
-  const std::vector<int>& getVolumeList();
-  void setVolumeList(const std::vector<int>& volumeList);
-  int setCurrentLine(std::ifstream& inFile);
+  std::ifstream &getPtracFile();
+  const std::string &getPtracPath();
+  void setPtracPath(const std::string &ptracPath);
+  const std::vector<int> &getVolumeList();
+  void setVolumeList(const std::vector<int> &volumeList);
+  int setCurrentLine(std::ifstream &inFile);
   int getPointID();
   int getEventID();
-  void setPointEvent(const std::pair<int, int>& pointEvent);
+  void setPointEvent(const std::pair<int, int> &pointEvent);
   std::vector<double> getPointXyz();
-  void setPointXyz(const std::vector<double>& pointXyz);
+  void setPointXyz(const std::vector<double> &pointXyz);
   int getCellID();
   int getMaterialID();
-  void setCellMaterial(const std::pair<int, int>& cellMat);
-  std::map<int, std::string>& getCell2Density();
-
+  void setCellMaterial(const std::pair<int, int> &cellMat);
+  std::map<int, std::string> &getCell2Density();
 };
-
 
 #endif /* MCNPGEOMETRY_H_ */

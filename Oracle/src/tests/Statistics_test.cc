@@ -10,16 +10,19 @@
 
 using namespace std;
 
-class StatisticsTest : public ::testing::Test {
+class StatisticsTest : public ::testing::Test
+{
 
 public:
   Statistics *Stats;
-  void SetUp( ){
+  void SetUp()
+  {
     // code here will execute just before the test ensues
     Stats = new Statistics();
   }
 
-  void TearDown( ){
+  void TearDown()
+  {
     delete Stats;
   }
 };
