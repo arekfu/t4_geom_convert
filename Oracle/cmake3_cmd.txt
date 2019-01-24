@@ -1,0 +1,1 @@
+cmake3 .. -DT4_DIR=/data/tmpdm2s/dm232107/product/t4/t4.11/cen7/share/^Cake -DHDF5_DIR=/home/tri4dev/developers/prerequisites/install/lin-x86-64-cen7/hdf5-1.8.14
