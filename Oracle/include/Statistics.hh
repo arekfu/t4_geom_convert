@@ -22,11 +22,11 @@
 */
 struct failedPoint {
   std::array<double, 3> position;
-  int mcnpParticleID;
-  int mcnpCellID;
-  int mcnpMaterialID;
+  double mcnpParticleID;
+  double mcnpCellID;
+  double mcnpMaterialID;
   double color;
-  int rank;
+  double rank;
 };
 
 /** \class Statistics.

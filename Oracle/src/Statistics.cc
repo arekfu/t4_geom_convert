@@ -65,11 +65,11 @@ void Statistics::setNbT4Volumes(long nbVolumes)
 void Statistics::recordFailure(vector<double> position, long rank, int pointID, int cellID, int materialID)
 {
   failedPoint failed{{position[0], position[1], position[2]},
-                     pointID,
-                     cellID,
-                     materialID,
+                     double(pointID),
+                     double(cellID),
+                     double(materialID),
                      position[0],
-                     int(rank)};
+                     double(rank)};
   failures.push_back(failed);
 }
 
@@ -113,11 +113,11 @@ void Statistics::writeOutForVisu(string &fname)
                       T4_TYPE_DOUBLE, "x",
                       T4_TYPE_DOUBLE, "y",
                       T4_TYPE_DOUBLE, "z",
-                      T4_TYPE_INT, "pointID",
-                      T4_TYPE_INT, "cellID",
-                      T4_TYPE_INT, "materialID",
+                      T4_TYPE_DOUBLE, "pointID",
+                      T4_TYPE_DOUBLE, "cellID",
+                      T4_TYPE_DOUBLE, "materialID",
                       T4_TYPE_DOUBLE, "color",
-                      T4_TYPE_INT, "rank",
+                      T4_TYPE_DOUBLE, "rank",
                       T4_NO_TYPE);
 
   for (int iFail = 0; iFail < nbFailure; iFail++) {
