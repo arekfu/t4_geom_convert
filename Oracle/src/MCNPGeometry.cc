@@ -285,7 +285,7 @@ map<int, string> &MCNPGeometry::getCell2Density()
   return cell2Density;
 }
 
-void MCNPGeometry::getNextLine()
+void MCNPGeometry::getNextLinePtrac()
 {
   getline(ptracFile, currentLine);
 }

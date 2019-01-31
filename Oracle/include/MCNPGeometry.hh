@@ -151,7 +151,12 @@ public:
    */
   std::string getMaterialDensity();
 
-  void getNextLine();
+  /**
+   * Stores the next line in the PTRAC file in the currentLine variable.
+   *
+   *
+   */
+  void getNextLinePtrac();
 
   /**
    * Determines whether we have read the whole block data in the input file.
