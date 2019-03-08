@@ -1,0 +1,15 @@
+__pycache__
+.hypothesis
+.cache
+doc/build
+*.pyc
+htmlcov
+.coverage
+.eggs
+build
+dist
+*.egg
+*.egg-info
+*~
+.pytest_cache
+testconnverti.txt
