@@ -35,6 +35,11 @@ pipeline {
   }
 
   stages {
+    stage('Clean workspace') {
+      steps {
+        cleanWs()
+      }
+    }
     stage('Checkout') {
       steps {
         dir("${SRC}") {
@@ -42,7 +47,7 @@ pipeline {
         }
       }
     }
-    stage('Configure') {
+    stage('Configure Oracle') {
       steps {
         echo "Starting cmake for ${env.BUILD_ID} on ${env.JENKINS_URL}..."
         dir("${ORACLE_BUILD}") {
@@ -53,7 +58,7 @@ pipeline {
         }
       }
     }
-    stage('Build') {
+    stage('Build Oracle') {
       steps {
         echo "Starting cmake for ${env.BUILD_ID} on ${env.JENKINS_URL}..."
         dir("${ORACLE_BUILD}") {
@@ -63,22 +68,32 @@ pipeline {
         }       
       }
     }
-//     stage('Linting') {
-//       steps {
-//         echo 'Linting...'
-//         dir("${SRC}") {
-//           sh """
-//               source "${VENV}/bin/activate"
-//               pylint -f parseable valjean/ tests/ | tee pylint.out
-//               # flake8 returns 1 in case of warnings and that would stop the
-//               # build
-//               flake8 --tee --output-file flake8.out || true
-//               # avoid empty flake8.out files, Jenkins complains 
-//               echo "end of flake8 file" >> flake8.out
-//               """
-//         }
-//       }
-//     }
+    stage('Install Converter') {
+      steps {
+        sh """
+        python3 -m venv "${VENV}"
+        source "${VENV}/bin/activate"
+        python3 -m pip install --upgrade pip setuptools
+        python3 -m pip install ${SRC}[dev]
+        """
+      }
+    }
+    stage('Linting') {
+      steps {
+        echo 'Linting...'
+        dir("${SRC}") {
+          sh """
+              source "${VENV}/bin/activate"
+              pylint -f parseable t4-geom-convert/ | tee pylint.out
+              # flake8 returns 1 in case of warnings and that would stop the
+              # build
+              flake8 --tee --output-file flake8.out || true
+              # avoid empty flake8.out files, Jenkins complains 
+              echo "end of flake8 file" >> flake8.out
+              """
+        }
+      }
+    }
 //     stage('Build and check HTML doc') {
 //       steps {
 //         echo 'Building and checking documentation...'
@@ -97,8 +112,8 @@ pipeline {
         echo 'Running unit tests...'
         dir("${ORACLE_BUILD}") {
           sh """
-						 cp ${DATA}/* ${ORACLE_BUILD}
-						 ./tests --gtest_output=xml:gtestresults.xml
+             cp ${DATA}/* ${ORACLE_BUILD}
+             ./tests --gtest_output=xml:gtestresults.xml
              """
 //          step([$class: 'CoberturaPublisher',
 //                autoUpdateHealth: false,
@@ -122,28 +137,15 @@ pipeline {
         notifyTuleap(false)
     }
     always {
-//      warnings(parserConfigurations: [[parserName: 'pep8', pattern: "**/flake8.out"],
-//                                      [parserName: 'pylint', pattern: "**/pylint.out"],
-//                                      [parserName: 'sphinx-build', pattern: "**/sphinx-html.out"],
-//                                      [parserName: 'sphinx-linkcheck', pattern: "**/sphinx-linkcheck.out"]],
-//               usePreviousBuildAsReference: true)
-//      archiveArtifacts artifacts: "**/flake8.out", fingerprint: true
-//      archiveArtifacts artifacts: "**/pylint.out", fingerprint: true
-//      archiveArtifacts artifacts: "**/sphinx-html.out", fingerprint: true
-//      archiveArtifacts artifacts: "**/sphinx-linkcheck.out", fingerprint: true
-//      archiveArtifacts artifacts: "**/pytest.out", fingerprint: true
-//      publishHTML (target: [
-//                   allowMissing: false,
-//                   alwaysLinkToLastBuild: false,
-//                   keepAll: true,
-//                   reportDir: "${SRC}/doc/build/html",
-//                   reportFiles: 'index.html',
-//                   reportName: "Sphinx documentation"
-//      ])
-      junit "**/gtestresults.xml"
-    }
-    cleanup {
-      cleanWs()
+      recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: pep8(pattern: '**/flake8.out', reportEncoding: 'UTF-8')
+      recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: pyLint(pattern: '**/pylint.out', reportEncoding: 'UTF-8')
+//       recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: sphinxBuild(pattern: '**/sphinx-*.out', reportEncoding: 'UTF-8')
+      archiveArtifacts artifacts: "**/flake8.out", fingerprint: true
+      archiveArtifacts artifacts: "**/pylint.out", fingerprint: true
+//       archiveArtifacts artifacts: "**/sphinx-html.out", fingerprint: true
+//       archiveArtifacts artifacts: "**/sphinx-linkcheck.out", fingerprint: true
+//       archiveArtifacts artifacts: "**/pytest.out", fingerprint: true
+//       junit "**/pytest.xml"
     }
   }
 }
