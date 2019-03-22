@@ -7,10 +7,11 @@ Created on 6 févr. 2019
 :file : CIntermediateVolumeT4.py
 '''
 
-
+from collections import OrderedDict
 from ..Volume.CDictVolumeT4 import CDictVolumeT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
 from ..Volume.CCellConversion import CCellConversion
+
 
 class CIntermediateVolumeT4(object):
     '''
@@ -29,7 +30,7 @@ class CIntermediateVolumeT4(object):
         instance of the CVolumeT4 Class
         '''
         dic_test = dict()
-        dic_cellT4 = dict()
+        dic_cellT4 = OrderedDict()
         objT4 = CDictVolumeT4(dic_cellT4)
         for key, val in CDictCellMCNP().d_cellMCNP.items():
             dic_test[key] = dict()

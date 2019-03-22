@@ -20,7 +20,7 @@ class CCompositionConversionMCNPToT4(object):
         '''
         Constructor
         '''
-        
+
     def m_conversionCompositionMCNPToT4(self):
         '''
         :brief: method recuperate the dictionary of the composition from MCNP
@@ -42,9 +42,9 @@ class CCompositionConversionMCNPToT4(object):
                 isotopeT4 = atomicNumberT4, massNumberT4
                 l_compositionT4.append((isotopeT4, fraction))
             valueT4 = l_compositionT4
-            obj_T4.__setitem__(key, valueT4)    
+            obj_T4.__setitem__(key, valueT4) 
         return d_CompositionT4
-    
+
 # d = CCompositionConversionMCNPToT4().m_conversionCompositionMCNPToT4()
 # for key,val in d.items():
 #     print(key,val)

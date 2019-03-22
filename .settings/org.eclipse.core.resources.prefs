@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+encoding//t4_geom_convert/Kernel/BoundaryCondition/CBoundCond.py=utf-8
+encoding//t4_geom_convert/Kernel/BoundaryCondition/CConversionBoundaryCondition.py=utf-8
 encoding//t4_geom_convert/Kernel/Composition/CCompositionConversionMCNPToT4.py=utf-8
 encoding//t4_geom_convert/Kernel/Composition/CCompositionMCNP.py=utf-8
 encoding//t4_geom_convert/Kernel/Composition/CCompositionT4.py=utf-8
@@ -11,6 +13,7 @@ encoding//t4_geom_convert/Kernel/FileHanlders/Parser/CParseMCNPCell.py=utf-8
 encoding//t4_geom_convert/Kernel/FileHanlders/Parser/CParseMCNPComposition.py=utf-8
 encoding//t4_geom_convert/Kernel/FileHanlders/Parser/CParseMCNPSurface.py=utf-8
 encoding//t4_geom_convert/Kernel/FileHanlders/Parser/CParseMCNPTransform.py=utf-8
+encoding//t4_geom_convert/Kernel/FileHanlders/Writer/CWriteT4BoundCond.py=utf-8
 encoding//t4_geom_convert/Kernel/FileHanlders/Writer/CWriteT4Composition.py=utf-8
 encoding//t4_geom_convert/Kernel/FileHanlders/Writer/CWriteT4GeomComp.py=utf-8
 encoding//t4_geom_convert/Kernel/FileHanlders/Writer/CWriteT4Geometry.py=utf-8

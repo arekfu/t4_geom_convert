@@ -14,10 +14,10 @@ Created on 7 févr. 2019
     >>> print(dict_Composition)
 
 '''
-
+from .Parameters import f_inputMCNP
 from ....MIP import mip
 
-from .Parameters import f_inputMCNP
+
 from ...Composition.CCompositionMCNP import CCompositionMCNP
 from ....MIP.geom.grammars.composition import get_materialComposition
 
