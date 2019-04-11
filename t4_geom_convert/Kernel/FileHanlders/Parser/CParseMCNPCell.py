@@ -14,12 +14,13 @@ Created on 5 févr. 2019
     >>> print(dict_Cell)
 
 '''
-
+import re
 from ....MIP.geom.cells import get_cells
 from ....MIP import mip
 from ....MIP.geom.parsegeom import get_ast
 from .Parameters import f_inputMCNP
 from ...Volume.CCellMCNP import CCellMCNP
+from ....MIP.geom.composition import get_materialImportance
 class CParseMCNPCell(object):
     '''
     :brief: Class which parse the block CELLS.
@@ -32,6 +33,31 @@ class CParseMCNPCell(object):
         '''
         self.inputMCNP = f_inputMCNP
         
+    def m_parsingMaterialImportance(self):
+        '''
+        :brief method which permit to recover the information of each line
+        of the block SURFACE
+        :return: dictionary which contains the ID of the materials as a key
+        and as a value, a object from the values of the importance of the cells
+        '''
+        inputCell = mip.MIP(self.inputMCNP)
+        importanceParser = get_materialImportance(inputCell, lim=None)
+        listeCellImp = []
+        i = 0
+        for k, v in list(importanceParser.items()):
+            liste_imp = v
+            for element in liste_imp:
+                if 'R' in element:
+                    index = i
+                    value_imp = liste_imp[index-1]
+                    liste_findInt = re.findall(r'\d+', element)
+                    numOfRep = int(liste_findInt[0])
+                    listeCellImp.extend([int(value_imp)]*numOfRep)
+                else:
+                    listeCellImp.append(int(element))
+                i += 1
+        return listeCellImp
+
     def m_parsingCell(self):
         '''
         :brief method which permit to recover the information of each line of
@@ -42,14 +68,24 @@ class CParseMCNPCell(object):
         inputCell = mip.MIP(self.inputMCNP)
         cellParser = get_cells(inputCell, lim=None)
         dictCell = dict()
+        liste_importance = self.m_parsingMaterialImportance()
+        i = 0
+        print(liste_importance)
         for k, v in list(cellParser.items()):
-            material, geometry, option = v
-            materialID = material.split()[0]
-            if int(materialID) == 0:
-                density = None
-            else:
-                density = material.split()[1]
-            astMcnp = get_ast(geometry)
-            importance = option
-            dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance)
+            print(i)
+            if liste_importance[i] != 0:
+                material, geometry, option = v
+                materialID = material.split()[0]
+                if int(materialID) == 0:
+                    density = None
+                else:
+                    density = material.split()[1]
+                astMcnp = get_ast(geometry)
+                importance = option
+                dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance)
+            i += 1
         return dictCell
+
+d = CParseMCNPCell().m_parsingCell()
+for k in d.keys():
+    print(k)

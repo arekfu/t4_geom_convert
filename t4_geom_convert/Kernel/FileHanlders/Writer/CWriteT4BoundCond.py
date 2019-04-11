@@ -24,14 +24,16 @@ class CWriteT4BoundCond(object):
         f = open('testconnverti.txt', "a+")
         f.write("\r\n BOUNDARY_CONDITION \r\n")
         f.write("\r\n")
+        f.write("\r\n ALL_COMPLETE \r\n")
+        f.write("\r\n")
         d_boundCond = CConversionBoundaryCondition().m_conversionBoundCond()
+        f.write(str(len(d_boundCond)))
+        f.write("\r\n")
         for k in d_boundCond.keys():
-            p_materialName = str(k)
-            l_surfaceID = d_boundCond[k].surfaceID
-            l_typeOfBound = d_boundCond[k].typeOfBound
-            for i in range(0,len(l_surfaceID)):
-                f.write("%s %s %s \r" % (p_materialName, l_surfaceID[i], l_typeOfBound[i]))
+            p_typeOfBound = d_boundCond[k].typeOfBound
+            f.write("%s %s \r" %(str(k), p_typeOfBound))
         f.write("\r\n")
         f.write("END_BOUNDARY_CONDITION")
+        f.write("\r\n")
         f.close()
 CWriteT4BoundCond().m_writeT4BoundCond()

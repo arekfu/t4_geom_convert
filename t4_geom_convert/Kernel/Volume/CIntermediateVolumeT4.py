@@ -37,7 +37,6 @@ class CIntermediateVolumeT4(object):
             root = val.geometry
             tree = root
             tup = CCellConversion(key*1000, objT4).m_postOrderTraversalFlag(tree)
-            print(tup)
             opt_tree = CCellConversion(key*1000, objT4).m_postOrderTraversalOptimisation(tup)
             j = CCellConversion(key*1000, objT4).m_postOrderTraversalConversion(opt_tree)
             objT4.volumeT4[j].fictive = ''

@@ -31,6 +31,8 @@ class CIntermediateCompositionT4(object):
         dic_CompositionT4 = CCompositionConversionMCNPToT4().m_conversionCompositionMCNPToT4()
         for key in dic_CompositionT4.keys():
             l_listeMaterialComposition = []
+            l_density = []
+            l_typeDensityT4 = []
             for val in dic_CompositionT4.values():
                 for elmt in val:
                     isotopeCaracteristic, abondance = elmt
@@ -42,12 +44,14 @@ class CIntermediateCompositionT4(object):
             for k in dic_cellMCNP.keys():
                 if int(dic_cellMCNP[k].materialID) == key:
                     density = dic_cellMCNP[k].density
-                    if float(density) < 0:
-                        typeDensityT4 = 'Density'
-                    if float(density) > 0:
-                        typeDensityT4 = 'Point Wise'
-            dic_newCompositionT4[key] = CCompositionT4(typeDensityT4, 'm'+str(key),\
-                                                       float(density),\
+                    if float(density) not in l_density:
+                        l_density.append(float(density))
+                        if float(density) < 0:
+                            l_typeDensityT4.append('Density')
+                        if float(density) > 0:
+                            l_typeDensityT4.append('Point Wise')
+            dic_newCompositionT4[key] = CCompositionT4(l_typeDensityT4, 'm'+str(key),\
+                                                       l_density,\
                                                        len(l_listeMaterialComposition),\
                                                        l_listeMaterialComposition)
         return dic_newCompositionT4

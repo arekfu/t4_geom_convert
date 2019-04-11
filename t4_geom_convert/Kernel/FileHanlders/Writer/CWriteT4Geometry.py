@@ -26,6 +26,7 @@ class CWriteT4Geometry(object):
         '''
         f = open('testconnverti.txt', "a+")
         f.write("GEOMETRY \r\n")
+        f.write("\r\n")
         f.write("TITLE title")
         f.write("\r\n")
         dic_surface = CIntermediateSurfaceT4().m_constructSurfaceT4()
@@ -45,6 +46,7 @@ class CWriteT4Geometry(object):
             f.write("VOLU %s %s %s %s ENDV  \r" % (k, s_operator, s_param, s_fictive))
         f.write("\r\n")
         f.write("ENDG")
+        f.write("\r\n")
         f.close()
 
 CWriteT4Geometry().m_writeT4Geometry()

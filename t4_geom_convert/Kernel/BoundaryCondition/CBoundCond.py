@@ -13,9 +13,8 @@ class CBoundCond(object):
     '''
 
 
-    def __init__(self, p_surfaceID, p_typeOfBound):
+    def __init__(self, p_typeOfBound):
         '''
         Constructor
         '''
-        self.surfaceID = p_surfaceID
         self.typeOfBound = p_typeOfBound

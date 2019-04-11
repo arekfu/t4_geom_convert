@@ -28,22 +28,24 @@ class CWriteT4Composition(object):
         dic_composition = CIntermediateCompositionT4().m_constructCompositionT4()
         for k in dic_composition.keys():
             s_paramMaterialComposition = ''
-            p_typeDensity = dic_composition[k].typeDensity
-            p_materialName = dic_composition[k].material
-            p_densityValue = dic_composition[k].valueOfDensity
+            l_typeDensity = dic_composition[k].typeDensity
+            l_densityValue = dic_composition[k].valueOfDensity
             p_numberOfIsotope = dic_composition[k].numberOfIsotope
             list_isotope = dic_composition[k].listMaterialComposition
             for element in list_isotope:
                 nameIsotope, abondanceIsotope = element
                 s_paramMaterialComposition = s_paramMaterialComposition +\
                 str(nameIsotope) + ' ' + str(abondanceIsotope) +' '
-                print(s_paramMaterialComposition)
-            f.write("%s %s %s %s %s %s \r" % (p_typeDensity, temperature,\
-                                              p_materialName,p_densityValue,\
+            for i in range(0,len(l_densityValue)):
+                p_materialName = dic_composition[k].material
+                f.write("%s %s %s %s %s %s \r" % (l_typeDensity[i], temperature,\
+                                              p_materialName,abs(l_densityValue[i]),\
                                               p_numberOfIsotope,\
                                               s_paramMaterialComposition))
+                p_materialName += str(i*1000)
         f.write("\r\n")
         f.write("END_COMPOSITION")
+        f.write("\r\n")
         f.close()
 
 CWriteT4Composition().m_writeT4Composition()
