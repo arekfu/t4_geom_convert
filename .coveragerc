@@ -1,0 +1,11 @@
+[run]
+omit =
+        tests/*
+        */MIP/*
+branch = True
+
+[html]
+directory = UnitTests/htmlcov
+
+[xml]
+output = UnitTests/coverage.xml

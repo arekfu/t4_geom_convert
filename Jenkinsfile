@@ -84,7 +84,7 @@ pipeline {
         dir("${SRC}") {
           sh """
               source "${VENV}/bin/activate"
-              pylint -f parseable t4-geom-convert/ | tee pylint.out
+              pylint -f parseable t4-geom-convert/ | tee pylint.out || true
               # flake8 returns 1 in case of warnings and that would stop the
               # build
               flake8 --tee --output-file flake8.out || true
@@ -94,19 +94,6 @@ pipeline {
         }
       }
     }
-//     stage('Build and check HTML doc') {
-//       steps {
-//         echo 'Building and checking documentation...'
-//         dir("${SRC}") {
-//           sh """
-//              source "${VENV}/bin/activate"
-//              # be nitpicky on the HTML documentation
-//              PYTHONPATH=. sphinx-build -a -E -N -n -w sphinx-html.out -W -b html doc/src doc/build/html
-//              PYTHONPATH=. sphinx-build -a -E -N -w sphinx-linkcheck.out -W -b linkcheck doc/src doc/build/linkcheck
-//              """
-//         }
-//       }
-//     }
     stage('Run unit tests') {
       steps {
         echo 'Running unit tests...'
@@ -115,16 +102,22 @@ pipeline {
              cp ${DATA}/* ${ORACLE_BUILD}
              ./tests --gtest_output=xml:gtestresults.xml
              """
-//          step([$class: 'CoberturaPublisher',
-//                autoUpdateHealth: false,
-//                autoUpdateStability: false,
-//                coberturaReportFile: 'tests/coverage.xml',
-//                failUnhealthy: false,
-//                failUnstable: false,
-//                maxNumberOfBuilds: 0,
-//                onlyStable: false,
-//                sourceEncoding: 'ASCII',
-//                zoomCoverageChart: false])
+        }
+        dir("${SRC}") {
+          sh """
+             source "${VENV}/bin/activate"
+             pytest --cov-report term-missing --cov-config .coveragerc --cov-report=xml --cov=t4_geom_convert --junit-xml=pytest.xml --timeout=30 | tee pytest.out || true
+             """
+          step([$class: 'CoberturaPublisher',
+                autoUpdateHealth: false,
+                autoUpdateStability: false,
+                coberturaReportFile: 'UnitTests/coverage.xml',
+                failUnhealthy: false,
+                failUnstable: false,
+                maxNumberOfBuilds: 0,
+                onlyStable: false,
+                sourceEncoding: 'ASCII',
+                zoomCoverageChart: false])
         }
       }
     }
@@ -139,13 +132,10 @@ pipeline {
     always {
       recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: pep8(pattern: '**/flake8.out', reportEncoding: 'UTF-8')
       recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: pyLint(pattern: '**/pylint.out', reportEncoding: 'UTF-8')
-//       recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: sphinxBuild(pattern: '**/sphinx-*.out', reportEncoding: 'UTF-8')
       archiveArtifacts artifacts: "**/flake8.out", fingerprint: true
       archiveArtifacts artifacts: "**/pylint.out", fingerprint: true
-//       archiveArtifacts artifacts: "**/sphinx-html.out", fingerprint: true
-//       archiveArtifacts artifacts: "**/sphinx-linkcheck.out", fingerprint: true
-//       archiveArtifacts artifacts: "**/pytest.out", fingerprint: true
-//       junit "**/pytest.xml"
+      archiveArtifacts artifacts: "**/pytest.out", fingerprint: true
+      junit "**/pytest.xml"
     }
   }
 }
