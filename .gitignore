@@ -9,3 +9,5 @@ Oracle/docs/html
 Oracle/docs/latex
 Oracle/checks
 Oracle/report.txt
+.eggs
+__pycache__
