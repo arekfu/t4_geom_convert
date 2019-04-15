@@ -31,7 +31,7 @@ setup(name=name,
               'build_dir': ('setup.py', 'doc/build'),
               }
           },
-      data_files=[('', ['README.rst'])]
+#       data_files=[('', ['README.rst'])]
 #       ,
 #       use_scm_version=True
 #       ,
