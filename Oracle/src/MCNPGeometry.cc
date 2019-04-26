@@ -29,7 +29,7 @@ MCNPGeometry::MCNPGeometry(const string &ptracPath, const string &inputPath) : p
                                                                                inputFile(inputPath)
 {
   if (ptracFile.fail()) {
-    std::cerr << "PTRAC file not found." << endl;
+    std::cerr << "PTRAC file " << ptracPath << " not found." << endl;
     exit(EXIT_FAILURE);
   }
   if (inputFile.fail()) {

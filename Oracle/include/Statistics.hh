@@ -25,7 +25,7 @@ struct failedPoint {
   double mcnpParticleID;
   double mcnpCellID;
   double mcnpMaterialID;
-  double color;
+  double dist;
   double rank;
 };
 
@@ -112,8 +112,9 @@ public:
   * @param[in] pointID The point number as listed by MCNP in the PTRAC file
   * @param[in] cellID The volume number where the point is located according to MCNP.
   * @param[in] materialID The material number where the point is located according to MCNP.
+  * @param[in] dist The distance from the nearest surface
   */
-  void recordFailure(std::vector<double> position, long rank, int pointID, int cellID, int materialID);
+  void recordFailure(std::vector<double> position, long rank, int pointID, int cellID, int materialID, double dist);
 
   /**
   * Get the list of failed tests.

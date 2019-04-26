@@ -40,7 +40,7 @@ TEST_F(StatisticsTest, addFailed)
   vector<failedPoint> failures = Stats->getFailures();
   ASSERT_EQ(failures.size(), 0);
 
-  Stats->recordFailure(position, 3.0, 1, 4, 2);
+  Stats->recordFailure(position, 3.0, 1, 4, 2, position[0]);
   failures = Stats->getFailures();
   ASSERT_EQ(failures.size(), 1);
   ASSERT_EQ(failures[0].position[0], fail.position[0]);
@@ -49,6 +49,6 @@ TEST_F(StatisticsTest, addFailed)
   ASSERT_EQ(failures[0].mcnpParticleID, fail.mcnpParticleID);
   ASSERT_EQ(failures[0].mcnpCellID, fail.mcnpCellID);
   ASSERT_EQ(failures[0].mcnpMaterialID, fail.mcnpMaterialID);
-  ASSERT_EQ(failures[0].color, fail.color);
+  ASSERT_EQ(failures[0].dist, fail.dist);
   ASSERT_EQ(failures[0].rank, fail.rank);
 }

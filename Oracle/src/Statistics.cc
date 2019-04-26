@@ -62,13 +62,13 @@ void Statistics::setNbT4Volumes(long nbVolumes)
   nbT4Volumes = nbVolumes;
 }
 
-void Statistics::recordFailure(vector<double> position, long rank, int pointID, int cellID, int materialID)
+void Statistics::recordFailure(vector<double> position, long rank, int pointID, int cellID, int materialID, double dist)
 {
   failedPoint failed{{position[0], position[1], position[2]},
                      double(pointID),
                      double(cellID),
                      double(materialID),
-                     position[0],
+                     dist,
                      double(rank)};
   failures.push_back(failed);
 }
@@ -84,6 +84,14 @@ void Statistics::report()
   cout << "Reporting on MCNP/T4 geometry comparison" << endl;
   cout << "-----------------------------" << endl;
 
+  double maxDist = 0.;
+  double averageDist = 0.;
+  for(auto const &failedPoint: failures) {
+    averageDist += failedPoint.dist;
+    maxDist = std::max(maxDist, failedPoint.dist);
+  }
+  averageDist /= failures.size();
+
   int totalPt = getTotalPts();
   cout << "Number of SAMPLED points : " << totalPt << endl;
   reportOn("SUCCESSFUL", nbSuccess, totalPt);
@@ -92,6 +100,8 @@ void Statistics::report()
   reportOn("OUTSIDE   ", nbOutside, totalPt);
   cout << "Number of COVERED volumes: " << coveredRanks.size() << endl;
   cout << "Number of INPUT   volumes: " << nbT4Volumes << endl;
+  cout << "Average distance to surface for FAILED points: " << averageDist << endl;
+  cout << "Maximum distance to surface for FAILED points: " << maxDist << endl;
 }
 
 void Statistics::reportOn(const string &status, int data, int total)
@@ -116,7 +126,7 @@ void Statistics::writeOutForVisu(string &fname)
                       T4_TYPE_DOUBLE, "pointID",
                       T4_TYPE_DOUBLE, "cellID",
                       T4_TYPE_DOUBLE, "materialID",
-                      T4_TYPE_DOUBLE, "color",
+                      T4_TYPE_DOUBLE, "dist",
                       T4_TYPE_DOUBLE, "rank",
                       T4_NO_TYPE);
 

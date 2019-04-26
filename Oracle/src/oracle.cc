@@ -33,7 +33,7 @@ int strictness_level = 3; //Global variable required by T4 libraries
 
 Statistics compare_geoms(const OptionsCompare &options)
 {
-  T4Geometry t4Geom(options.filenames[0], options.delta);
+  T4Geometry t4Geom(options.filenames[0]);
   MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
   Statistics stats;
 
@@ -47,7 +47,7 @@ Statistics compare_geoms(const OptionsCompare &options)
             << std::endl;
 
   if (options.verbosity > 0) {
-    cout << "delta is " << t4Geom.getDelta() << endl;
+    cout << "delta is " << options.delta << endl;
   }
 
   // The number of header lines must be 8 !!
@@ -72,14 +72,15 @@ Statistics compare_geoms(const OptionsCompare &options)
         if (t4Geom.weakEquivalence(materialDensityKey, compo)) {
           stats.incrementSuccess();
         } else {
-          if (t4Geom.isPointNearSurface(point, rank)) {
+          double const dist = t4Geom.distanceFromSurface(point, rank);
+          if (dist <= options.delta) {
             stats.incrementIgnore();
           } else {
             int pID = mcnpGeom.getPointID();
             int cID = mcnpGeom.getCellID();
             int mID = mcnpGeom.getMaterialID();
             stats.incrementFailure();
-            stats.recordFailure(point, rank, pID, cID, mID);
+            stats.recordFailure(point, rank, pID, cID, mID, dist);
             if (options.verbosity > 0) {
               cout << "Failed tests at position: " << endl
                    << "x = " << point[0] << endl
@@ -101,7 +102,7 @@ int main(int argc, char **argv)
   auto start = std::chrono::system_clock::now();
   std::cout << "*** MCNP / Tripoli-4 geometry comparison ***" << endl;
   t4_output_stream = &cout;
-  t4_language = (T4_language)0;
+  t4_language = (T4_language)2;
 
   // ---- Read options ----
   OptionsCompare options;

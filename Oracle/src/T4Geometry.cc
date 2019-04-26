@@ -19,8 +19,7 @@ const vector<vector<double>> T4Geometry::directions = {{0.0, 0.0, 1.0},
                                                        {1.0, 0.0, 0.0},
                                                        {-1.0, 0.0, 0.0}};
 
-T4Geometry::T4Geometry(const string &t4Filename, double delta) : t4Filename(t4Filename),
-                                                                 delta(delta)
+T4Geometry::T4Geometry(const string &t4Filename) : t4Filename(t4Filename)
 {
   readT4input();
 }
@@ -101,12 +100,7 @@ Compos *const &T4Geometry::getCompos()
   return compos;
 }
 
-double T4Geometry::getDelta()
-{
-  return delta;
-}
-
-bool T4Geometry::isPointNearSurface(const vector<double> &point, long rank)
+double T4Geometry::distanceFromSurface(const vector<double> &point, long rank)
 {
   double shortestDist = 1.0e+10;
   pair<double, long> result;
@@ -114,5 +108,5 @@ bool T4Geometry::isPointNearSurface(const vector<double> &point, long rank)
     result = volumes->next_surface_in_direction(rank, point, idir);
     shortestDist = min(result.first, shortestDist);
   }
-  return shortestDist <= delta;
+  return shortestDist;
 }

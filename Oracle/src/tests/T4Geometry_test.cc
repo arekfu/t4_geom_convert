@@ -22,7 +22,7 @@ protected:
   {
     t4_output_stream = &cout;
     t4_language = (T4_language)0;
-    t4Geom = new T4Geometry("slab.t4", 1.0e-7);
+    t4Geom = new T4Geometry("slab.t4");
   }
 
   static void TearDownTestCase()
@@ -92,14 +92,14 @@ TEST_F(T4test, DistanceToSurface)
   Volumes *volumes = t4Geom->getVolumes();
 
   rank = volumes->which_volume(point1);
-  ASSERT_TRUE(t4Geom->isPointNearSurface(point1, rank));
+  ASSERT_TRUE(t4Geom->distanceFromSurface(point1, rank) <= 1e-7);
 
   rank = volumes->which_volume(point1a);
-  ASSERT_TRUE(t4Geom->isPointNearSurface(point1a, rank));
+  ASSERT_TRUE(t4Geom->distanceFromSurface(point1a, rank) <= 1e-7);
 
   rank = volumes->which_volume(point1b);
-  ASSERT_TRUE(t4Geom->isPointNearSurface(point1b, rank));
+  ASSERT_TRUE(t4Geom->distanceFromSurface(point1b, rank) <= 1e-7);
 
   rank = volumes->which_volume(point2);
-  ASSERT_FALSE(t4Geom->isPointNearSurface(point2, rank));
+  ASSERT_FALSE(t4Geom->distanceFromSurface(point2, rank) <= 1e-7);
 }

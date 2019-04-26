@@ -33,7 +33,6 @@ class T4Geometry
   Compos *compos;
   std::string t4Filename;
   std::map<std::string, std::string> equivalenceMap;
-  double delta;
 
 public:
   T4Geometry();
@@ -42,10 +41,9 @@ public:
    *  Class constructor.
    *
    * @param[in] t4Filename The Tripoli-4 geometry file to be compared.
-   * @param[in] delta The distance to the closest boundary below which a mismatch
    * is ignored.
    */
-  T4Geometry(const std::string &t4Filename, double delta);
+  T4Geometry(const std::string &t4Filename);
 
   /**
    *  Class destructor.
@@ -64,7 +62,6 @@ public:
   std::string getFilename();
   Volumes *const &getVolumes();
   Compos *const &getCompos();
-  double getDelta();
 
   /**
    * Check if the input material as already been mapped to T4 composition.
@@ -90,13 +87,13 @@ public:
   bool weakEquivalence(const std::string &matDens, const std::string &compo);
 
   /**
-   * Checks if the considered point distance to the nearest surface is below
-   * a pre-defined threshold delta.
+   * Returns an estimate of the distance from the considered point to the
+   * nearest surface.
    * @param[in] point the coordinates of the considered point.
    * @param[in] long the volume number where the considered point is.
-   * @return True if the point distance to the next surface is too small, False otherwise.
+   * @return an estimate of the distance
    */
-  bool isPointNearSurface(const std::vector<double> &point, long rank);
+  double distanceFromSurface(const std::vector<double> &point, long rank);
 };
 
 #endif /* T4GEOMETRY_H_ */
