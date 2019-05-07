@@ -11,3 +11,4 @@ Oracle/checks
 Oracle/report.txt
 .eggs
 __pycache__
+*.egg-info
