@@ -14,12 +14,10 @@ Created on 7 févr. 2019
     >>> print(dict_Composition)
 
 '''
-from .Parameters import f_inputMCNP
 from ....MIP import mip
-
-
 from ...Composition.CCompositionMCNP import CCompositionMCNP
 from ....MIP.geom.grammars.composition import get_materialComposition
+from t4_geom_convert.Kernel.Configuration.CConfigParameters import CConfigParameters
 
 class CParseMCNPComposition(object):
     '''
@@ -32,7 +30,7 @@ class CParseMCNPComposition(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = f_inputMCNP
+        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
 
     def m_parsingMaterialComposition(self):
         '''

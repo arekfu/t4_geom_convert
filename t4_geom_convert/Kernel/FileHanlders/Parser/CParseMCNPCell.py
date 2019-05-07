@@ -18,9 +18,9 @@ import re
 from ....MIP.geom.cells import get_cells
 from ....MIP import mip
 from ....MIP.geom.parsegeom import get_ast
-from .Parameters import f_inputMCNP
 from ...Volume.CCellMCNP import CCellMCNP
 from ....MIP.geom.composition import get_materialImportance
+from t4_geom_convert.Kernel.Configuration.CConfigParameters import CConfigParameters
 class CParseMCNPCell(object):
     '''
     :brief: Class which parse the block CELLS.
@@ -31,7 +31,7 @@ class CParseMCNPCell(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = f_inputMCNP
+        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
         
     def m_parsingMaterialImportance(self):
         '''
@@ -85,7 +85,3 @@ class CParseMCNPCell(object):
                 dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance)
             i += 1
         return dictCell
-
-d = CParseMCNPCell().m_parsingCell()
-for k in d.keys():
-    print(k)

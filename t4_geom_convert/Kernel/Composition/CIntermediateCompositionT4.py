@@ -47,9 +47,9 @@ class CIntermediateCompositionT4(object):
                     if float(density) not in l_density:
                         l_density.append(float(density))
                         if float(density) < 0:
-                            l_typeDensityT4.append('Density')
+                            l_typeDensityT4.append('DENSITY')
                         if float(density) > 0:
-                            l_typeDensityT4.append('Point Wise')
+                            l_typeDensityT4.append('POINT WISE')
             dic_newCompositionT4[key] = CCompositionT4(l_typeDensityT4, 'm'+str(key),\
                                                        l_density,\
                                                        len(l_listeMaterialComposition),\

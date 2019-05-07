@@ -16,10 +16,9 @@ Created on 6 févr. 2019
 '''
 from ....MIP import mip
 from ....MIP.geom.surfaces import get_surfaces
-
-from ...FileHanlders.Parser.Parameters import f_inputMCNP
 from ...Surface.CSurfaceMCNP import CSurfaceMCNP
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP
+from t4_geom_convert.Kernel.Configuration.CConfigParameters import CConfigParameters
 
 class CParseMCNPSurface(object):
     '''
@@ -31,7 +30,7 @@ class CParseMCNPSurface(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = f_inputMCNP
+        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
 
     def m_parsingSurface(self):
         '''
