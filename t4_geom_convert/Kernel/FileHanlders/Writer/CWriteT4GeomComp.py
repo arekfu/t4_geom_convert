@@ -23,18 +23,18 @@ class CWriteT4GeomComp(object):
         :brief: method writing GeomComp of the T4 input file
         '''
         f = open('testconnverti.txt', "a+")
-        f.write("\r\n GEOMCOMP \r\n")
-        f.write("\r\n")
+        f.write("\n GEOMCOMP \n")
+        f.write("\n")
         dic_geomComp = CIntermediateGeomCompT4().m_constructGeomCompT4()
         for k in dic_geomComp.keys():
             p_materialName = str(k)
             p_numberOfCell = str(dic_geomComp[k].volumeNumberMaterial)
             p_listVolumeId = dic_geomComp[k].listVolumeId
-            f.write("%s %s %s \r" % ("m" + p_materialName, p_numberOfCell,\
+            f.write("%s %s %s \n" % ("m" + p_materialName, p_numberOfCell,\
                                      p_listVolumeId))
-        f.write("\r\n")
+        f.write("\n")
         f.write("END_GEOMCOMP")
-        f.write("\r\n")
+        f.write("\n")
         f.close()
 
 CWriteT4GeomComp().m_writeT4GeomComp()

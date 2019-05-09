@@ -22,18 +22,18 @@ class CWriteT4BoundCond(object):
         :brief: method writing GeomComp of the T4 input file
         '''
         f = open('testconnverti.txt', "a+")
-        f.write("\r\n BOUNDARY_CONDITION \r\n")
-        f.write("\r\n")
-        f.write("\r\n ALL_COMPLETE \r\n")
-        f.write("\r\n")
+        f.write("\n BOUNDARY_CONDITION \n")
+        f.write("\n")
+        f.write("\n ALL_COMPLETE \n")
+        f.write("\n")
         d_boundCond = CConversionBoundaryCondition().m_conversionBoundCond()
         f.write(str(len(d_boundCond)))
-        f.write("\r\n")
+        f.write("\n")
         for k in d_boundCond.keys():
             p_typeOfBound = d_boundCond[k].typeOfBound
-            f.write("%s %s \r" %(str(k), p_typeOfBound))
-        f.write("\r\n")
+            f.write("%s %s \n" %(str(k), p_typeOfBound))
+        f.write("\n")
         f.write("END_BOUNDARY_CONDITION")
-        f.write("\r\n")
+        f.write("\n")
         f.close()
 CWriteT4BoundCond().m_writeT4BoundCond()
