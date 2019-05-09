@@ -14,6 +14,8 @@
 from ..Surface.CDictSurfaceMCNP import CDictSurfaceMCNP
 from ..Surface.CDictSurfaceT4 import CDictSurfaceT4
 from ..Surface.DTypeConversion import dict_conversionSurfaceType
+from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MCNPS
+from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 import math
 
 class CSurfaceConversionMCNPToT4(object):
@@ -34,83 +36,115 @@ class CSurfaceConversionMCNPToT4(object):
         dic_SurfaceT4 = dict()
         obj_T4 = CDictSurfaceT4(dic_SurfaceT4)
         for key, val in CDictSurfaceMCNP().d_surfaceMCNP.items():
-            typeSurfaceMCNP = val.typeSurface
-            typeSurfaceT4 = dict_conversionSurfaceType[typeSurfaceMCNP]
             try:
-                listCoefSurfaceT4 = self.m_surfaceParametresConversion(typeSurfaceMCNP,
-                                                                   val.paramSurface)
+                surfacesT4 = self.m_surfaceParametresConversion(val)
             except:
                 print(key, 'Parameters of this surface do not comply')
                 raise
-            valueT4 = (typeSurfaceT4, listCoefSurfaceT4)
-            obj_T4.__setitem__(key, valueT4)
+            obj_T4[key] = surfacesT4
         return dic_SurfaceT4
 
-    def m_surfaceParametresConversion(self, p_typeSurfaceMCNP, p_listeParametreMCNP):
+    def m_surfaceParametresConversion(self, p_surfaceMCNP):
         '''
         method which take information of the MCNP Surface and return a list of
         converted surface in T4
         '''
-        listeParametreT4 = []
-        if p_typeSurfaceMCNP.name == "PX" or p_typeSurfaceMCNP.name == "PY" or\
-        p_typeSurfaceMCNP.name == "PZ" and len(p_listeParametreMCNP) == 1:
-            listeParametreT4 = p_listeParametreMCNP
-        elif p_typeSurfaceMCNP.name == "P" or p_typeSurfaceMCNP.name == "S" and\
-        len(p_listeParametreMCNP) == 4:
-            listeParametreT4 = p_listeParametreMCNP
-        elif p_typeSurfaceMCNP.name == "C/X" or p_typeSurfaceMCNP.name == "C/Y" or\
-        p_typeSurfaceMCNP.name == "C/Z"  and len(p_listeParametreMCNP) == 3:
-            listeParametreT4 = p_listeParametreMCNP
-        elif p_typeSurfaceMCNP.name == "GQ"  and len(p_listeParametreMCNP) == 8:
-            listeParametreT4 = p_listeParametreMCNP
-        elif p_typeSurfaceMCNP.name == "SO"  and len(p_listeParametreMCNP) == 1:
-            listeParametreT4 = [0, 0, 0, p_listeParametreMCNP[0]]
-        elif p_typeSurfaceMCNP.name == "SX"  and len(p_listeParametreMCNP) == 2:
-            listeParametreT4 = [p_listeParametreMCNP[0], 0, 0, p_listeParametreMCNP[1]]
-        elif p_typeSurfaceMCNP.name == "SY"  and len(p_listeParametreMCNP) == 2:
-            listeParametreT4 = [0, p_listeParametreMCNP[0], 0, p_listeParametreMCNP[1]]
-        elif p_typeSurfaceMCNP.name == "SZ"  and len(p_listeParametreMCNP) == 2:
-            listeParametreT4 = [0, 0, p_listeParametreMCNP[0], p_listeParametreMCNP[1]]
-        elif p_typeSurfaceMCNP.name == "CX" or p_typeSurfaceMCNP.name == "CY" or\
-        p_typeSurfaceMCNP.name == "CZ"  and len(p_listeParametreMCNP) == 1:
-            listeParametreT4 = [0, 0, p_listeParametreMCNP[0]]
-        elif (p_typeSurfaceMCNP.name == "K/X"
-              or p_typeSurfaceMCNP.name == "K/Y"
-              or p_typeSurfaceMCNP.name == "K/Z"):
-            p_atant = math.atan(math.sqrt(float(p_listeParametreMCNP[3])))
-            if len(p_listeParametreMCNP) == 4:
-                listeParametreT4 = [p_listeParametreMCNP[0],
-                                    p_listeParametreMCNP[1],
-                                    p_listeParametreMCNP[2], p_atant]
-            elif len(p_listeParametreMCNP) == 5:
-                listeParametreT4 = [p_listeParametreMCNP[0],
-                                    p_listeParametreMCNP[1],
-                                    p_listeParametreMCNP[2], p_atant,
-                                    p_listeParametreMCNP[4]]
-            else:
-                msg = ('Unexpected number of MCNP parameters in {} surface: {}'
-                       .format(p_typeSurfaceMCNP, len(p_listeParametreMCNP)))
-                raise ValueError(msg)
-        elif p_typeSurfaceMCNP.name == "KX":
-            if len(p_listeParametreMCNP) == 2:
-                p_atant = math.atan(math.sqrt(float(p_listeParametreMCNP[1])))
-                listeParametreT4 = [p_listeParametreMCNP[0], 0, 0, p_atant]
-            else:
-                raise ValueError('Cannot handle 1-nappe KX cones (yet)')
-        elif p_typeSurfaceMCNP.name == "KY":
-            if len(p_listeParametreMCNP) == 2:
-                p_atant = math.atan(math.sqrt(float(p_listeParametreMCNP[1])))
-                listeParametreT4 = [0, p_listeParametreMCNP[0], 0, p_atant]
-            else:
-                raise ValueError('Cannot handle 1-nappe KY cones (yet)')
-        elif p_typeSurfaceMCNP.name == "KZ":
-            if len(p_listeParametreMCNP) == 2:
-                p_atant = math.atan(math.sqrt(float(p_listeParametreMCNP[1])))
-                listeParametreT4 = [0, 0, p_listeParametreMCNP[0], p_atant]
-            else:
-                raise ValueError('Cannot handle 1-nappe KZ cones (yet)')
-        else:
-            raise ValueError('Cannot convert MCNP surface: {} {}'
-                             .format(p_typeSurfaceMCNP, p_listeParametreMCNP))
+        typeSurfaceMCNP = p_surfaceMCNP.typeSurface
+        listeParametreMCNP = p_surfaceMCNP.paramSurface
 
-        return listeParametreT4
+        typeSurfaceT4 = dict_conversionSurfaceType[typeSurfaceMCNP]
+
+        # First handle cones, which are a bit of a special case due to the fact
+        # that they can have an extra +-1 parameter to indicate one-nappe
+        # cones. Since one-nappe cones are not implemented in TRIPOLI-4, we
+        # have to emulate them using a two-nappe cone and a plane. We return
+        # the TRIPOLI-4 two-nappe cone, plus a pair consisting of the TRIPOLI-4
+        # plane and the side of the plane which should be used, regardless of
+        # which side of the cone appears in the cell definition.
+        if typeSurfaceMCNP == MCNPS.KX:
+            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[1])))
+            listeParametreT4 = [listeParametreMCNP[0], 0, 0, p_atant]
+            coneT4 = (typeSurfaceT4, listeParametreT4)
+            if len(listeParametreMCNP) == 2:
+                return [coneT4]
+            if len(listeParametreMCNP) == 3:
+                side = int(listeParametreMCNP[-1])
+                planeT4 = (T4S.PLANEX, [listeParametreMCNP[0]])
+                return [coneT4, (planeT4, side)]
+            msg = ('Unexpected number of parameters in MCNP surface: {}'
+                    .format(p_surfaceMCNP))
+            raise ValueError(msg)
+        elif typeSurfaceMCNP == MCNPS.KY:
+            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[1])))
+            listeParametreT4 = [0, listeParametreMCNP[0], 0, p_atant]
+            coneT4 = (typeSurfaceT4, listeParametreT4)
+            if len(listeParametreMCNP) == 2:
+                return [coneT4]
+            if len(listeParametreMCNP) == 3:
+                side = int(listeParametreMCNP[-1])
+                planeT4 = (T4S.PLANEY, [listeParametreMCNP[0]])
+                return [coneT4, (planeT4, side)]
+            msg = ('Unexpected number of parameters in MCNP surface: {}'
+                    .format(p_surfaceMCNP))
+            raise ValueError(msg)
+        elif typeSurfaceMCNP == MCNPS.KZ:
+            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[1])))
+            listeParametreT4 = [0, 0, listeParametreMCNP[0], p_atant]
+            coneT4 = (typeSurfaceT4, listeParametreT4)
+            if len(listeParametreMCNP) == 2:
+                return [coneT4]
+            if len(listeParametreMCNP) == 3:
+                side = int(listeParametreMCNP[-1])
+                planeT4 = (T4S.PLANEZ, [listeParametreMCNP[0]])
+                return [coneT4, (planeT4, side)]
+            msg = ('Unexpected number of parameters in MCNP surface: {}'
+                    .format(p_surfaceMCNP))
+            raise ValueError(msg)
+        elif typeSurfaceMCNP in (MCNPS.K_X, MCNPS.K_Y, MCNPS.K_Z):
+            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[3])))
+            if len(listeParametreMCNP) == 4:
+                listeParametreT4 = [listeParametreMCNP[0],
+                                    listeParametreMCNP[1],
+                                    listeParametreMCNP[2], p_atant]
+                return [(typeSurfaceT4, listeParametreT4)]
+            if len(listeParametreMCNP) == 5:
+                side = int(listeParametreMCNP[-1])
+                if typeSurfaceMCNP == MCNPS.K_X:
+                    planeT4 = (T4S.PLANEX, [listeParametreMCNP[0]])
+                elif typeSurfaceMCNP == MCNPS.K_Y:
+                    planeT4 = (T4S.PLANEY, [listeParametreMCNP[1]])
+                elif typeSurfaceMCNP == MCNPS.K_Z:
+                    planeT4 = (T4S.PLANEZ, [listeParametreMCNP[2]])
+                return [coneT4, (planeT4, side)]
+            msg = ('Unexpected number of parameters in MCNP surface: {}'
+                    .format(p_surfaceMCNP))
+            raise ValueError(msg)
+
+        # Not a cone, fall back to the normal treatment
+        if (typeSurfaceMCNP in (MCNPS.PX, MCNPS.PY, MCNPS.PZ)
+            and len(listeParametreMCNP) == 1):
+            listeParametreT4 = listeParametreMCNP
+        elif (typeSurfaceMCNP in (MCNPS.P, MCNPS.S)
+              and len(listeParametreMCNP) == 4):
+            listeParametreT4 = listeParametreMCNP
+        elif (typeSurfaceMCNP in (MCNPS.C_X, MCNPS.C_Y, MCNPS.C_Z)
+              and len(listeParametreMCNP) == 3):
+            listeParametreT4 = listeParametreMCNP
+        elif typeSurfaceMCNP == MCNPS.GQ  and len(listeParametreMCNP) == 8:
+            listeParametreT4 = listeParametreMCNP
+        elif typeSurfaceMCNP == MCNPS.SO  and len(listeParametreMCNP) == 1:
+            listeParametreT4 = [0, 0, 0, listeParametreMCNP[0]]
+        elif typeSurfaceMCNP == MCNPS.SX  and len(listeParametreMCNP) == 2:
+            listeParametreT4 = [listeParametreMCNP[0], 0, 0, listeParametreMCNP[1]]
+        elif typeSurfaceMCNP == MCNPS.SY  and len(listeParametreMCNP) == 2:
+            listeParametreT4 = [0, listeParametreMCNP[0], 0, listeParametreMCNP[1]]
+        elif typeSurfaceMCNP == MCNPS.SZ  and len(listeParametreMCNP) == 2:
+            listeParametreT4 = [0, 0, listeParametreMCNP[0], listeParametreMCNP[1]]
+        elif (typeSurfaceMCNP in (MCNPS.CX, MCNPS.CY, MCNPS.CZ)
+              and len(listeParametreMCNP) == 1):
+            listeParametreT4 = [0, 0, listeParametreMCNP[0]]
+        else:
+            raise ValueError('Cannot convert MCNP surface: {}'
+                             .format(p_surfaceMCNP))
+
+        return [(typeSurfaceT4, listeParametreT4)]

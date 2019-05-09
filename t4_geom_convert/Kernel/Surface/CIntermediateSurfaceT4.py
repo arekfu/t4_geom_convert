@@ -36,7 +36,14 @@ class CIntermediateSurfaceT4(object):
         '''
         dic_newSurfaceT4 = dict()
         dic_surfaceT4 = CSurfaceConversionMCNPToT4().m_conversionMCNPToT4()
-        for key, val in dic_surfaceT4.items():
-            p_typeSurface, p_listCoefSurface = val
-            dic_newSurfaceT4[key] = CSurfaceT4(p_typeSurface.name, p_listCoefSurface)
+        free_id = max(int(k) for k in dic_surfaceT4.keys()) + 1
+        for key, surfs in dic_surfaceT4.items():
+            extra_surfs = surfs[1:]
+            extra_ids = []
+            for (p_typeSurface, p_listCoefSurface), side in extra_surfs:
+                dic_newSurfaceT4[free_id] = (CSurfaceT4(p_typeSurface.name, p_listCoefSurface), [])
+                extra_ids.append(side * free_id)
+                free_id += 1
+            p_typeSurface, p_listCoefSurface = surfs[0]
+            dic_newSurfaceT4[key] = (CSurfaceT4(p_typeSurface.name, p_listCoefSurface), extra_ids)
         return dic_newSurfaceT4

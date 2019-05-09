@@ -6,9 +6,9 @@ Created on 19 févr. 2019
 '''
 from enum import Enum
 
-ESurfaceTypeT4Eng = Enum('ESurfaceTypeMCNPEng', 'PLANEX PLANEY PLANEZ PLANE \
-SPHERE CYLX CYLY CYLZ  \
-CONEX CONEY CONEZ QUAD TORUSX TORUSY TORUSZ ')
+ESurfaceTypeT4Eng = Enum('ESurfaceTypeMCNPEng', 'PLANEX PLANEY PLANEZ PLANE '
+                         'SPHERE CYLX CYLY CYLZ CONEX CONEY CONEZ QUAD TORUSX '
+                         'TORUSY TORUSZ ')
 
 # ESurfaceTypeT4Fr = Enum('ESurfaceTypeMCNPFr','PLANX PLANY PLANZ PLAN \
 # SPHERE CYLX CYLY CYLZ CONEX CONEY CONEZ \

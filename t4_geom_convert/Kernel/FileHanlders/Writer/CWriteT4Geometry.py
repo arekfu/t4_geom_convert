@@ -38,7 +38,7 @@ class CWriteT4Geometry(object):
             f.write("SURFACE %s %s %s \n" % (k, dic_surface[k].typeSurface,\
                                              s_paramSurface))
         f.write("\n")
-        dic_volume = CIntermediateVolumeT4().m_constructVolumeT4()
+        dic_volume = CIntermediateVolumeT4(dic_surface).m_constructVolumeT4()
         for k in dic_volume.keys():
             s_operator = dic_volume[k].operator
             s_param = dic_volume[k].param
