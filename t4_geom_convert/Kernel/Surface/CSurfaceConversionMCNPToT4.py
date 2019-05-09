@@ -37,7 +37,7 @@ class CSurfaceConversionMCNPToT4(object):
             typeSurfaceMCNP = val.typeSurface
             typeSurfaceT4 = dict_conversionSurfaceType[typeSurfaceMCNP]
             try:
-                listCoefSurfaceT4 = self.m_surfaceParamètresConversion(typeSurfaceMCNP,\
+                listCoefSurfaceT4 = self.m_surfaceParametresConversion(typeSurfaceMCNP,
                                                                    val.paramSurface)
             except:
                 print(key, 'Parameters of this surface do not comply')
@@ -46,7 +46,7 @@ class CSurfaceConversionMCNPToT4(object):
             obj_T4.__setitem__(key, valueT4)
         return dic_SurfaceT4
 
-    def m_surfaceParamètresConversion(self, p_typeSurfaceMCNP, p_listeParametreMCNP):
+    def m_surfaceParametresConversion(self, p_typeSurfaceMCNP, p_listeParametreMCNP):
         '''
         method which take information of the MCNP Surface and return a list of
         converted surface in T4
