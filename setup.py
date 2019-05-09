@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 
 
-name = 'Converter'
+name = 't4_geom_convert'
 author = u'Martin Maurey'
 author_email = u'martin.maurey@cea.fr'
 pkg_copyright = u'2019, ' + author
