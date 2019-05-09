@@ -6,9 +6,9 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 :file : Converter_CLI..py
 '''
-from FileHanlders.Writer.CWriteT4Geometry import CWriteT4Geometry
-from FileHanlders.Writer.CWriteT4Composition import CWriteT4Composition
-from FileHanlders.Writer.CWriteT4GeomComp import CWriteT4GeomComp
+from t4_geom_convert.Kernel.FileHanlders.Writer.CWriteT4Geometry import CWriteT4Geometry
+from t4_geom_convert.Kernel.FileHanlders.Writer.CWriteT4Composition import CWriteT4Composition
+from t4_geom_convert.Kernel.FileHanlders.Writer.CWriteT4GeomComp import CWriteT4GeomComp
 """
 Usage:
         Converter_CLI.py conversion <p_nameT4File> <p_nameMCNPFile>
