@@ -56,7 +56,7 @@ class CCellConversion(object):
         tuple_final = 'EQUA', str_equa, s_fictive
         return(tuple_final)
 
-    def m_conversionINTUNION(self, op, left_id, right_id, fictive):
+    def m_conversionINTUNION(self, op, *ids, fictive):
         '''
         :brief: method analyze the type of conversion needed between a T4 INTERSECTION
         and a T4 UNION and return a tuple with the information of the T4 VOLUME
@@ -70,7 +70,7 @@ class CCellConversion(object):
             s_fictive = ''
         if fictive == True:
             s_fictive = 'FICTIVE'
-        s_param = '2 ' + str(left_id) + ' ' + str(right_id)
+        s_param = str(len(ids)) + ' ' + ' '.join(str(a_id) for a_id in ids)
         tuple_final = opT4, s_param, s_fictive
         return tuple_final
 
@@ -110,10 +110,10 @@ class CCellConversion(object):
             self.dictClassT4[p_id] = CVolumeT4(opT4, param, fict)
             return p_id
         else:
-            p_id, op, left, right = p_tree
-            l_id = self.m_postOrderTraversalConversion(left)
-            r_id = self.m_postOrderTraversalConversion(right)
-            tupOPER = self.m_conversionINTUNION(op, l_id, r_id, fictive=True)
+            print(p_tree)
+            p_id, op, *args = p_tree
+            arg_ids = [self.m_postOrderTraversalConversion(arg) for arg in args]
+            tupOPER = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
             opT4, param, fict = tupOPER
             self.dictClassT4.__setitem__(p_id, CVolumeT4(opT4, param, fict))
             return p_id
