@@ -47,7 +47,7 @@ class CParseMCNPCell(object):
         for k, v in list(importanceParser.items()):
             liste_imp = v
             for element in liste_imp:
-                if 'R' in element:
+                if 'R' in element.upper():
                     index = i
                     value_imp = liste_imp[index-1]
                     liste_findInt = re.findall(r'\d+', element)
