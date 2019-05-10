@@ -70,9 +70,7 @@ class CParseMCNPCell(object):
         dictCell = dict()
         liste_importance = self.m_parsingMaterialImportance()
         i = 0
-        print(liste_importance)
         for k, v in list(cellParser.items()):
-            print(i)
             if liste_importance[i] != 0:
                 material, geometry, option = v
                 materialID = material.split()[0]
