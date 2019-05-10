@@ -48,8 +48,10 @@ class CCellConversion(object):
             else:
                 i_plus += 1
                 str_equaPlus = str_equaPlus + str(elt) + ' '
-        str_equaPlus = 'PLUS'+ ' ' + str(i_plus) + ' ' + str_equaPlus
-        str_equaMinus = 'MINUS'+ ' ' + str(i_minus) + ' ' + str_equaMinus
+        if i_plus > 0:
+            str_equaPlus = 'PLUS'+ ' ' + str(i_plus) + ' ' + str_equaPlus
+        if i_minus > 0:
+            str_equaMinus = 'MINUS'+ ' ' + str(i_minus) + ' ' + str_equaMinus
         str_equa = str_equaPlus + ' ' + str_equaMinus
         if fictive == False:
             s_fictive = ''
