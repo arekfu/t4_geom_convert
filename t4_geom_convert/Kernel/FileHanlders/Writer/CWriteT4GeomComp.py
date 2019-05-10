@@ -18,11 +18,10 @@ class CWriteT4GeomComp(object):
         '''
         Constructor
         '''
-    def m_writeT4GeomComp(self):
+    def m_writeT4GeomComp(self, f):
         '''
         :brief: method writing GeomComp of the T4 input file
         '''
-        f = open('testconnverti.txt', "a+")
         f.write("\n GEOMCOMP \n")
         f.write("\n")
         dic_geomComp = CIntermediateGeomCompT4().m_constructGeomCompT4()
@@ -35,6 +34,5 @@ class CWriteT4GeomComp(object):
         f.write("\n")
         f.write("END_GEOMCOMP")
         f.write("\n")
-        f.close()
 
-CWriteT4GeomComp().m_writeT4GeomComp()
+# CWriteT4GeomComp().m_writeT4GeomComp()

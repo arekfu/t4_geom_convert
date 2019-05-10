@@ -17,11 +17,10 @@ class CWriteT4Composition(object):
         '''
         Constructor
         '''
-    def m_writeT4Composition(self):
+    def m_writeT4Composition(self, f):
         '''
         :brief: method writing composition of the T4 input file
         '''
-        f = open('testconnverti.txt',"a+")
         f.write("\n COMPOSITION \n")
         f.write("\n")
         temperature = 300
@@ -46,6 +45,5 @@ class CWriteT4Composition(object):
         f.write("\n")
         f.write("END_COMPOSITION")
         f.write("\n")
-        f.close()
 
-CWriteT4Composition().m_writeT4Composition()
+# CWriteT4Composition().m_writeT4Composition()

@@ -18,25 +18,23 @@ class CWriteT4Geometry(object):
         '''
         Constructor
         '''
-    def m_writeT4Geometry(self):
+    def m_writeT4Geometry(self, f):
         '''
         :brief: method separated in two part,
         the first for the surface and the second for the volume
         This method fills a file of the geometry for the input file of T4
         '''
-        f = open('testconnverti.txt', "a+")
         f.write("GEOMETRY \n")
         f.write("\n")
         f.write("TITLE title")
         f.write("\n")
         dic_surface = CIntermediateSurfaceT4().m_constructSurfaceT4()
-        for k in dic_surface.keys():
-            s_paramSurface = ''
-            list_paramSurface = dic_surface[k].paramSurface
-            for element in list_paramSurface:
-                s_paramSurface = s_paramSurface + str(element) + ' '
-            f.write("SURFACE %s %s %s \n" % (k, dic_surface[k].typeSurface,\
-                                             s_paramSurface))
+        for key, (surf, _extra_ids) in dic_surface.items():
+            list_paramSurface = surf.paramSurface
+            print(key, surf.typeSurface, list_paramSurface)
+            s_paramSurface = ' '.join(str(element) for element in list_paramSurface)
+            f.write("SURFACE %s %s %s\n" % (key, surf.typeSurface,
+                                            s_paramSurface))
         f.write("\n")
         dic_volume = CIntermediateVolumeT4(dic_surface).m_constructVolumeT4()
         for k in dic_volume.keys():
@@ -47,6 +45,5 @@ class CWriteT4Geometry(object):
         f.write("\n")
         f.write("ENDG")
         f.write("\n")
-        f.close()
 
-CWriteT4Geometry().m_writeT4Geometry()
+# CWriteT4Geometry().m_writeT4Geometry()
