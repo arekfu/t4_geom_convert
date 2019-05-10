@@ -133,7 +133,9 @@ class CCellConversion(object):
         new_args = [self.m_postOrderTraversalOptimisation(node) for node in args]
         new_node = [p_id, op]
         for node in new_args:
-            if CTreeMethods().m_isInterSurface(node) and op == '*':
+            if CTreeMethods().m_isIntersection(node) and op == '*':
+                new_node.extend(node[2:])
+            elif CTreeMethods().m_isUnion(node) and op == ':':
                 new_node.extend(node[2:])
             else:
                 new_node.append(node)

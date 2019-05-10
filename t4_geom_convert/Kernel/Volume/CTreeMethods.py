@@ -47,6 +47,28 @@ class CTreeMethods(object):
 
         return False
 
+    def m_isIntersection(self, tree):
+        '''
+        :brief: method which permit to know if a node is an intersection
+        :return: a boolean.
+        '''
+        if isinstance(tree, list):
+            if tree[1] == '*':
+                return True
+
+        return False
+
+    def m_isUnion(self, tree):
+        '''
+        :brief: method which permit to know if a node is a union
+        :return: a boolean.
+        '''
+        if isinstance(tree, list):
+            if tree[1] == ':':
+                return True
+
+        return False
+
 # for key,val in CDictCellMCNP().d_cellMCNP.items():
 #     root = val.geometry
 #     tree = root
