@@ -20,7 +20,7 @@ from ....MIP import mip
 from ....MIP.geom.parsegeom import get_ast
 from ...Volume.CCellMCNP import CCellMCNP
 from ....MIP.geom.composition import get_materialImportance
-from t4_geom_convert.Kernel.Configuration.CConfigParameters import CConfigParameters
+from ...Configuration.CConfigParameters import CConfigParameters
 class CParseMCNPCell(object):
     '''
     :brief: Class which parse the block CELLS.

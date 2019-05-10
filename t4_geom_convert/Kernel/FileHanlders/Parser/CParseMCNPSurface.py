@@ -18,7 +18,7 @@ from ....MIP import mip
 from ....MIP.geom.surfaces import get_surfaces
 from ...Surface.CSurfaceMCNP import CSurfaceMCNP
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP
-from t4_geom_convert.Kernel.Configuration.CConfigParameters import CConfigParameters
+from ...Configuration.CConfigParameters import CConfigParameters
 
 class CParseMCNPSurface(object):
     '''

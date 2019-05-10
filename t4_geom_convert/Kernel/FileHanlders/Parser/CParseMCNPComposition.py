@@ -17,7 +17,7 @@ Created on 7 févr. 2019
 from ....MIP import mip
 from ...Composition.CCompositionMCNP import CCompositionMCNP
 from ....MIP.geom.grammars.composition import get_materialComposition
-from t4_geom_convert.Kernel.Configuration.CConfigParameters import CConfigParameters
+from ...Configuration.CConfigParameters import CConfigParameters
 
 class CParseMCNPComposition(object):
     '''

@@ -17,7 +17,7 @@ Created on 6 févr. 2019
 from ....MIP import mip
 from ....MIP.geom.transforms import get_transforms
 from ...Surface.CTransformationMCNP import CTransformationMCNP
-from t4_geom_convert.Kernel.Configuration.CConfigParameters import CConfigParameters
+from ...Configuration.CConfigParameters import CConfigParameters
 
 class CParseMCNPTransform(object):
     '''
