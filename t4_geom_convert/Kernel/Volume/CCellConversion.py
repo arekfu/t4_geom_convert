@@ -159,9 +159,13 @@ class CCellConversion(object):
             return p_tree
 
         self.i += 1
-        new_node = [self.i, '*', p_tree]
-        new_node.extend(Surface(surf) for surf in surfT4[1])
-        # print('replace: replacing {} with {}'.format(p_tree, new_node))
+        if p_tree < 0:
+            new_node = [self.i, '*', p_tree]
+            new_node.extend(Surface(surf) for surf in surfT4[1])
+        else:
+            new_node = [self.i, ':', p_tree]
+            new_node.extend(Surface(-surf) for surf in surfT4[1])
+        print('replace: replacing {} with {}'.format(p_tree, new_node))
         return GeomExpression(new_node)
 
 # dic_test = dict()

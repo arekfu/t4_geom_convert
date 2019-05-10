@@ -16,7 +16,7 @@ from ..Surface.CDictSurfaceT4 import CDictSurfaceT4
 from ..Surface.DTypeConversion import dict_conversionSurfaceType
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MCNPS
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
-import math
+from math import atan, pi, sqrt
 
 class CSurfaceConversionMCNPToT4(object):
     '''
@@ -62,7 +62,7 @@ class CSurfaceConversionMCNPToT4(object):
         # plane and the side of the plane which should be used, regardless of
         # which side of the cone appears in the cell definition.
         if typeSurfaceMCNP == MCNPS.KX:
-            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[1])))
+            p_atant = 180.*atan(sqrt(float(listeParametreMCNP[1])))/pi
             listeParametreT4 = [listeParametreMCNP[0], 0, 0, p_atant]
             coneT4 = (typeSurfaceT4, listeParametreT4)
             if len(listeParametreMCNP) == 2:
@@ -75,7 +75,7 @@ class CSurfaceConversionMCNPToT4(object):
                     .format(p_surfaceMCNP))
             raise ValueError(msg)
         elif typeSurfaceMCNP == MCNPS.KY:
-            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[1])))
+            p_atant = 180.*atan(sqrt(float(listeParametreMCNP[1])))/pi
             listeParametreT4 = [0, listeParametreMCNP[0], 0, p_atant]
             coneT4 = (typeSurfaceT4, listeParametreT4)
             if len(listeParametreMCNP) == 2:
@@ -88,7 +88,7 @@ class CSurfaceConversionMCNPToT4(object):
                     .format(p_surfaceMCNP))
             raise ValueError(msg)
         elif typeSurfaceMCNP == MCNPS.KZ:
-            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[1])))
+            p_atant = 180.*atan(sqrt(float(listeParametreMCNP[1])))/pi
             listeParametreT4 = [0, 0, listeParametreMCNP[0], p_atant]
             coneT4 = (typeSurfaceT4, listeParametreT4)
             if len(listeParametreMCNP) == 2:
@@ -101,7 +101,7 @@ class CSurfaceConversionMCNPToT4(object):
                     .format(p_surfaceMCNP))
             raise ValueError(msg)
         elif typeSurfaceMCNP in (MCNPS.K_X, MCNPS.K_Y, MCNPS.K_Z):
-            p_atant = math.atan(math.sqrt(float(listeParametreMCNP[3])))
+            p_atant = 180.*atan(sqrt(float(listeParametreMCNP[3])))/pi
             if len(listeParametreMCNP) == 4:
                 listeParametreT4 = [listeParametreMCNP[0],
                                     listeParametreMCNP[1],
