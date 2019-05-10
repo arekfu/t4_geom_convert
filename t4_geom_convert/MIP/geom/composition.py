@@ -38,9 +38,8 @@ def get_materialImportance(input, lim = None):
     #L=[]
     for c in input.cards(blocks='d', skipcomments=True):
         type, name, params = c.parts()
-        if 'imp:' in name.lower():
-            params = params.split()
-            params[0] = str(type)
+        if 'imp:n' in name.lower():
+            params = (type + params).split()
             d[name] = params
             n += 1
             if lim and n > lim:
