@@ -67,9 +67,9 @@ class CCellConversion(object):
         '''
 
         if op == '*':
-            opT4 = 'INTE'
+            opT4 = 'EQUA INTE'
         if op == ':':
-            opT4 = 'UNION'
+            opT4 = 'EQUA UNION'
         if fictive == False:
             s_fictive = ''
         if fictive == True:
