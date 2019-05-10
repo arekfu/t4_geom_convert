@@ -52,9 +52,9 @@ class CParseMCNPCell(object):
                     value_imp = liste_imp[index-1]
                     liste_findInt = re.findall(r'\d+', element)
                     numOfRep = int(liste_findInt[0])
-                    listeCellImp.extend([int(value_imp)]*numOfRep)
+                    listeCellImp.extend([float(value_imp)]*numOfRep)
                 else:
-                    listeCellImp.append(int(element))
+                    listeCellImp.append(float(element))
                 i += 1
         return listeCellImp
 
