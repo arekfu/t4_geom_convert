@@ -4,6 +4,7 @@ test.py
 Oracle/build
 Oracle/debug
 Oracle/release
+Oracle/build
 Oracle/runs
 Oracle.zip
 Oracle/docs/html
@@ -19,3 +20,4 @@ tmp_GEO*
 .eggs
 __pycache__
 *.egg-info
+t4_geom_convert/Kernel/Configuration/config_parameters.ini
