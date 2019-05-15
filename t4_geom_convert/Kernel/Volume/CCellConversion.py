@@ -65,11 +65,13 @@ class CCellConversion(object):
         :brief: method analyze the type of conversion needed between a T4 INTERSECTION
         and a T4 UNION and return a tuple with the information of the T4 VOLUME
         '''
-
+        keyS = 100000
         if op == '*':
             opT4 = 'EQUA INTE'
         if op == ':':
-            opT4 = 'EQUA UNION'
+            tupleForEqua = self.m_conversionEQUA([keyS+1, -(keyS+2)], fictive=True)
+            tupleEquaFinal = tupleForEqua[0:2]
+            opT4 = tupleEquaFinal[0] + ' ' + tupleEquaFinal[1] + 'UNION'
         if fictive == False:
             s_fictive = ''
         if fictive == True:

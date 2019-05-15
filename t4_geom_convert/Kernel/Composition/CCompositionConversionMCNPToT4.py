@@ -30,6 +30,7 @@ class CCompositionConversionMCNPToT4(object):
         obj_T4 = CDictCompositionT4(d_CompositionT4)
         l_compositionT4 = []
         for key, val in CDictCompositionMCNP().d_compositionMCNP.items():
+            l_compositionT4 = []
             listMaterialsSurface = val.m_ordDict()
             for element in listMaterialsSurface:
                 isotopeId, fraction = element
@@ -42,9 +43,8 @@ class CCompositionConversionMCNPToT4(object):
                 isotopeT4 = atomicNumberT4, massNumberT4
                 l_compositionT4.append((isotopeT4, fraction))
             valueT4 = l_compositionT4
-            obj_T4.__setitem__(key, valueT4) 
+            obj_T4.__setitem__(key, valueT4)    
         return d_CompositionT4
-
 # d = CCompositionConversionMCNPToT4().m_conversionCompositionMCNPToT4()
 # for key,val in d.items():
 #     print(key,val)
