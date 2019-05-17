@@ -6,7 +6,7 @@ Created on 6 févr. 2019
 :data : 06 February 2019
 :file : CDictCompositionMCNP.py
 '''
-from _collections_abc import MutableMapping
+from collections.abc import MutableMapping
 from ..FileHanlders.Parser.CParseMCNPComposition import CParseMCNPComposition
 from collections import OrderedDict
 

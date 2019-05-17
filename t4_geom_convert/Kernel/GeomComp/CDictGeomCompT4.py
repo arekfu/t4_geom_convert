@@ -6,7 +6,7 @@ Created on 6 févr. 2019
 :data : 06 February 2019
 :file : CDictGeomCompT4.py
 '''
-from _collections_abc import MutableMapping
+from collections.abc import MutableMapping
 
 class CDictGeomCompT4(MutableMapping):
     '''
