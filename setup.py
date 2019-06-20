@@ -22,7 +22,7 @@ setup(name=name,
       packages=find_packages(exclude=['doc', 'tests', 'tests.*', 'Oracle']),
       python_requires='>=3.4',
       setup_requires=['pytest-runner'],
-      install_requires=['TatSu'],
+      install_requires=['TatSu==4.3.0'],
       tests_require=test_deps,
       extras_require={'dev': dev_deps},
       command_options={
