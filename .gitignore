@@ -1,6 +1,7 @@
 *~
 *.gch
 test.py
+Oracle/build
 Oracle/debug
 Oracle/release
 Oracle/runs
@@ -9,6 +10,12 @@ Oracle/docs/html
 Oracle/docs/latex
 Oracle/checks
 Oracle/report.txt
+*.jpg
+*.bmp
+*.dat
+*.general
+*.window
+tmp_GEO*
 .eggs
 __pycache__
 *.egg-info

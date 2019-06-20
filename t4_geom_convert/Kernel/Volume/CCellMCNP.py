@@ -15,7 +15,7 @@ class CCellMCNP(object):
 
 
     def __init__(self, p_materialID, p_density, syntaxTreeMCNP,\
-                 p_importance, p_universe=0, fill=None):
+                 p_importance, p_universe, fillid, filltr, costr, idorigin=None):
         '''
         Constructor
         :param: p_materialID : identity number of the material
@@ -30,7 +30,10 @@ class CCellMCNP(object):
         self.geometry = syntaxTreeMCNP
         self.importance = p_importance
         self.universe = p_universe
-        self.fill = fill
+        self.fillid = fillid
+        self.filltr = filltr
+        self.idorigin = [] if idorigin is None else idorigin.copy()
+        self.costr = costr
 
     def m_evaluateASTMCNP(self):
         '''
@@ -43,3 +46,9 @@ class CCellMCNP(object):
         :brief: method applying the De Morgan law on a syntax tree
         '''
         self.geometry = self.geometry.inverse()
+    
+    def m_copy(self):
+        if hasattr(self.geometry , 'copy'):
+            return CCellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.idorigin.copy())
+        return CCellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.idorigin.copy())
+        

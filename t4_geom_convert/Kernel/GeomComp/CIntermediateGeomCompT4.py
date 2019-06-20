@@ -10,6 +10,7 @@ Created on 6 févr. 2019
 from ..GeomComp.CDictGeomCompT4 import CDictGeomCompT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
 from ..GeomComp.CGeomCompT4 import CGeomCompT4
+from collections import defaultdict
 
 class CIntermediateGeomCompT4(object):
     '''
@@ -21,27 +22,24 @@ class CIntermediateGeomCompT4(object):
         Constructor
         '''
 
-    def m_constructGeomCompT4(self):
+    def m_constructGeomCompT4(self, dicVol):
         '''
         :brief: method constructing a dictionary with the id of the
         material as a key and the instance of CGeomCompT4 as a value
         '''
         dic_geomCompT4 = dict()
-        dic_partialGeomComp = dict()
+        dic_partialGeomComp = defaultdict(list)
         obj_T4 = CDictGeomCompT4(dic_geomCompT4)
         dic_cellMCNP = CDictCellMCNP().d_cellMCNP
-        for key in dic_cellMCNP.keys():
-            obj_cellMCNP = dic_cellMCNP[key]
-            materialName = obj_cellMCNP.materialID
-            dic_partialGeomComp[materialName] = ""
-        for key in dic_cellMCNP.keys():
-            cellID = str(key)
-            obj_cellMCNP = dic_cellMCNP[key]
-            materialName = obj_cellMCNP.materialID
-            dic_partialGeomComp[materialName] = dic_partialGeomComp[materialName] +\
-            " " + cellID
+        for key, val in dicVol.items():
+            if val.idorigin:
+                volID = val.idorigin[0]
+            else:
+                volID = key
+            materialName = dic_cellMCNP[volID].materialID
+            dic_partialGeomComp[materialName].append(key)
         for key in dic_partialGeomComp.keys():
-            numberOfCell = len(dic_partialGeomComp[key].split(" ")) - 1
+            numberOfCell = len(dic_partialGeomComp[key])
             listCell = dic_partialGeomComp[key]
-            obj_T4.__setitem__(key, CGeomCompT4(numberOfCell, listCell))
+            obj_T4[key] = CGeomCompT4(numberOfCell, " ".join(str(x) for x in listCell))
         return obj_T4.geomCompT4

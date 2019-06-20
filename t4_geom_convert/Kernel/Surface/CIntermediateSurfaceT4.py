@@ -18,6 +18,7 @@ Created on 6 févr. 2019
 '''
 from ..Surface.CSurfaceConversionMCNPToT4 import CSurfaceConversionMCNPToT4
 from ..Surface.CSurfaceT4 import CSurfaceT4
+from ..Transformation.CConversionSurfaceTransformed import CConversionSurfaceTransformed
 
 class CIntermediateSurfaceT4(object):
     '''
@@ -28,6 +29,7 @@ class CIntermediateSurfaceT4(object):
         '''
         Constructor
         '''
+        
 
     def m_constructSurfaceT4(self):
         '''
@@ -36,8 +38,16 @@ class CIntermediateSurfaceT4(object):
         '''
         dic_newSurfaceT4 = dict()
         dic_surfaceT4 = CSurfaceConversionMCNPToT4().m_conversionMCNPToT4()
+        print('surfaceT4')
+        dic_surfaceT4Tr = CConversionSurfaceTransformed().m_conversionSurfaceTransformed()
+        print('surfaceT4Tr')
+        dic_surfaceT4.update(dic_surfaceT4Tr)
+        print(dic_surfaceT4Tr)
+        print(dic_surfaceT4)
         free_id = max(int(k) for k in dic_surfaceT4.keys()) + 1
+        keyS = 100000
         for key, surfs in dic_surfaceT4.items():
+            print('surface', key)
             extra_surfs = surfs[1:]
             extra_ids = []
             for (p_typeSurface, p_listCoefSurface), side in extra_surfs:
@@ -46,4 +56,6 @@ class CIntermediateSurfaceT4(object):
                 free_id += 1
             p_typeSurface, p_listCoefSurface = surfs[0]
             dic_newSurfaceT4[key] = (CSurfaceT4(p_typeSurface.name, p_listCoefSurface), extra_ids)
+        dic_newSurfaceT4[keyS + 1] = (CSurfaceT4('PLANEX', [1]), [])
+        dic_newSurfaceT4[keyS + 2] = (CSurfaceT4('PLANEX', [-1]), [])
         return dic_newSurfaceT4

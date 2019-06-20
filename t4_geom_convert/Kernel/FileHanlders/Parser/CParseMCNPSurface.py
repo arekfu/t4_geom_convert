@@ -19,6 +19,7 @@ from ....MIP.geom.surfaces import get_surfaces
 from ...Surface.CSurfaceMCNP import CSurfaceMCNP
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP
 from ...Configuration.CConfigParameters import CConfigParameters
+from ...Surface.ESurfaceTypeMCNP import string_to_enum
 
 class CParseMCNPSurface(object):
     '''
@@ -34,20 +35,19 @@ class CParseMCNPSurface(object):
 
     def m_parsingSurface(self):
         '''
-        :brief method which permit to recover the information of each line 
+        :brief method which permit to recover the information of each line
         of the block SURFACE
-        :return: dictionary which contains the ID of the surfaces as a key 
+        :return: dictionary which contains the ID of the surfaces as a key
         and as a value, a object from the class CSurfaceMCNP
         '''
         inputCell = mip.MIP(self.inputMCNP)
         surfaceParser = get_surfaces(inputCell, lim=None)
         dictSurface = dict()
         for k, v in list(surfaceParser.items()):
-            p_1, p_2, p_typeSurface, l_paramSurface = v
-            try:
-                enumSurface = getattr(ESurfaceTypeMCNP, p_typeSurface.upper())
-            except:
-                print('Surface', k)
-                print(p_typeSurface.upper(), ':The type of this surface does not exist')
-            dictSurface[k] = CSurfaceMCNP(p_1, p_2, enumSurface, l_paramSurface)
+            p_boundCond, p_transformation, p_typeSurface, l_paramSurface = v
+            if p_transformation:
+                continue
+            enumSurface = string_to_enum(p_typeSurface)
+            dictSurface[k] = CSurfaceMCNP(p_boundCond, p_transformation,\
+                                           enumSurface, l_paramSurface)
         return dictSurface

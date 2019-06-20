@@ -29,21 +29,28 @@ class CWriteT4Geometry(object):
         f.write("TITLE title")
         f.write("\n")
         dic_surface = CIntermediateSurfaceT4().m_constructSurfaceT4()
-        for key, (surf, _extra_ids) in dic_surface.items():
+        dic_volume, surf_used = CIntermediateVolumeT4(dic_surface).m_constructVolumeT4()
+        for key in sorted(surf_used):
+            surf, _ = dic_surface[key]
             list_paramSurface = surf.paramSurface
             print(key, surf.typeSurface, list_paramSurface)
             s_paramSurface = ' '.join(str(element) for element in list_paramSurface)
             f.write("SURFACE %s %s %s\n" % (key, surf.typeSurface,
                                             s_paramSurface))
         f.write("\n")
-        dic_volume = CIntermediateVolumeT4(dic_surface).m_constructVolumeT4()
-        for k in dic_volume.keys():
-            s_operator = dic_volume[k].operator
-            s_param = dic_volume[k].param
-            s_fictive = dic_volume[k].fictive
-            f.write("VOLU %s %s %s %s ENDV  \n" % (k, s_operator, s_param, s_fictive))
+
+        for k, val in dic_volume.items():
+            s_operator = val.operator
+            s_param = val.param
+            s_fictive = val.fictive
+            if val.idorigin:
+                s_comment = "// %s" %val.idorigin
+            else:
+                s_comment = ""
+            f.write("VOLU %s %s %s %s ENDV %s \n" % (k, s_operator, s_param, s_fictive, s_comment))
         f.write("\n")
         f.write("ENDG")
         f.write("\n")
+        return dic_volume
 
 # CWriteT4Geometry().m_writeT4Geometry()
