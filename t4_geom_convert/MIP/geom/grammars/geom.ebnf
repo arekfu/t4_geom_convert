@@ -9,14 +9,18 @@ isect =
     | o:operand;
 
 operand =
-    | o:cell
+	| o:cell
     | o:surface
     | l:'_(' o:compl r:')' 
-    | l:'('  o:union r:')'; 
+    | l:'('  o:union r:')'
+    | l:'^(' o:complcell r:')'; 
 
 compl = union ; 
 
 surface = /[-+]{0,1}\d+/;
 
 cell = /_\d+/;
+
+complcell =  /\d+/;
+
 

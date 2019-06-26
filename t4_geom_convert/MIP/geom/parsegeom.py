@@ -20,6 +20,7 @@ re_union = re.compile('\s*:\s*')
 re_pareno = re.compile('\(\s*')
 re_parenc = re.compile('\s*\)')
 re_spaces = re.compile('\s+')
+re_compl = re.compile('#(\d+)')
 
 
 def normalize(geom):
@@ -37,8 +38,11 @@ def normalize(geom):
     g = re_parenc.sub(')', g)
     # replace one or more spaces with exactly one ' '.
     g = re_spaces.sub('*', g)
+
+    g = re_compl.sub(r'^(\1)', g)
     g = g.replace('#', '_')
     return g
+    #jeu de données MCNP: parfois espace entre dièse et son opérande---> enlever les espaces après l\'opérateur dièse
 
 
 def get_ast(geom):

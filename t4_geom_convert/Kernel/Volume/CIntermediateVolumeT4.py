@@ -14,7 +14,6 @@ from ..Volume.CCellConversion import CCellConversion
 from ..Volume.CTreeMethods import CTreeMethods
 from ..Surface.CDictSurfaceMCNP import CDictSurfaceMCNP
 
-
 class CIntermediateVolumeT4(object):
     '''
     :brief: Intermediate class which change the value of the dictionary from the
@@ -42,21 +41,26 @@ class CIntermediateVolumeT4(object):
         listekeys = []
         surf_used = set()
         conv = CCellConversion(free_key, objT4, self.dic_surface, dicSurfaceMCNP, mcnp_dict)
-        for i in mcnp_dict.keys():
-            listekeys.append(i)
+        listekeys = list(mcnp_dict)
+        for key in listekeys:
+            new_geom = conv.m_postOrderTraversalCompl(mcnp_dict[key].geometry)
+            mcnp_dict[key].geometry = new_geom
         for i,key in enumerate(listekeys):
             print('FILL', key, ' ', i, len(listekeys))
             print('*******************************************************************')
             conv.m_postOrderTraversalFill(key, mcnp_new_dict)
         for key, val in mcnp_new_dict.items():
-            print('volume', key, val.importance, val.universe)
+            print('volume', key, val.geometry, val.importance, val.universe)
             if val.importance != 0 and val.universe == 0 and val.fillid is None:
                 dic_test[key] = dict()
                 root = val.geometry
                 treeMaster = root
                 tup = conv.m_postOrderTraversalFlag(treeMaster)
+                print('tup',tup)
                 replace = conv.m_postOrderTraversalReplace(tup)
+                print('replace', replace)
                 opt_tree = conv.m_postOrderTraversalOptimisation(replace)
+                print('opt_tree', opt_tree)
                 surf_used |= set(self.m_surfacesUsed(opt_tree))
                 j = conv.m_postOrderTraversalConversion(opt_tree, val.idorigin)
                 objT4.volumeT4[j].fictive = ''
@@ -69,9 +73,9 @@ class CIntermediateVolumeT4(object):
 
     def m_surfacesUsed(self, tree):
         if CTreeMethods().m_isLeaf(tree):
-            print('leaf', tree)
+            #print('leaf', tree)
             return [abs(tree)]
         _id, _op, *args = tree
         result = [x for leaf in args for x in self.m_surfacesUsed(leaf)]
-        print('result', tree, result)  
+        #print('result', tree, result)  
         return result

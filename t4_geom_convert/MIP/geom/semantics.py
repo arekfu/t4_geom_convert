@@ -41,11 +41,17 @@ class GeomSemantics(object):
     def cell(self, ast):
         return Cell(ast[1:])
 
+    def complcell(self, ast):
+        return Cell(ast)
+
     def operand(self, ast):
         if ast.l == '_(':
             return ast.o.inverse()
         elif ast.l == '(':
             return ast.o
+        elif ast.l == '^(':
+            e = GeomExpression(('^', Cell(ast.o)))
+            return e
         else:
             return ast.o
 

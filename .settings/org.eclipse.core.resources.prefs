@@ -44,4 +44,5 @@ encoding//t4_geom_convert/Kernel/Volume/CTreeMethods.py=utf-8
 encoding//t4_geom_convert/Kernel/Volume/CVolumeT4.py=utf-8
 encoding//t4_geom_convert/MIP/geom/composition.py=utf-8
 encoding//t4_geom_convert/MIP/geom/grammars/composition.py=utf-8
+encoding//t4_geom_convert/MIP/geom/parsegeom.py=utf-8
 encoding/setup.py=utf-8
