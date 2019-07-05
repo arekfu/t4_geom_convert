@@ -22,6 +22,7 @@ from ...Volume.CCellMCNP import CCellMCNP
 from ....MIP.geom.composition import get_materialImportance
 from ...Configuration.CConfigParameters import CConfigParameters
 import pickle
+from collections import OrderedDict
 class CParseMCNPCell(object):
     '''
     :brief: Class which parse the block CELLS.
@@ -68,9 +69,10 @@ class CParseMCNPCell(object):
         '''
         inputCell = mip.MIP(self.inputMCNP)
         cellParser = get_cells(inputCell, lim=None)
-        dictCell = dict()
+        dictCell = OrderedDict()
+        dicCellMCNP_name = self.inputMCNP + '_dicCellMCNP'
         try:
-            with open("dicCellMCNP", mode='rb') as dicfile:
+            with open(dicCellMCNP_name, mode='rb') as dicfile:
                 dictCell = pickle.load(dicfile)
             print('jai lu le fichier')
         except:
@@ -79,12 +81,13 @@ class CParseMCNPCell(object):
             listeCellParser = list(cellParser.items())
             lencell = len(listeCellParser)
             for i, (k, v) in enumerate(listeCellParser):
-                print("Parse Cell", k)
-                print(i, '/', lencell)
+#                 print("Parse Cell", k)
+#                 print(i, '/', lencell)
                 fillid = None
                 costr = False
                 listeparamfill = []
                 importance = None
+                lattice = False
                 universe = 0
                 material, geometry, option = v
                 option_liste = option.lower().replace('(','').replace(')','').split()
@@ -95,24 +98,27 @@ class CParseMCNPCell(object):
                     if ('fill=' or '*fill=') in elt:
                         if '*' in elt:
                             costr = True
-                        fillid = int(elt.split('=')[1])
+                        fillid = int(float(elt.split('=')[1]))
                         while option_liste and '=' not in option_liste[0]:
                             listeparamfill.append(float(option_liste.pop(0)))
                     if 'u=' in elt:
-                        universe = int(elt.split('=')[1])
+                        universe = int(float(elt.split('=')[1]))
+                    if 'lat=' in elt:
+                        lattice = True
                 materialID = material.split()[0]
                 if int(materialID) == 0:
                     density = None
                 else:
                     density = material.split()[1]
+#                 print('Dens', k, density)
                 astMcnp = get_ast(geometry)
                 #importance = option
                 if importance is None:
                     importance = liste_importance[i]
-                    print('importance',k, importance, i, liste_importance)
+#                     print('importance',k, importance, i, liste_importance)
                 if importance != 0:
-                    dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance, universe, fillid, listeparamfill, costr)
-            with open("dicCellMCNP", mode='wb') as dicfile:
+                    dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance, universe, fillid, listeparamfill, costr, lattice)
+            with open(dicCellMCNP_name, mode='wb') as dicfile:
                 pickle.dump(dictCell, dicfile)
         return dictCell
     

@@ -12,6 +12,9 @@ from .cells import get_cells
 from .transforms import get_transforms
 from .parsegeom import get_ast
 from .semantics import Surface, Cell
+import ast
+from _ast import AST
+from t4_geom_convert.MIP.geom.semantics import GeomExpression
 
 
 def extract_surfaces(ast):
@@ -33,6 +36,40 @@ def extract_surfaces(ast):
     else:
         s.add(abs(ast[2]))
     return s
+
+
+def extract_surfaces_list(ast):
+    """
+    Return set of surfaces used in ast.
+    """
+    if isinstance(ast, Surface):
+        return [ast]
+    elif isinstance(ast, Cell):
+        return []
+
+    l = []
+    if isinstance(ast[1], tuple):
+        l.extend(extract_surfaces_list(ast[1]))
+    else:
+        l.append(ast[1])
+    if isinstance(ast[2], tuple):
+        l.extend(extract_surfaces_list(ast[2]))
+    else:
+        l.append(ast[2])
+    return l
+
+def replace_surfaces(ast, dic):
+    if isinstance(ast, Surface):
+        surf = int(ast)
+        new = dic[abs(surf)]
+        return Surface(new if surf > 0 else -new)
+    elif isinstance(ast, Cell):
+        raise ValueError("cannot replace surfaces in #: %s" % ast)
+
+    op, *args = ast
+    l = [op]
+    l.extend(replace_surfaces(arg, dic) for arg in args)
+    return GeomExpression(*l)
 
 
 def get_raw_geom(i, lim=None):
@@ -104,3 +141,4 @@ if __name__ == '__main__':
     import json
     f = open(argv[1] + '.json', 'w')
     json.dump((cd, cads), f)
+    

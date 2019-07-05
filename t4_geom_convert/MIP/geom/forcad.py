@@ -82,10 +82,10 @@ def _norm(x, y, z):
 
 
 def _sphere(x, y, z, R):
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
-    R = R/1e2
+    x = x
+    y = y
+    z = z
+    R = R
     frm = ((x, y, z), (0, 0, 1))
     srf = (R, )
     pin = (x, y, z)
@@ -97,9 +97,9 @@ def _plane(x, y, z, A, B, C):
     Plane throught the point (x, y, z) with the normal (A, B, C). The latter
     must be normalized to have unit length.
     """
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
+    x = x
+    y = y
+    z = z
     frm = ((x, y, z), (A, B, C))
     srf = ()
     pin = _shift(x, y, z, A, B, C, -_offset)
@@ -107,10 +107,10 @@ def _plane(x, y, z, A, B, C):
 
 
 def _cylinder(x, y, z, r, A, B, C):
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
-    r = r/1e2
+    x = x
+    y = y
+    z = z
+    r = r
     frm = ((x, y, z), (A, B, C))
     srf = (r, )
     pin = (x, y, z)
@@ -125,9 +125,9 @@ def _cone(x, y, z, tana, A, B, C, log=False):
 
     CAD requries a point on the axis not coincident with the focus.
     """
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
+    x = x
+    y = y
+    z = z
     p = _shift(x, y, z, A, B, C, _offset)
     frm = (p, (A, B, C))
     srf = (tana*_offset, atan(tana))
@@ -142,11 +142,11 @@ def _torus(x, y, z, A, B, C, r1, r2):
     A, B, C -- normal vector to the major radius
     r1, r2  -- major and minor radii
     """
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
-    r1 = r1/1e2
-    r2 = r2/1e2
+    x = x
+    y = y
+    z = z
+    r1 = r1
+    r2 = r2
     frm = ((x, y, z), (A, B, C))
     srf = (r1, r2)
 
@@ -486,9 +486,6 @@ def apply_transform(frm, pin, tr):
     """
     Return transformed frame frm and point pin according to transformation tr
     """
-    tr[0] = tr[0]/1e2
-    tr[1] = tr[1]/1e2
-    tr[2] = tr[2]/1e2
     p, v = frm
     pp = transform_point(p, tr)
     vp = transform_vector(v, tr)

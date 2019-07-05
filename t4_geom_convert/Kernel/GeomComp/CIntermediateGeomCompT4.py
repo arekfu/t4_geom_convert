@@ -10,7 +10,7 @@ Created on 6 févr. 2019
 from ..GeomComp.CDictGeomCompT4 import CDictGeomCompT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
 from ..GeomComp.CGeomCompT4 import CGeomCompT4
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 class CIntermediateGeomCompT4(object):
     '''
@@ -22,16 +22,17 @@ class CIntermediateGeomCompT4(object):
         Constructor
         '''
 
-    def m_constructGeomCompT4(self, dicVol):
+    def m_constructGeomCompT4(self, dicVol, dic_cellMCNP):
         '''
         :brief: method constructing a dictionary with the id of the
         material as a key and the instance of CGeomCompT4 as a value
         '''
-        dic_geomCompT4 = dict()
+        dic_geomCompT4 = OrderedDict()
         dic_partialGeomComp = defaultdict(list)
         obj_T4 = CDictGeomCompT4(dic_geomCompT4)
-        dic_cellMCNP = CDictCellMCNP().d_cellMCNP
         for key, val in dicVol.items():
+            if val.fictive != '':
+                continue
             if val.idorigin:
                 volID = val.idorigin[0]
             else:

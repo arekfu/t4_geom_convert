@@ -20,6 +20,7 @@ from ...Surface.CSurfaceMCNP import CSurfaceMCNP
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP
 from ...Configuration.CConfigParameters import CConfigParameters
 from ...Surface.ESurfaceTypeMCNP import string_to_enum
+from collections import OrderedDict
 
 class CParseMCNPSurface(object):
     '''
@@ -42,7 +43,7 @@ class CParseMCNPSurface(object):
         '''
         inputCell = mip.MIP(self.inputMCNP)
         surfaceParser = get_surfaces(inputCell, lim=None)
-        dictSurface = dict()
+        dictSurface = OrderedDict()
         for k, v in list(surfaceParser.items()):
             p_boundCond, p_transformation, p_typeSurface, l_paramSurface = v
             if p_transformation:

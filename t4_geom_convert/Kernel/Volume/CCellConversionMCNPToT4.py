@@ -31,7 +31,7 @@ class CCellConversionMCNPToT4(object):
         dic_cellT4 = dict()
         objT4 = CDictVolumeT4(dic_cellT4)
         for key,val in CDictCellMCNP().d_cellMCNP.items() :
-            print(key)
+#             print(key)
             AST = val.m_evaluateASTMCNP()
             value = self.m_conversionASTInVolumeT4(key, AST)
             objT4.__setitem__(key, value)

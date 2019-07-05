@@ -33,7 +33,6 @@ class GeomExpression(tuple):
 
 
 
-
 class GeomSemantics(object):
     def surface(self, ast):
         return Surface(ast)

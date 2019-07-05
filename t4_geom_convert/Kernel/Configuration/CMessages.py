@@ -9,3 +9,4 @@ Created on 6 févr. 2019
 FILE = u"FILE"
 INPUT_FILE_T4 = u"u_inputFileT4"
 INPUT_FILE_MCNP = u"u_inputFileMCNP"
+LATTICE = u"LATTICE"

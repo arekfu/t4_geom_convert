@@ -15,7 +15,7 @@ class CCellMCNP(object):
 
 
     def __init__(self, p_materialID, p_density, syntaxTreeMCNP,\
-                 p_importance, p_universe, fillid, filltr, costr, idorigin=None):
+                 p_importance, p_universe, fillid, filltr, costr, lattice, idorigin=None):
         '''
         Constructor
         :param: p_materialID : identity number of the material
@@ -33,6 +33,7 @@ class CCellMCNP(object):
         self.fillid = fillid
         self.filltr = filltr
         self.idorigin = [] if idorigin is None else idorigin.copy()
+        self.lattice = lattice
         self.costr = costr
 
     def m_evaluateASTMCNP(self):
@@ -49,6 +50,6 @@ class CCellMCNP(object):
     
     def m_copy(self):
         if hasattr(self.geometry , 'copy'):
-            return CCellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.idorigin.copy())
-        return CCellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.idorigin.copy())
+            return CCellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.lattice, self.idorigin.copy())
+        return CCellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.lattice, self.idorigin.copy())
         

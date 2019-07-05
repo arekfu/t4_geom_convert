@@ -26,9 +26,9 @@ class CTreeMethods(object):
           of a Surface or a Geometry
         :return: a boolean.
         '''
-        if isinstance(tree, geom.semantics.GeomExpression):
+        if isinstance(tree, (tuple, list, geom.semantics.GeomExpression)):
             return False
-        elif isinstance(tree, geom.semantics.Surface):
+        elif isinstance(tree, (int, geom.semantics.Surface)):
             return True
         else:
             return False
@@ -39,9 +39,9 @@ class CTreeMethods(object):
         of Surfaces
         :return: a boolean.
         '''
-        if isinstance(tree, list):
+        if isinstance(tree, (list,tuple)):
             op = tree[1]
-            if all(isinstance(child, geom.semantics.Surface) for\
+            if all(isinstance(child, (geom.semantics.Surface, int)) for\
                    child in tree[2:]) and op == '*':
                 return True
 
@@ -52,7 +52,7 @@ class CTreeMethods(object):
         :brief: method which permit to know if a node is an intersection
         :return: a boolean.
         '''
-        if isinstance(tree, list):
+        if isinstance(tree, (list,tuple)):
             if tree[1] == '*':
                 return True
 
@@ -63,7 +63,7 @@ class CTreeMethods(object):
         :brief: method which permit to know if a node is a union
         :return: a boolean.
         '''
-        if isinstance(tree, list):
+        if isinstance(tree, (list,tuple)):
             if tree[1] == ':':
                 return True
 

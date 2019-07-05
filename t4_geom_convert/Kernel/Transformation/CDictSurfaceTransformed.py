@@ -21,6 +21,7 @@ from ...MIP.geom.surfaces import get_surfaces
 from ..Transformation.CSurfaceTransformed import CSurfaceTransformed
 from ..Surface.ESurfaceTypeMCNP import string_to_enum
 from ...MIP.geom.transforms import get_transforms
+from collections import OrderedDict
 
 class CDictSurfaceTransformed(object):
     '''
@@ -37,12 +38,12 @@ class CDictSurfaceTransformed(object):
     def m_surfaceTransformed(self):
         inputCell = mip.MIP(self.inputMCNP)
         transformParsed = get_transforms(inputCell, lim=None)
-        print(transformParsed)
+#         print(transformParsed)
         surfaceParser = get_surfaces(inputCell, lim=None)
-        dictSurfaceTransformed = dict()
+        dictSurfaceTransformed = OrderedDict()
         for k, v in list(surfaceParser.items()):
             p_boundCond, p_transformation, p_typeSurface, l_paramSurface = v
-            print(p_typeSurface)
+#             print(p_typeSurface)
             if p_transformation:
                 enumSurface = string_to_enum(p_typeSurface)
                 dictSurfaceTransformed[k] = CTransformationFonction().m_transformation(p_boundCond, transformParsed[int(p_transformation)], enumSurface, l_paramSurface)

@@ -18,6 +18,7 @@ from ....MIP import mip
 from ....MIP.geom.transforms import get_transforms
 from ...Surface.CTransformationMCNP import CTransformationMCNP
 from ...Configuration.CConfigParameters import CConfigParameters
+from collections import OrderedDict
 
 class CParseMCNPTransform(object):
     '''
@@ -40,7 +41,7 @@ class CParseMCNPTransform(object):
         '''
         inputCell = mip.MIP(self.inputMCNP)
         transformParser = get_transforms(inputCell, lim=None)
-        dictSurface = dict()
+        dictSurface = OrderedDict()
         for k, v in list(transformParser.items()):
             l_transformationParameters = v
             l_originTransformation = l_transformationParameters[0:3]

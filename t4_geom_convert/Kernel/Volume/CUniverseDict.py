@@ -6,7 +6,8 @@ Created on 6 févr. 2019
 :data : 06 February 2019
 :file : CUniverseDict.py
 '''
-from FileHanlders.Parser.CParseMCNPCell import CParseMCNPCell
+from ..FileHanlders.Parser.CParseMCNPCell import CParseMCNPCell
+from collections import OrderedDict
 
 
 class CUniverseDict(object):
@@ -19,12 +20,12 @@ class CUniverseDict(object):
         '''
         Constructor
         '''
-        self.d_cellMCNP = dict()
+        self.d_cellMCNP = OrderedDict()
         self.d_cellMCNP = d_dicCellMCNP
     
     def m_dictUniverse(self):
         
-        d_universeDict = dict()
+        d_universeDict = OrderedDict()
         for k, val in self.d_cellMCNP.items():
             d_universeDict[int(val.universe)] = []
         for k, val in self.d_cellMCNP.items():

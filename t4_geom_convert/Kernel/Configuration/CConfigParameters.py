@@ -9,7 +9,7 @@ Created on 6 févr. 2019
 import os
 from ...Kernel import Configuration
 import configparser
-from ...Kernel.Configuration.CMessages import INPUT_FILE_MCNP, FILE, INPUT_FILE_T4
+from ...Kernel.Configuration.CMessages import INPUT_FILE_MCNP, FILE, INPUT_FILE_T4, LATTICE
 
 class CConfigParameters(object):
     '''
@@ -67,3 +67,18 @@ class CConfigParameters(object):
         config.read(self.confPath)
         p_nameInuptFileT4 = config[FILE][INPUT_FILE_T4]
         return p_nameInuptFileT4
+
+    def m_readDomainForLattice(self, key):
+        listeDomaine = []
+        config = configparser.ConfigParser()
+        config.read(self.confPath)
+        p_range = config[LATTICE]['cell' + str(key)]
+        list1 = p_range.split(',')
+        for element in list1:
+            partial_list = element.split(':')
+            if len(partial_list) != 2:
+                raise ValueError('Problem with lattice domain of cell %s' %key)
+            else:
+                listeDomaine.append((int(partial_list[0]),int(partial_list[1])))
+#         print('listeDomaine', listeDomaine)
+        return listeDomaine

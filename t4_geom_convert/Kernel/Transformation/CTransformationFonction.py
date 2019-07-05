@@ -27,7 +27,7 @@ class CTransformationFonction(object):
         '''
 
     def m_transformation(self,p_boundCond, trpl, p_typeSurface, l_paramSurface):
-        print('P_TYPESURFACE',p_typeSurface)
+#         print('P_TYPESURFACE',p_typeSurface)
         if not trpl:
             return CSurfaceTransformed(\
                     p_boundCond, p_typeSurface, l_paramSurface)
@@ -37,8 +37,8 @@ class CTransformationFonction(object):
             l_paramSurface = CTransformationQuad().m_transformationQuad(\
                                 l_paramSurface, trpl)
         else:
-            print('typeSurface', type(p_typeSurface))
-            print('paramSurface', l_paramSurface)
+#             print('typeSurface', type(p_typeSurface))
+#             print('paramSurface', l_paramSurface)
             if isinstance(p_typeSurface, str):
                 f = (l_paramSurface[0], l_paramSurface[1])
                 p = (0,0,0)
@@ -51,6 +51,6 @@ class CTransformationFonction(object):
 #                     p_typeSurface, l_pparamSurface, l_complParam = \
 #                     CTransformationFonction().m_transformation(k,surfaceParser)
             l_paramSurface = l_pparamSurface[0], l_pparamSurface[1], l_complParam
-        print('CSurfaceTr', p_typeSurface, l_paramSurface)
+#         print('CSurfaceTr', p_typeSurface, l_paramSurface)
         return CSurfaceTransformed(\
                     p_boundCond, p_typeSurface, l_paramSurface)

@@ -9,6 +9,7 @@ from ..Composition.CDictCompositionT4 import CDictCompositionT4
 from ..Composition.CDictCompositionMCNP import CDictCompositionMCNP
 from ..Composition.CIsotopeConversion import CIsotopeConversion
 from ..Composition.EIsotopeNameElementT4 import EIsotopeNameElement
+from collections import OrderedDict
 
 class CCompositionConversionMCNPToT4(object):
     '''
@@ -26,7 +27,7 @@ class CCompositionConversionMCNPToT4(object):
         :brief: method recuperate the dictionary of the composition from MCNP
         and return a dictionary of the composition for T4
         '''
-        d_CompositionT4 = dict()
+        d_CompositionT4 = OrderedDict()
         obj_T4 = CDictCompositionT4(d_CompositionT4)
         l_compositionT4 = []
         for key, val in CDictCompositionMCNP().d_compositionMCNP.items():

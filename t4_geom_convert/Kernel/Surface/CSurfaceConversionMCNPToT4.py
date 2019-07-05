@@ -17,6 +17,7 @@ from ..Surface.DTypeConversion import dict_conversionSurfaceType
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MCNPS
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 from math import atan, pi, sqrt
+from collections import OrderedDict
 
 class CSurfaceConversionMCNPToT4(object):
     '''
@@ -33,16 +34,17 @@ class CSurfaceConversionMCNPToT4(object):
         :brief: method which convert MCNP surface and constructing the
         dictionary of Surface T4
         '''
-        dic_SurfaceT4 = dict()
+        dic_SurfaceT4 = OrderedDict()
         obj_T4 = CDictSurfaceT4(dic_SurfaceT4)
-        for key, val in CDictSurfaceMCNP().d_surfaceMCNP.items():
+        dic_surface_mcnp = CDictSurfaceMCNP().d_surfaceMCNP
+        for key, val in dic_surface_mcnp.items():
             try:
                 surfacesT4 = self.m_surfaceParametresConversion(val)
             except:
                 print(key, 'Parameters of this surface do not comply')
                 raise
             obj_T4[key] = surfacesT4
-        return dic_SurfaceT4
+        return dic_SurfaceT4, dic_surface_mcnp
 
     def m_surfaceParametresConversion(self, p_surfaceMCNP):
         '''

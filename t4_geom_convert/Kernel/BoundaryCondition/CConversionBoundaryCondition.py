@@ -8,6 +8,7 @@ Created on 6 févr. 2019
 '''
 from ..FileHanlders.Parser.CParseMCNPSurface import CParseMCNPSurface
 from ..BoundaryCondition.CBoundCond import CBoundCond
+from collections import OrderedDict
 
 
 class CConversionBoundaryCondition(object):
@@ -24,7 +25,7 @@ class CConversionBoundaryCondition(object):
         :brief: method constructing a dictionary with the id of the
         material as a key and the instance of CBoundCondT4 as a value
         '''
-        d_boundCond = dict()
+        d_boundCond = OrderedDict()
         d_surface = CParseMCNPSurface().m_parsingSurface()
         for k, v in list(d_surface.items()):
             if v.boundaryCond != '':
@@ -35,7 +36,7 @@ class CConversionBoundaryCondition(object):
     def m_conversionBoundCond(self):
         '''
         '''
-        d_boundCondT4 = dict()
+        d_boundCondT4 = OrderedDict()
         d_boundcondMCNP = self.m_recuperateBoundaryCondition()
         for k in d_boundcondMCNP.keys():
             p_boundCondMCNP = d_boundcondMCNP[k].typeOfBound

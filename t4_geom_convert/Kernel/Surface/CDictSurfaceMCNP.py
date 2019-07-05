@@ -8,6 +8,7 @@ Created on 6 févr. 2019
 '''
 from _collections_abc import MutableMapping
 from ..FileHanlders.Parser.CParseMCNPSurface import CParseMCNPSurface
+from collections import OrderedDict
 
 class CDictSurfaceMCNP(MutableMapping):
     '''
@@ -19,7 +20,7 @@ class CDictSurfaceMCNP(MutableMapping):
         '''
         Constructor
         '''
-        self.d_surfaceMCNP = dict()
+        self.d_surfaceMCNP = OrderedDict()
         self.d_surfaceMCNP = CParseMCNPSurface().m_parsingSurface()
 
     def __getitem__(self, key):

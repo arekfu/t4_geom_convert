@@ -9,6 +9,7 @@ Created on 6 févr. 2019
 from ..Composition.CCompositionT4 import CCompositionT4
 from ..Composition.CCompositionConversionMCNPToT4 import CCompositionConversionMCNPToT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
+from collections import OrderedDict
 
 class CIntermediateCompositionT4(object):
     '''
@@ -22,15 +23,15 @@ class CIntermediateCompositionT4(object):
         Constructor
         '''
 
-    def m_constructCompositionT4(self):
+    def m_constructCompositionT4(self, dic_cellMCNP):
         '''
         :brief: method changing the tuple from CCompositionConversionMCNPToT4
         in instance of the CVolumeT4 Class
         '''
-        dic_newCompositionT4 = dict()
+        dic_newCompositionT4 = OrderedDict()
         dic_CompositionT4 = CCompositionConversionMCNPToT4().m_conversionCompositionMCNPToT4()
         for key,val in dic_CompositionT4.items():
-            print(key, val)
+            #print(key, val)
             l_listeMaterialComposition = []
             l_density = []
             l_typeDensityT4 = []
@@ -42,10 +43,12 @@ class CIntermediateCompositionT4(object):
                     massNumber = massNumber[1:]
                 isotopeT4 = nameElement + massNumber
                 l_listeMaterialComposition.append((isotopeT4, abondance))
-            dic_cellMCNP = CDictCellMCNP().d_cellMCNP
-            for k in dic_cellMCNP.keys():
-                if int(dic_cellMCNP[k].materialID) == key:
-                    density = dic_cellMCNP[k].density
+            for cell in dic_cellMCNP.values():
+                if cell.importance <= 0. or cell.universe != 0 or cell.fillid is not None:
+                    continue
+#                 print(cell.materialID, cell.density)
+                if int(cell.materialID) == key:
+                    density = cell.density
                     if float(density) not in l_density:
                         l_density.append(float(density))
                         if float(density) < 0:

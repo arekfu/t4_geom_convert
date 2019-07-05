@@ -18,6 +18,7 @@ from ....MIP import mip
 from ...Composition.CCompositionMCNP import CCompositionMCNP
 from ....MIP.geom.grammars.composition import get_materialComposition
 from ...Configuration.CConfigParameters import CConfigParameters
+from collections import OrderedDict
 
 class CParseMCNPComposition(object):
     '''
@@ -41,7 +42,7 @@ class CParseMCNPComposition(object):
         '''
         inputCell = mip.MIP(self.inputMCNP)
         compositionParser = get_materialComposition(inputCell, lim=None)
-        dictComposition = dict()
+        dictComposition = OrderedDict()
         for k, v in list(compositionParser.items()):
             l_materialCompositionParameters = v
             dictComposition[k] = CCompositionMCNP(l_materialCompositionParameters)

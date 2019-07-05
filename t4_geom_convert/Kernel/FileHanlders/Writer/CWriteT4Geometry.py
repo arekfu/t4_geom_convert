@@ -8,6 +8,8 @@ Created on 6 févr. 2019
 '''
 from ...Surface.CIntermediateSurfaceT4 import CIntermediateSurfaceT4
 from ...Volume.CIntermediateVolumeT4 import CIntermediateVolumeT4
+import pickle
+from ...Configuration.CConfigParameters import CConfigParameters
 
 class CWriteT4Geometry(object):
     '''
@@ -26,14 +28,32 @@ class CWriteT4Geometry(object):
         '''
         f.write("GEOMETRY \n")
         f.write("\n")
-        f.write("TITLE title")
-        f.write("\n")
-        dic_surface = CIntermediateSurfaceT4().m_constructSurfaceT4()
-        dic_volume, surf_used = CIntermediateVolumeT4(dic_surface).m_constructVolumeT4()
+        f.write("TITLE title\n\n")
+        f.write("HASH_TABLE\n\n")
+        input_file = CConfigParameters().m_readNameMCNPInputFile()
+        dicCell_name = input_file + '_dicCell'
+        dicSurface_name = input_file + '_dicSurface'
+        try:
+            with open(dicSurface_name, mode='rb') as dicfile:
+                dic_surfaceT4, dic_surfaceMCNP  = pickle.load(dicfile)
+                print('_dicSurface lu')
+        except:
+            dic_surfaceT4, dic_surfaceMCNP = CIntermediateSurfaceT4().m_constructSurfaceT4()
+            with open(dicSurface_name, mode='wb') as dicfile:
+                pickle.dump((dic_surfaceT4, dic_surfaceMCNP), dicfile)
+        try:
+            with open(dicCell_name, mode='rb') as dicfile:
+                dic_volume,surf_used, mcnp_new_dict, dic_surfaceT4 = pickle.load(dicfile)
+                print('_dicCell lu')
+        except:
+            dic_volume, surf_used, mcnp_new_dict = CIntermediateVolumeT4(dic_surfaceT4, dic_surfaceMCNP).m_constructVolumeT4()
+            with open(dicCell_name, mode='wb') as dicfile:
+                pickle.dump((dic_volume, surf_used, mcnp_new_dict, dic_surfaceT4), dicfile)
+#         print(len(dic_surfaceT4), len(dic_surfaceMCNP))
         for key in sorted(surf_used):
-            surf, _ = dic_surface[key]
+            surf, _ = dic_surfaceT4[key]
             list_paramSurface = surf.paramSurface
-            print(key, surf.typeSurface, list_paramSurface)
+#             print(key, surf.typeSurface, list_paramSurface)
             s_paramSurface = ' '.join(str(element) for element in list_paramSurface)
             f.write("SURFACE %s %s %s\n" % (key, surf.typeSurface,
                                             s_paramSurface))
@@ -51,6 +71,6 @@ class CWriteT4Geometry(object):
         f.write("\n")
         f.write("ENDG")
         f.write("\n")
-        return dic_volume
+        return dic_volume, mcnp_new_dict
 
 # CWriteT4Geometry().m_writeT4Geometry()

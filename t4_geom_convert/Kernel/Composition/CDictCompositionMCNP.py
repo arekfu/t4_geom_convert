@@ -8,6 +8,7 @@ Created on 6 févr. 2019
 '''
 from _collections_abc import MutableMapping
 from ..FileHanlders.Parser.CParseMCNPComposition import CParseMCNPComposition
+from collections import OrderedDict
 
 
 class CDictCompositionMCNP(MutableMapping):
@@ -20,7 +21,7 @@ class CDictCompositionMCNP(MutableMapping):
         '''
         Constructor
         '''
-        self.d_compositionMCNP = dict()
+        self.d_compositionMCNP = OrderedDict()
         self.d_compositionMCNP = CParseMCNPComposition().m_parsingMaterialComposition()
         
     def __getitem__(self, key):

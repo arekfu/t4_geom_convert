@@ -8,6 +8,7 @@ Created on 6 févr. 2019
 '''
 from _collections_abc import MutableMapping
 from ..FileHanlders.Parser.CParseMCNPCell import CParseMCNPCell
+from collections import OrderedDict
 
 
 class CDictCellMCNP(MutableMapping):
@@ -20,7 +21,7 @@ class CDictCellMCNP(MutableMapping):
         '''
         Constructor
         '''
-        self.d_cellMCNP = dict()
+        self.d_cellMCNP = OrderedDict()
         self.d_cellMCNP = CParseMCNPCell().m_parsingCell()
 
     def __getitem__(self, key):
