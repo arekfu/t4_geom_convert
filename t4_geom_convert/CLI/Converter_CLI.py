@@ -11,7 +11,7 @@ from ..Kernel.FileHanlders.Writer.CWriteT4Composition import CWriteT4Composition
 from ..Kernel.FileHanlders.Writer.CWriteT4GeomComp import CWriteT4GeomComp
 from ..Kernel.Configuration.CConfigParameters import CConfigParameters
 from ..Kernel.FileHanlders.Writer.CWriteT4BoundCond import CWriteT4BoundCond
-import cProfile
+# import cProfile
 """
 Usage:
         Converter_CLI.py conversion <p_nameT4File> <p_nameMCNPFile>
@@ -29,4 +29,5 @@ if __name__ == '__main__':
     config = CConfigParameters()
     t4_fname = config.m_readNameT4InputFile()
     mcnp_fname = config.m_readNameMCNPInputFile()
-    cProfile.run('conversion(t4_fname, mcnp_fname)', 'ici.profile')
+    conversion(t4_fname, mcnp_fname)
+    # cProfile.run('conversion(t4_fname, mcnp_fname)', 'ici.profile')

@@ -22,10 +22,10 @@ class CWriteT4Composition(object):
         '''
         :brief: method writing composition of the T4 input file
         '''
-        f.write("\r\n COMPOSITION \r\n")
-        f.write("\r\n")
+        f.write("\nCOMPOSITION\n")
         temperature = 300
         dic_composition = CIntermediateCompositionT4().m_constructCompositionT4(self.mcnp_new_dict)
+        f.write(str(len(dic_composition)) + "\n")
         for k in dic_composition.keys():
             s_paramMaterialComposition = ''
             l_typeDensity = dic_composition[k].typeDensity
@@ -38,14 +38,13 @@ class CWriteT4Composition(object):
                 str(nameIsotope) + ' ' + str(abondanceIsotope) +' '
             for i in range(0,len(l_densityValue)):
                 p_materialName = dic_composition[k].material
-                f.write("%s %s %s %s %s %s \r" % (l_typeDensity[i], temperature,\
+                f.write("%s %s %s %s %s %s \n" % (l_typeDensity[i], temperature,\
                                               p_materialName,abs(l_densityValue[i]),\
                                               p_numberOfIsotope,\
                                               s_paramMaterialComposition))
-                p_materialName += str(i*1000)
-        f.write("\r\n")
+        f.write("\n")
         f.write("END_COMPOSITION")
-        f.write("\r\n")
+        f.write("\n")
 
 
 # CWriteT4Composition().m_writeT4Composition()

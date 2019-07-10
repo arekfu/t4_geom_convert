@@ -48,8 +48,8 @@ class CTransformationQuad(object):
              [g*0.5, h*0.5, i*0.5, j]])
         R = np.array(\
             [[r11, r12, r13,0],
-             [r21, r22, r32,0],
-             [r31, r23, r33, 0],
+             [r21, r22, r23,0],
+             [r31, r32, r33, 0],
              [0 ,0 ,0 ,1]])
         Q = np.array(\
             [[1, 0, 0, x],

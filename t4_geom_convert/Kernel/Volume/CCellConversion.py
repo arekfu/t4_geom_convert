@@ -53,7 +53,11 @@ class CCellConversion(object):
         str_equaPlus = ''
         i_minus = 0
         i_plus = 0
+        seen = set()
         for elt in list_surface:
+            if elt in seen:
+                continue
+            seen.add(elt)
             if '-' in str(elt):
                 i_minus += 1
                 elt = int(elt)
@@ -73,8 +77,8 @@ class CCellConversion(object):
             s_fictive = ''
         if fictive == True:
             s_fictive = 'FICTIVE'
-        tuple_final = 'EQUA', str_equa, s_fictive
-        return(tuple_final)
+        params = ['EQUA', str_equa]
+        return params, s_fictive
 
     def m_conversionINTUNION(self, op, *ids, fictive):
         '''
@@ -82,19 +86,21 @@ class CCellConversion(object):
         and a T4 UNION and return a tuple with the information of the T4 VOLUME
         '''
 #         print('OP', op)
+        params = []
         keyS = 100000
         if op == '*':
-            opT4 = 'EQUA INTE'
+            params.extend(('EQUA', 'INTE'))
         if op == ':':
             tupleForEqua = self.m_conversionEQUA([keyS+1, -(keyS+2)], fictive=True)
-            tupleEquaFinal = tupleForEqua[0:2]
-            opT4 = tupleEquaFinal[0] + ' ' + tupleEquaFinal[1] + 'UNION'
+            params.extend(tupleForEqua[0])
+            params.append('UNION')
+        params.append(len(ids))
+        params.extend(ids)
         if fictive == False:
             s_fictive = ''
         if fictive == True:
             s_fictive = 'FICTIVE'
-        s_param = str(len(ids)) + ' ' + ' '.join(str(a_id) for a_id in ids)
-        tuple_final = opT4, s_param, s_fictive
+        tuple_final = params, s_fictive
 #         print('tuple final',tuple_final)
         return tuple_final
 
@@ -122,7 +128,7 @@ class CCellConversion(object):
                 mcnp_new_dict[new_key].materialID = mcnp_new_dict[element].materialID
                 mcnp_new_dict[new_key].density = mcnp_new_dict[element].density
                 mcnp_new_dict[new_key].idorigin = mcnp_new_dict[element].idorigin.copy()
-                mcnp_new_dict[new_key].idorigin.append(element)
+                mcnp_new_dict[new_key].idorigin.append((element, key))
 #                 print('idorigin', key, new_key, element, mcnp_new_dict[key].idorigin, mcnp_new_dict[new_key].idorigin)
 #                 print('idorigin', id(mcnp_new_dict[key]), id(mcnp_new_dict[new_key]))
                 tree = self.m_postOrderTraversalTransform(mcnp_element_geom, mcnp_key_filltr)
@@ -179,42 +185,60 @@ class CCellConversion(object):
         and filled a dictionary (of CVolumeT4 instance)
         '''
 #         print('PTREE', p_tree)
-        if CTreeMethods().m_isInterSurface(p_tree):
-            p_id, op = p_tree[0:2]
-            children = p_tree[2:]
-            tupEQUA = self.m_conversionEQUA(children, fictive=True)
-            opT4, param, fict = tupEQUA
-            self.dictClassT4.__setitem__(p_id, CVolumeT4(opT4, param, fict,idorigin))
-            return p_id
+        # if CTreeMethods().m_isInterSurface(p_tree):
+        #     p_id, op = p_tree[0:2]
+        #     children = p_tree[2:]
+        #     tupEQUA = self.m_conversionEQUA(children, fictive=True)
+        #     params, fict = tupEQUA
+        #     self.dictClassT4[p_id] = CVolumeT4(params, fict,idorigin)
+        #     return p_id
         if CTreeMethods().m_isLeaf(p_tree):
             self.new_cell_key += 1
             p_id = self.new_cell_key
             tupEQUA = self.m_conversionEQUA([p_tree], fictive=True)
-            opT4, param, fict = tupEQUA
-            self.dictClassT4[p_id] = CVolumeT4(opT4, param, fict, idorigin)
+            params, fict = tupEQUA
+            self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
             return p_id
 
         p_id, op, *args = p_tree
-#         if op == '*':
-#             surfs = []
-#             nodes = []
-#             for arg in args:
-#                 if CTreeMethods().m_isLeaf(arg):
-#                     surfs.append(arg)
-#                 else:
-#                     nodes.append(arg)
-#             arg_ids = [self.m_postOrderTraversalConversion(node, idorigin) for node in nodes]
-#             tupOPER = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
-#             opT4, param, fict = tupOPER
-#             volume = CVolumeT4('**', (surfs, param), fict, idorigin)
-#             self.dictClassT4[p_id] = volume
-#             return p_id
 
-        arg_ids = [self.m_postOrderTraversalConversion(node, idorigin) for node in args]
-        tupOPER = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
-        opT4, param, fict = tupOPER
-        self.dictClassT4.__setitem__(p_id, CVolumeT4(opT4, param, fict, idorigin))
+        if op == '*':
+            surfs = []
+            nodes = []
+            for arg in args:
+                if CTreeMethods().m_isLeaf(arg):
+                    surfs.append(arg)
+                else:
+                    nodes.append(arg)
+            # here we know that paramsOPER starts as ['EQUA', 'INTE', ...]
+            # because op == '*'
+            if surfs:
+                paramsEQUA, fict = self.m_conversionEQUA(surfs, fictive=True)
+                params = paramsEQUA.copy()
+                if nodes:
+                    arg_ids = [self.m_postOrderTraversalConversion(node, idorigin)
+                            for node in nodes]
+                    paramsOPER, _fict = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
+                    params.extend(paramsOPER[1:])  # take everything after the EQUA
+            else:
+                # we assume that nodes is not empty
+                arg_ids = [self.m_postOrderTraversalConversion(node, idorigin)
+                        for node in nodes]
+                paramsOPER, fict = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
+                params = paramsOPER.copy()  # take everything after the EQUA
+            self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
+            return p_id
+
+        # here op == ':'
+        if op != ':':
+            raise ValueError('Converting cell with unexpected operator: %s'
+                             % op)
+        arg_ids = [self.m_postOrderTraversalConversion(arg, idorigin)
+                    for arg in args]
+        params, fict = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
+        self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
         return p_id
+
 
     def m_postOrderTraversalOptimisation(self, p_tree):
         '''

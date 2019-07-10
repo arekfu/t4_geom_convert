@@ -102,7 +102,7 @@ int main(int argc, char **argv)
   auto start = std::chrono::system_clock::now();
   std::cout << "*** MCNP / Tripoli-4 geometry comparison ***" << endl;
   t4_output_stream = &cout;
-  t4_language = (T4_language)2;
+  t4_language = (T4_language)0;
 
   // ---- Read options ----
   OptionsCompare options;

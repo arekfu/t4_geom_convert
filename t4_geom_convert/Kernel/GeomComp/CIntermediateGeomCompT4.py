@@ -28,16 +28,18 @@ class CIntermediateGeomCompT4(object):
         material as a key and the instance of CGeomCompT4 as a value
         '''
         dic_geomCompT4 = OrderedDict()
-        dic_partialGeomComp = defaultdict(list)
+        dic_partialGeomComp = OrderedDict()
         obj_T4 = CDictGeomCompT4(dic_geomCompT4)
         for key, val in dicVol.items():
             if val.fictive != '':
                 continue
             if val.idorigin:
-                volID = val.idorigin[0]
+                volID = val.idorigin[0][0]
             else:
                 volID = key
             materialName = dic_cellMCNP[volID].materialID
+            if materialName not in dic_partialGeomComp:
+                dic_partialGeomComp[materialName] = []
             dic_partialGeomComp[materialName].append(key)
         for key in dic_partialGeomComp.keys():
             numberOfCell = len(dic_partialGeomComp[key])

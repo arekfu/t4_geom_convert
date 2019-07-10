@@ -10,6 +10,7 @@ from ..Composition.CDictCompositionMCNP import CDictCompositionMCNP
 from ..Composition.CIsotopeConversion import CIsotopeConversion
 from ..Composition.EIsotopeNameElementT4 import EIsotopeNameElement
 from collections import OrderedDict
+from math import fabs
 
 class CCompositionConversionMCNPToT4(object):
     '''
@@ -42,7 +43,7 @@ class CCompositionConversionMCNPToT4(object):
                 else:
                     massNumberT4 = massNumber
                 isotopeT4 = atomicNumberT4, massNumberT4
-                l_compositionT4.append((isotopeT4, fraction))
+                l_compositionT4.append((isotopeT4, str(fabs(float(fraction)))))
             valueT4 = l_compositionT4
             obj_T4.__setitem__(key, valueT4)    
         return d_CompositionT4

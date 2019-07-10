@@ -60,14 +60,13 @@ class CWriteT4Geometry(object):
         f.write("\n")
 
         for k, val in dic_volume.items():
-            s_operator = val.operator
-            s_param = val.param
+            s_params = ' '.join(str(param) for param in val.params)
             s_fictive = val.fictive
             if val.idorigin:
                 s_comment = "// %s" %val.idorigin
             else:
                 s_comment = ""
-            f.write("VOLU %s %s %s %s ENDV %s \n" % (k, s_operator, s_param, s_fictive, s_comment))
+            f.write("VOLU %s %s %s ENDV %s \n" % (k, s_params, s_fictive, s_comment))
         f.write("\n")
         f.write("ENDG")
         f.write("\n")

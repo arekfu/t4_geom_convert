@@ -215,8 +215,10 @@ class CSurfaceConversionMCNPToT4(object):
         elif (typeSurfaceMCNP in (MCNPS.PX, MCNPS.PY, MCNPS.PZ)
             and len(listeParametreMCNP) == 1):
             listeParametreT4 = listeParametreMCNP
-        elif (typeSurfaceMCNP in (MCNPS.P, MCNPS.S)
-              and len(listeParametreMCNP) == 4):
+        elif typeSurfaceMCNP == MCNPS.P and len(listeParametreMCNP) == 4:
+            listeParametreT4 = [listeParametreMCNP[0], listeParametreMCNP[1],
+                                listeParametreMCNP[2], -listeParametreMCNP[3]]
+        elif typeSurfaceMCNP == MCNPS.S and len(listeParametreMCNP) == 4:
             listeParametreT4 = listeParametreMCNP
         elif (typeSurfaceMCNP in (MCNPS.C_X, MCNPS.C_Y, MCNPS.C_Z)
               and len(listeParametreMCNP) == 3):
