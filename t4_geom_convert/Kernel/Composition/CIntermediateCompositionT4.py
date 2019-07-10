@@ -49,11 +49,11 @@ class CIntermediateCompositionT4(object):
 #                 print(cell.materialID, cell.density)
                 if int(cell.materialID) == key:
                     density = cell.density
-                    if float(density) not in l_density:
-                        l_density.append(float(density))
+                    if density not in l_density:
+                        l_density.append(density)
                         if float(density) < 0:
                             l_typeDensityT4.append('DENSITY')
-                        if float(density) > 0:
+                        else:
                             l_typeDensityT4.append('POINT_WISE')
             dic_newCompositionT4[key] = CCompositionT4(l_typeDensityT4, 'm'+str(key),\
                                                        l_density,\

@@ -9,6 +9,7 @@ from ..Transformation.CDictSurfaceTransformed import CDictSurfaceTransformed
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng
 import math
 from collections import OrderedDict
+from math import pi
 
 class CConversionSurfaceTransformed(object):
     '''
@@ -25,7 +26,7 @@ class CConversionSurfaceTransformed(object):
         dicSurfaceTransformed = CDictSurfaceTransformed().m_surfaceTransformed()
         for k, val in dicSurfaceTransformed.items():
             #print('transformation', k)
-            dic_SurfaceT4Tr[k]=[self.m_conversion(val)]
+            dic_SurfaceT4Tr[k] = self.m_conversion(val)
 
         return dic_SurfaceT4Tr, dicSurfaceTransformed
             
@@ -60,10 +61,19 @@ class CConversionSurfaceTransformed(object):
             point = tuple_param[0]
             x, y, z = point
             unitary_vector = tuple_param[1]
-            teta = tuple_param[2][1]
+            teta = 180.*tuple_param[2][1]/pi
             ux, uy, uz = unitary_vector
             param = [x, y, z, teta, ux, uy, uz]
             type_surface = ESurfaceTypeT4Eng.CONE
+            nappe = tuple_param[2][2]
+            if nappe is None:
+                return [(type_surface, param)]
+            D = -(ux*x + uy*y + uz*z)
+            paramPlane = [ux,uy,uz,D]
+            typePlane = ESurfaceTypeT4Eng.PLANE
+            plane = (typePlane, paramPlane)
+            side = int(nappe)
+            return [(type_surface, param), (plane, side)]
         if val.typeSurface == 'gq':
             type_surface = ESurfaceTypeT4Eng.QUAD
             param = val.paramSurface
@@ -89,4 +99,4 @@ class CConversionSurfaceTransformed(object):
                 raise ValueError('Cannot convert TORUS with generic axis: %s'%unitary_vector)
             param = [x,y,z,r1, r2, r2]
         
-        return (type_surface, param)
+        return [(type_surface, param)]

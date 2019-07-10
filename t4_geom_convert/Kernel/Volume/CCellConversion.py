@@ -166,11 +166,23 @@ class CCellConversion(object):
              = surfaceObject.boundaryCond,\
              surfaceObject.typeSurface, surfaceObject.paramSurface
             surfaceObject = CTransformationFonction().m_transformation(p_boundCond, p_transf, p_typeSurface, l_paramSurface)
-            (typeSurface, param) = CConversionSurfaceTransformed().m_conversion(surfaceObject)
+            surfs = CConversionSurfaceTransformed().m_conversion(surfaceObject)
+            
+            extra_surfs = surfs[1:]
+            extra_ids = []
+            for (p_typeSurface, p_listCoefSurface), side in extra_surfs:
+                self.new_surf_key += 1
+                new_key = self.new_surf_key
+                self.dictSurfaceT4[new_key] = (CSurfaceT4(p_typeSurface.name, p_listCoefSurface), [])
+                extra_ids.append(side * new_key)
+                
+            typeSurface, param = surfs[0]
             self.new_surf_key += 1
             new_key = self.new_surf_key
+            self.dictSurfaceT4[new_key] = (CSurfaceT4(typeSurface.name, param), extra_ids)
+
             self.dicSurfaceMCNP[new_key] = surfaceObject
-            self.dictSurfaceT4[new_key] = (CSurfaceT4(typeSurface.name, param),[])
+
             return new_key if p_tree >= 0 else -new_key
         else:
             op, *args = p_tree

@@ -37,7 +37,11 @@ class CIntermediateGeomCompT4(object):
                 volID = val.idorigin[0][0]
             else:
                 volID = key
-            materialName = dic_cellMCNP[volID].materialID
+            density = dic_cellMCNP[volID].density
+            if density is None:
+                materialName = dic_cellMCNP[volID].materialID 
+            else:
+                materialName = dic_cellMCNP[volID].materialID + '_' + density 
             if materialName not in dic_partialGeomComp:
                 dic_partialGeomComp[materialName] = []
             dic_partialGeomComp[materialName].append(key)

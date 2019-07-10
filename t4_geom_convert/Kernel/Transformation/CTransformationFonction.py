@@ -39,6 +39,7 @@ class CTransformationFonction(object):
         else:
 #             print('typeSurface', type(p_typeSurface))
 #             print('paramSurface', l_paramSurface)
+
             if isinstance(p_typeSurface, str):
                 f = (l_paramSurface[0], l_paramSurface[1])
                 p = (0,0,0)
@@ -50,7 +51,17 @@ class CTransformationFonction(object):
             p_typeSurface, l_pparamSurface, l_complParam = t, f, s
 #                     p_typeSurface, l_pparamSurface, l_complParam = \
 #                     CTransformationFonction().m_transformation(k,surfaceParser)
-            l_paramSurface = l_pparamSurface[0], l_pparamSurface[1], l_complParam
+            if p_typeSurface == 'k':
+                new_complParam = list(l_complParam)
+                if len(l_paramSurface) == 2 or len(l_paramSurface) == 4:
+                    new_complParam.append(None)
+                elif len(l_paramSurface) == 3 or len(l_paramSurface) == 5:
+                    new_complParam.append(l_paramSurface[-1])
+                else:
+                    raise ValueError('Unexpected number of parameters for cone: %d' % len(l_paramSurface))
+                l_paramSurface = l_pparamSurface[0], l_pparamSurface[1], tuple(new_complParam)
+            else:
+                l_paramSurface = l_pparamSurface[0], l_pparamSurface[1], l_complParam
 #         print('CSurfaceTr', p_typeSurface, l_paramSurface)
         return CSurfaceTransformed(\
                     p_boundCond, p_typeSurface, l_paramSurface)

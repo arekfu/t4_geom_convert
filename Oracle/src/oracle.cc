@@ -65,7 +65,13 @@ Statistics compare_geoms(const OptionsCompare &options)
       stats.recordCoveredRank(rank);
 
       string materialDensityKey = mcnpGeom.getMaterialDensity();
+      int cID = mcnpGeom.getCellID();
       if (!t4Geom.materialInMap(materialDensityKey)) {
+        if (options.verbosity > 0) {
+          cout << "at point: (" << point[0] << ", " << point[1] << ", " << point[2]
+            << "); associating MCNP material \"" << materialDensityKey << "\" (cell ID " << cID << ") --> T4 composition \"" << compo
+            << '"' << endl;
+        }
         t4Geom.addEquivalence(materialDensityKey, compo);
         stats.incrementSuccess();
       } else {
@@ -77,7 +83,6 @@ Statistics compare_geoms(const OptionsCompare &options)
             stats.incrementIgnore();
           } else {
             int pID = mcnpGeom.getPointID();
-            int cID = mcnpGeom.getCellID();
             int mID = mcnpGeom.getMaterialID();
             stats.incrementFailure();
             stats.recordFailure(point, rank, pID, cID, mID, dist);

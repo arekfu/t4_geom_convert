@@ -134,6 +134,7 @@ void MCNPGeometry::parseINP()
         associateCell2Density();
       }
     }
+    std::cout << "...read " << cell2Density.size() << " MCNP cells and their densities" << std::endl;
   }
   readNPS();
 }
@@ -199,7 +200,7 @@ void MCNPGeometry::checkDataFromLine6Ptrac(const string &line6, int nbData)
 
 bool MCNPGeometry::finishedReading()
 {
-  return currentLine.length() == 1 || currentLine.empty();
+  return currentLine.empty();
 }
 
 int MCNPGeometry::isLineAComment(string lineContent)
