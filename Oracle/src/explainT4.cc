@@ -21,7 +21,7 @@ int strictness_level = 3; //Global variable required by T4 libraries
 
 bool explainVolume(Ge_float const x, Ge_float const y, Ge_float const z, int const numvol, std::string const &prefix)
 {
-  bool success = false;
+  bool success = true;
   int rankvol = numvol_to_rankvol(numvol);
 
   if(rankvol >= 0) {
@@ -89,7 +89,7 @@ bool explainVolume(Ge_float const x, Ge_float const y, Ge_float const z, int con
           {
             auto const &inter_arg = op.operator_arg.inter_arg;
             std::cout << prefix << "* operator INTE, " << inter_arg.nb_arg << " args\n";
-            bool interSuccess = false;
+            bool interSuccess = true;
             for(int iarg=0; iarg<inter_arg.nb_arg; ++iarg) {
               Ge_volu *volu_inter = inter_arg.inter[iarg];
               int const subnumvol = volu_inter->numvol;
