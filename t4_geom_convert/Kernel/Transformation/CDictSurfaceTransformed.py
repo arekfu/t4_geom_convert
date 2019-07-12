@@ -43,9 +43,11 @@ class CDictSurfaceTransformed(object):
         dictSurfaceTransformed = OrderedDict()
         for k, v in list(surfaceParser.items()):
             p_boundCond, p_transformation, p_typeSurface, l_paramSurface = v
+            idorigin = [k]
 #             print(p_typeSurface)
             if p_transformation:
                 enumSurface = string_to_enum(p_typeSurface)
-                dictSurfaceTransformed[k] = CTransformationFonction().m_transformation(p_boundCond, transformParsed[int(p_transformation)], enumSurface, l_paramSurface)
+                idorigin.append('via transformation {}'.format(p_transformation))
+                dictSurfaceTransformed[k] = CTransformationFonction().m_transformation(p_boundCond, transformParsed[int(p_transformation)], enumSurface, l_paramSurface, idorigin)
         return dictSurfaceTransformed
 

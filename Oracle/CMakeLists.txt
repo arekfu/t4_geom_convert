@@ -11,7 +11,7 @@ include(LibUtils)
 include(FindMEDFile)
 include(DetectOS)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 find_package(T4 REQUIRED)
 
 # LAPACK/BLAS
@@ -116,3 +116,9 @@ target_include_directories(tests PUBLIC "${ORACLE_INCLUDE_DIR}")
 target_compile_options(tests PUBLIC -Wall -Wextra -pedantic -Wuninitialized )
 target_link_libraries(tests visutripoli4 t4core t4 gtest_main)
 compilation_info(tests)
+
+add_executable(explainT4 src/options_explainT4.cc src/T4Geometry.cc src/explainT4.cc)
+target_include_directories(explainT4 PUBLIC "${ORACLE_INCLUDE_DIR}")
+target_compile_options(explainT4 PUBLIC -Wall -Wextra -pedantic -Wuninitialized)
+target_link_libraries(explainT4 visutripoli4 t4geom t4core t4)
+compilation_info(explainT4)

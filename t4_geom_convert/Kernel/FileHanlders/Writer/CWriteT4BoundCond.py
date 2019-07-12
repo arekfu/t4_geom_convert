@@ -21,11 +21,13 @@ class CWriteT4BoundCond(object):
         '''
         :brief: method writing GeomComp of the T4 input file
         '''
+        d_boundCond = CConversionBoundaryCondition().m_conversionBoundCond()
+        if not d_boundCond:
+            return
         f.write("\n BOUNDARY_CONDITION \n")
         f.write("\n")
         f.write("\n ALL_COMPLETE \n")
         f.write("\n")
-        d_boundCond = CConversionBoundaryCondition().m_conversionBoundCond()
         f.write(str(len(d_boundCond)))
         f.write("\n")
         for k in d_boundCond.keys():

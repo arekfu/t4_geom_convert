@@ -30,6 +30,7 @@ void help()
   edit_help_option("-h, --help", "Displays this help message.");
   edit_help_option("-n, --npts", "Maximum number of tested points.");
   edit_help_option("-d, --delta", "Distance to the nearest surface below which a failed test is ignored.");
+  edit_help_option("-g, --guess-material-assocs", "guess the materials correspondence based on the first few points");
 
   std::cout << endl;
 }
@@ -39,7 +40,8 @@ void help()
 OptionsCompare::OptionsCompare() : help(false),
                                    verbosity(0),
                                    npoints(2000000),
-                                   delta(1.0E-7)
+                                   delta(1.0E-7),
+                                   guessMaterialAssocs(false)
 {
 }
 
@@ -63,6 +65,8 @@ void OptionsCompare::get_opts(int argc, char **argv)
         return;
       } else if (opt.compare("--verbose") == 0 || opt.compare("-V") == 0) {
         ++verbosity;
+      } else if (opt.compare("--guess-material-assocs") == 0 || opt.compare("-g") == 0) {
+        guessMaterialAssocs = true;
       } else if (opt.compare("--npts") == 0 || opt.compare("-n") == 0) {
         int nv = 1;
         check_argv(argc, i + nv);

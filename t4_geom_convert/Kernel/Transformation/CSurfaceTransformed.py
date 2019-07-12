@@ -13,7 +13,7 @@ class CSurfaceTransformed(object):
     '''
 
 
-    def __init__(self, p_boundaryCond, p_typeSurface, l_paramSurface):
+    def __init__(self, p_boundaryCond, p_typeSurface, l_paramSurface, idorigin):
         '''
         Constructor
         :param: p_boundaryCond : parameter 1 of the boundary condition
@@ -23,3 +23,4 @@ class CSurfaceTransformed(object):
         self.boundaryCond = p_boundaryCond
         self.typeSurface = p_typeSurface
         self.paramSurface = l_paramSurface
+        self.idorigin = idorigin

@@ -7,6 +7,8 @@ Created on 6 févr. 2019
 '''
 from ..Transformation.CDictSurfaceTransformed import CDictSurfaceTransformed
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng
+from ..Surface.CSurfaceT4 import CSurfaceT4
+from ..Surface.CSurfaceCollection import CSurfaceCollection
 import math
 from collections import OrderedDict
 from math import pi
@@ -29,7 +31,7 @@ class CConversionSurfaceTransformed(object):
             dic_SurfaceT4Tr[k] = self.m_conversion(val)
 
         return dic_SurfaceT4Tr, dicSurfaceTransformed
-            
+
     def m_conversion(self, val):
         if val.typeSurface == 'p':
             tuple_param = val.paramSurface
@@ -66,14 +68,15 @@ class CConversionSurfaceTransformed(object):
             param = [x, y, z, teta, ux, uy, uz]
             type_surface = ESurfaceTypeT4Eng.CONE
             nappe = tuple_param[2][2]
+            cone = CSurfaceT4(type_surface, param)
             if nappe is None:
-                return [(type_surface, param)]
+                return CSurfaceCollection(cone)
             D = -(ux*x + uy*y + uz*z)
             paramPlane = [ux,uy,uz,D]
             typePlane = ESurfaceTypeT4Eng.PLANE
-            plane = (typePlane, paramPlane)
+            plane = CSurfaceT4(typePlane, paramPlane)
             side = int(nappe)
-            return [(type_surface, param), (plane, side)]
+            return CSurfaceCollection(cone, fixed=[(plane, side)])
         if val.typeSurface == 'gq':
             type_surface = ESurfaceTypeT4Eng.QUAD
             param = val.paramSurface
@@ -98,5 +101,6 @@ class CConversionSurfaceTransformed(object):
             else:
                 raise ValueError('Cannot convert TORUS with generic axis: %s'%unitary_vector)
             param = [x,y,z,r1, r2, r2]
-        
-        return [(type_surface, param)]
+
+        surf = CSurfaceT4(type_surface, param)
+        return CSurfaceCollection(surf)

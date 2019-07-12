@@ -90,13 +90,13 @@ bool MCNPGeometry::readNextPtracData(long maxReadPoint)
 void MCNPGeometry::associateCell2Density()
 {
   istringstream iss(currentLine);
-  int cellNum;
+  unsigned long cellNum;
   string density;
   if (iss >> cellNum) {
-    int matNum;
+    unsigned long matNum;
     iss >> matNum;
     if (matNum == 0) {
-      addCell2Density(cellNum, "void");
+      addCell2Density(cellNum, {0, "void"});
     } else {
       iss >> density;
       istringstream istest(density);
@@ -108,15 +108,16 @@ void MCNPGeometry::associateCell2Density()
         std::cerr << currentLine << endl;
         exit(EXIT_FAILURE);
       }
-      addCell2Density(cellNum, density);
+      addCell2Density(cellNum, {matNum, density});
     }
   }
 }
 
-void MCNPGeometry::addCell2Density(int key, const string &value)
+void MCNPGeometry::addCell2Density(unsigned long key, const std::pair<unsigned long, std::string> &value)
 {
   if (cell2Density.find(key) == cell2Density.end()) {
-    cell2Density[key] = value;
+    std::string value_str = std::to_string(value.first) + "_" + value.second;
+    cell2Density[key] = value_str;
   } else {
     std::cerr << "This cellID " << key << " already appeared in the MCNP input file." << endl;
     std::cerr << "Check MCNP input file for errors..." << endl;
@@ -134,27 +135,17 @@ void MCNPGeometry::parseINP()
         associateCell2Density();
       }
     }
-    std::cout << "...read " << cell2Density.size() << " MCNP cells and their densities" << std::endl;
-  }
-  readNPS();
-}
-
-void MCNPGeometry::readNPS()
-{
-  string dummy;
-  if (inputFile) {
     while (getline(inputFile, currentLine)) {
-      if (isLineAComment(currentLine)) {
-        continue;
-      }
       if (currentLine.find("NPS") != string::npos || currentLine.find("nps") != string::npos) {
         istringstream iss(currentLine);
+        string dummy;
         double nps;
         iss >> dummy >> nps;
         this->nps = long(nps);
         break;
       }
     }
+    std::cout << "...read " << cell2Density.size() << " MCNP cells and their densities" << std::endl;
   }
 }
 
@@ -203,9 +194,14 @@ bool MCNPGeometry::finishedReading()
   return currentLine.empty();
 }
 
-int MCNPGeometry::isLineAComment(string lineContent)
+bool MCNPGeometry::isLineAComment(string const &lineContent) const
 {
   return lineContent[0] == 'c' || lineContent[0] == 'C';
+}
+
+bool MCNPGeometry::isLineAMaterial(string const &lineContent) const
+{
+  return lineContent[0] == 'm' || lineContent[0] == 'M';
 }
 
 void MCNPGeometry::incrementNbPointsRead()
@@ -215,8 +211,7 @@ void MCNPGeometry::incrementNbPointsRead()
 
 string MCNPGeometry::getMaterialDensity()
 {
-  string density = cell2Density[cellID];
-  return (to_string(materialID) + density);
+  return cell2Density[cellID];
 }
 
 const string &MCNPGeometry::getInputPath()
@@ -281,7 +276,7 @@ void MCNPGeometry::setCellMaterial(const pair<int, int> &cellMat)
   this->materialID = cellMat.second;
 }
 
-map<int, string> &MCNPGeometry::getCell2Density()
+map<unsigned long, string> &MCNPGeometry::getCell2Density()
 {
   return cell2Density;
 }

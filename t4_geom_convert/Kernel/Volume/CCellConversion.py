@@ -155,7 +155,7 @@ class CCellConversion(object):
             return new_tree
         else:
             return p_tree
-    
+
     def m_postOrderTraversalTransform(self, p_tree, p_transf):
         if CTreeMethods().m_isLeaf(p_tree):
 #             print('PTREE',p_tree)
@@ -165,22 +165,24 @@ class CCellConversion(object):
             p_boundCond, p_typeSurface, l_paramSurface \
              = surfaceObject.boundaryCond,\
              surfaceObject.typeSurface, surfaceObject.paramSurface
-            surfaceObject = CTransformationFonction().m_transformation(p_boundCond, p_transf, p_typeSurface, l_paramSurface)
-            surfs = CConversionSurfaceTransformed().m_conversion(surfaceObject)
-            
-            extra_surfs = surfs[1:]
-            extra_ids = []
-            for (p_typeSurface, p_listCoefSurface), side in extra_surfs:
+            idorigin = surfaceObject.idorigin + ['via tr']
+            surfaceObject = CTransformationFonction().m_transformation(p_boundCond, p_transf, p_typeSurface, l_paramSurface, idorigin)
+            surf_coll = CConversionSurfaceTransformed().m_conversion(surfaceObject)
+            idorigin = surfaceObject.idorigin.copy()
+
+            fixed_surfs = surf_coll.fixed
+            fixed_ids = []
+            for surf, side in fixed_surfs:
                 self.new_surf_key += 1
                 new_key = self.new_surf_key
-                self.dictSurfaceT4[new_key] = (CSurfaceT4(p_typeSurface.name, p_listCoefSurface), [])
-                extra_ids.append(side * new_key)
-                
-            typeSurface, param = surfs[0]
+                surf.idorigin.append('aux fixed surf')
+                self.dictSurfaceT4[new_key] = (surf, [])
+                fixed_ids.append(side * new_key)
+
+            surf = surf_coll.main
             self.new_surf_key += 1
             new_key = self.new_surf_key
-            self.dictSurfaceT4[new_key] = (CSurfaceT4(typeSurface.name, param), extra_ids)
-
+            self.dictSurfaceT4[new_key] = (surf, fixed_ids)
             self.dicSurfaceMCNP[new_key] = surfaceObject
 
             return new_key if p_tree >= 0 else -new_key
@@ -190,7 +192,7 @@ class CCellConversion(object):
             new_tree = [op]
             new_tree.extend(new_args)
             return new_tree
-    
+
     def m_postOrderTraversalConversion(self, p_tree, idorigin):
         '''
         :brief: method which take the tree create by m_postOrderTraversalFlag\

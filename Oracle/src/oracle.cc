@@ -53,7 +53,43 @@ Statistics compare_geoms(const OptionsCompare &options)
   // The number of header lines must be 8 !!
   mcnpGeom.goThroughHeaderPTRAC(8);
 
+  if(!options.guessMaterialAssocs) {
+    auto const &compos = t4Geom.getCompos()->get_compo_map();
+    for(auto const &compo: compos) {
+      std::string const &compo_name = compo.second;
+      if(compo_name == "No compo") {
+        continue;
+      }
+      auto pos = compo_name.find_first_of("_");
+      std::string index = compo_name.substr(1, pos-1);
+      std::string density = compo_name.substr(pos+1);
+      if(index == "0") {
+        density = "void";
+      } else {
+        density = compo_name.substr(pos+1);
+      }
+      std::string mcnp_compo_name = index + "_" + density;
+      if (options.verbosity > 0) {
+        std::cout << "associating MCNP material \"" << mcnp_compo_name << "\" --> T4 composition \"" << compo_name
+          << '"' << endl;
+      }
+      t4Geom.addEquivalence(mcnp_compo_name, compo_name);
+    }
+  }
+
+  unsigned long countPoints = 0;
+  auto current = std::chrono::system_clock::now();
+  auto previous = current;
   while (mcnpGeom.readNextPtracData(maxSampledPts)) {
+
+    ++countPoints;
+
+    current = std::chrono::system_clock::now();
+    auto print_seconds = current - previous;
+    if(print_seconds > 5s) {
+      std::cout << "Progress: " << countPoints << " / " << maxSampledPts << std::endl;
+      previous = current;
+    }
 
     vector<double> point = mcnpGeom.getPointXyz();
     long rank = t4Geom.getVolumes()->which_volume(point);
@@ -66,7 +102,7 @@ Statistics compare_geoms(const OptionsCompare &options)
 
       string materialDensityKey = mcnpGeom.getMaterialDensity();
       int cID = mcnpGeom.getCellID();
-      if (!t4Geom.materialInMap(materialDensityKey)) {
+      if (!t4Geom.materialInMap(materialDensityKey) && options.guessMaterialAssocs) {
         if (options.verbosity > 0) {
           cout << "at point: (" << point[0] << ", " << point[1] << ", " << point[2]
             << "); associating MCNP material \"" << materialDensityKey << "\" (cell ID " << cID << ") --> T4 composition \"" << compo

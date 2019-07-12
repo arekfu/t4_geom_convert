@@ -43,9 +43,9 @@ TEST_F(MCNPtestInput, isComment)
 TEST_F(MCNPtestInput, AssociateCell2Density)
 {
   MCNPg1->parseINP();
-  ASSERT_EQ(MCNPg1->getCell2Density()[1001], "-2.7");
-  ASSERT_EQ(MCNPg1->getCell2Density()[2001], "-2.7");
-  ASSERT_EQ(MCNPg1->getCell2Density()[3001], "-2.7");
+  ASSERT_EQ(MCNPg1->getCell2Density()[1001], "347_-2.7");
+  ASSERT_EQ(MCNPg1->getCell2Density()[2001], "346_-2.7");
+  ASSERT_EQ(MCNPg1->getCell2Density()[3001], "345_-2.7");
 }
 
 TEST_F(MCNPtestInput, AssociateMaterialDensity)
@@ -53,14 +53,8 @@ TEST_F(MCNPtestInput, AssociateMaterialDensity)
   MCNPg1->parseINP();
   MCNPg1->goThroughHeaderPTRAC(8);
   MCNPg1->readNextPtracData(20000);
-  ASSERT_EQ(MCNPg1->getMaterialDensity(), "1-2.7");
+  ASSERT_EQ(MCNPg1->getMaterialDensity(), "345_-2.7");
 
   MCNPg1->readNextPtracData(20000);
-  ASSERT_EQ(MCNPg1->getMaterialDensity(), "2-2.7");
-}
-
-TEST_F(MCNPtestInput, ReadNPS)
-{
-  MCNPg1->readNPS();
-  ASSERT_EQ(MCNPg1->getNPS(), 1000);
+  ASSERT_EQ(MCNPg1->getMaterialDensity(), "346_-2.7");
 }

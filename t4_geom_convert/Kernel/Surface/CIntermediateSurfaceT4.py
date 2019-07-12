@@ -18,6 +18,7 @@ Created on 6 févr. 2019
 '''
 from ..Surface.CSurfaceConversionMCNPToT4 import CSurfaceConversionMCNPToT4
 from ..Surface.CSurfaceT4 import CSurfaceT4
+from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 from ..Transformation.CConversionSurfaceTransformed import CConversionSurfaceTransformed
 from collections import OrderedDict
 
@@ -25,12 +26,6 @@ class CIntermediateSurfaceT4(object):
     '''
     :brief: Class which associate the T4 surface with the Class CSURFACET4
     '''
-
-    def __init__(self):
-        '''
-        Constructor
-        '''
-        
 
     def m_constructSurfaceT4(self):
         '''
@@ -48,16 +43,15 @@ class CIntermediateSurfaceT4(object):
         #print(dic_surfaceT4)
         free_id = max(int(k) for k in dic_surfaceT4.keys()) + 1
         keyS = 100000
-        for key, surfs in dic_surfaceT4.items():
+        for key, surf_coll in dic_surfaceT4.items():
 #             print('surface', key)
-            extra_surfs = surfs[1:]
-            extra_ids = []
-            for (p_typeSurface, p_listCoefSurface), side in extra_surfs:
-                dic_newSurfaceT4[free_id] = (CSurfaceT4(p_typeSurface.name, p_listCoefSurface), [])
-                extra_ids.append(side * free_id)
+            fixed_surfs = surf_coll.fixed
+            fixed_ids = []
+            for surf, side in fixed_surfs:
+                dic_newSurfaceT4[free_id] = (surf, [])
+                fixed_ids.append(side * free_id)
                 free_id += 1
-            p_typeSurface, p_listCoefSurface = surfs[0]
-            dic_newSurfaceT4[key] = (CSurfaceT4(p_typeSurface.name, p_listCoefSurface), extra_ids)
-        dic_newSurfaceT4[keyS + 1] = (CSurfaceT4('PLANEX', [1]), [])
-        dic_newSurfaceT4[keyS + 2] = (CSurfaceT4('PLANEX', [-1]), [])
+            dic_newSurfaceT4[key] = (surf_coll.main, fixed_ids)
+        dic_newSurfaceT4[keyS + 1] = (CSurfaceT4(T4S.PLANEX, [1], ['aux plane for unions']), [])
+        dic_newSurfaceT4[keyS + 2] = (CSurfaceT4(T4S.PLANEX, [-1], ['aux plane for unions']), [])
         return dic_newSurfaceT4, dic_surfaceMCNP

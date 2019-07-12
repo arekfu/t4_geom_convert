@@ -31,7 +31,7 @@ class MCNPGeometry
   int materialID;
   std::vector<double> pointXYZ;
 
-  std::map<int, std::string> cell2Density;
+  std::map<unsigned long, std::string> cell2Density;
 
   std::vector<int> volumeList;
   int nbDataCellMaterialLine;
@@ -96,12 +96,6 @@ public:
   void parseINP();
 
   /**
-   * Searches the INP file for the total number of particle NPS.
-   *
-   */
-  void readNPS();
-
-  /**
    * Reads the header lines. Sets the current line at the last header line of PTRAC file.
    *
    * @param[in] nHeaderLines The number of header lines in the PTRAC file.
@@ -142,7 +136,7 @@ public:
    *
    *
    */
-  void addCell2Density(int key, const std::string &value);
+  void addCell2Density(unsigned long key, const std::pair<unsigned long, std::string> &value);
 
   /**
    * Gives the association material ID - material density.
@@ -170,9 +164,17 @@ public:
    * Determines whether the current is a comment
    *
    *
-   * @returns 1 if current line is a comment, 0 otherwise
+   * @returns true if current line is a comment, false otherwise
    */
-  int isLineAComment(std::string lineContent);
+  bool isLineAComment(std::string const &lineContent) const;
+
+  /**
+   * Determines whether the current is a material definition
+   *
+   *
+   * @returns true if current line is a comment, false otherwise
+   */
+  bool isLineAMaterial(std::string const &lineContent) const;
 
   const std::string &getInputPath();
   long getNPS();
@@ -191,7 +193,7 @@ public:
   int getCellID();
   int getMaterialID();
   void setCellMaterial(const std::pair<int, int> &cellMat);
-  std::map<int, std::string> &getCell2Density();
+  std::map<unsigned long, std::string> &getCell2Density();
 };
 
 #endif /* MCNPGEOMETRY_H_ */

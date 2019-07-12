@@ -7,12 +7,12 @@ Created on 6 févr. 2019
 :file : CSurfaceMCNP.py
 '''
 
-class CSurfaceT4(object):
+class CSurfaceT4:
     '''
     :brief: Class which permit to access precisely to the information of the block SURFACE of T4
     '''
 
-    def __init__(self, p_typeSurface, l_paramSurface):
+    def __init__(self, p_typeSurface, l_paramSurface, idorigin=None):
         '''
         Constructor
         :param: p_typeSurface : string specifying the type of the Surface
@@ -21,3 +21,4 @@ class CSurfaceT4(object):
 
         self.typeSurface = p_typeSurface
         self.paramSurface = l_paramSurface
+        self.idorigin = idorigin.copy() if idorigin is not None else []

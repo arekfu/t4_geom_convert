@@ -16,6 +16,7 @@ public:
   int verbosity;
   long npoints;
   double delta;
+  bool guessMaterialAssocs;
 
   OptionsCompare();
   void get_opts(int, char **);

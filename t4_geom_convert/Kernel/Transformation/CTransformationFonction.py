@@ -26,14 +26,13 @@ class CTransformationFonction(object):
         Constructor
         '''
 
-    def m_transformation(self,p_boundCond, trpl, p_typeSurface, l_paramSurface):
+    def m_transformation(self,p_boundCond, trpl, p_typeSurface, l_paramSurface, idorigin):
 #         print('P_TYPESURFACE',p_typeSurface)
         if not trpl:
-            return CSurfaceTransformed(\
-                    p_boundCond, p_typeSurface, l_paramSurface)
-        if p_typeSurface == ESurfaceTypeMCNP.GQ:
+            return CSurfaceTransformed(p_boundCond, p_typeSurface,
+                                       l_paramSurface, idorigin)
+        if p_typeSurface == ESurfaceTypeMCNP.GQ or p_typeSurface == 'gq':
             p_typeSurface = 'gq'
-        if p_typeSurface == 'gq':
             l_paramSurface = CTransformationQuad().m_transformationQuad(\
                                 l_paramSurface, trpl)
         else:
@@ -63,5 +62,5 @@ class CTransformationFonction(object):
             else:
                 l_paramSurface = l_pparamSurface[0], l_pparamSurface[1], l_complParam
 #         print('CSurfaceTr', p_typeSurface, l_paramSurface)
-        return CSurfaceTransformed(\
-                    p_boundCond, p_typeSurface, l_paramSurface)
+        return CSurfaceTransformed(p_boundCond, p_typeSurface, l_paramSurface,
+                                   idorigin)

@@ -14,7 +14,7 @@ class CSurfaceMCNP(object):
     '''
 
 
-    def __init__(self, p_boundaryCond, p_transformation, p_typeSurface, l_paramSurface):
+    def __init__(self, p_boundaryCond, p_transformation, p_typeSurface, l_paramSurface, l_idorigin=None):
         '''
         Constructor
         :param: p_boundaryCond : parameter 1 of the boundary condition
@@ -26,3 +26,4 @@ class CSurfaceMCNP(object):
         self.transformation = p_transformation
         self.typeSurface = p_typeSurface
         self.paramSurface = l_paramSurface
+        self.idorigin = l_idorigin.copy() if l_idorigin is not None else []

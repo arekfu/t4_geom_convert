@@ -55,8 +55,9 @@ class CWriteT4Geometry(object):
             list_paramSurface = surf.paramSurface
 #             print(key, surf.typeSurface, list_paramSurface)
             s_paramSurface = ' '.join(str(element) for element in list_paramSurface)
-            f.write("SURFACE %s %s %s\n" % (key, surf.typeSurface,
-                                            s_paramSurface))
+            s_comment = '' if not surf.idorigin else '// ' + str(surf.idorigin)
+            f.write("SURF %s %s %s %s\n" % (key, surf.typeSurface.name,
+                                            s_paramSurface, s_comment))
         f.write("\n")
 
         for k, val in dic_volume.items():

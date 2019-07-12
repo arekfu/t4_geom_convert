@@ -41,26 +41,16 @@ class CTransformationQuad(object):
         r31 = l_paramTransformation[9]
         r32 = l_paramTransformation[10]
         r33 = l_paramTransformation[11]
-        A = np.array(\
-            [[a, d*0.5, f*0.5, g*0.5],\
-             [d*0.5, b, e*0.5, h*0.5],\
-             [f*0.5, e*0.5, c ,i*0.5],\
-             [g*0.5, h*0.5, i*0.5, j]])
-        R = np.array(\
-            [[r11, r12, r13,0],
-             [r21, r22, r23,0],
-             [r31, r32, r33, 0],
-             [0 ,0 ,0 ,1]])
-        Q = np.array(\
-            [[1, 0, 0, x],
-             [0, 1, 0, y],
-             [0, 0, 1, z],
-             [0, 0, 0, 1]])
-        RQ = np.matmul(R,Q)
-        if np.linalg.det(RQ) != 0:
-            T = np.linalg.inv(RQ)
-            TT = T.transpose()
-            Atransf  = np.matmul(TT, np.matmul(A, T))
+        A = np.array([[a, d*0.5, f*0.5, g*0.5],
+                      [d*0.5, b, e*0.5, h*0.5],
+                      [f*0.5, e*0.5, c ,i*0.5],
+                      [g*0.5, h*0.5, i*0.5, j]])
+        M = np.array([[r11, r12, r13, x],
+                      [r21, r22, r23, y],
+                      [r31, r32, r33, z],
+                      [0,   0,   0,   1]])
+        if np.linalg.det(M) != 0:
+            Atransf  = np.matmul(M.T, np.matmul(A, M))
             l_transfParamSurface[0] = Atransf.item(0,0)
             l_transfParamSurface[1] = Atransf.item(1,1)
             l_transfParamSurface[2] = Atransf.item(2,2)
