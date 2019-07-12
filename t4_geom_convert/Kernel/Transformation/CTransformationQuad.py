@@ -45,11 +45,21 @@ class CTransformationQuad(object):
                       [d*0.5, b, e*0.5, h*0.5],
                       [f*0.5, e*0.5, c ,i*0.5],
                       [g*0.5, h*0.5, i*0.5, j]])
-        M = np.array([[r11, r12, r13, x],
-                      [r21, r22, r23, y],
-                      [r31, r32, r33, z],
+        R = np.array([[r11, r12, r13, 0],
+                      [r21, r22, r23, 0],
+                      [r31, r32, r33, 0],
                       [0,   0,   0,   1]])
+        Q = np.array([[1, 0, 0, -x],
+                      [0, 1, 0, -y],
+                      [0, 0, 1, -z],
+                      [0,   0,   0,   1]])
+        M = np.matmul(R,Q)
+#         M = np.array([[r11, r12, r13, x],
+#                       [r21, r22, r23, y],
+#                       [r31, r32, r33, z],
+#                       [0,   0,   0,   1]])
         if np.linalg.det(M) != 0:
+            iM = np.linalg.inv(M)
             Atransf  = np.matmul(M.T, np.matmul(A, M))
             l_transfParamSurface[0] = Atransf.item(0,0)
             l_transfParamSurface[1] = Atransf.item(1,1)
@@ -63,4 +73,4 @@ class CTransformationQuad(object):
             l_transfParamSurface[9] = Atransf.item(3,3)
             return l_transfParamSurface
         else:
-            raise ValueError('error of rotation,R%s, Q%s,  RQ %s, A %s' %(R, Q, RQ, A))
+            raise ValueError('error of rotation,R%s, Q%s,  RQ %s, A %s' %(iM, A))
