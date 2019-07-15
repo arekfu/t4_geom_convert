@@ -25,9 +25,12 @@ def conversion(p_nameT4File, p_nameMCNPFile):
         CWriteT4GeomComp(dicVol, mcnp_new_dict).m_writeT4GeomComp(ofile)
         CWriteT4BoundCond().m_writeT4BoundCond(ofile)
 
-if __name__ == '__main__':
+def main():
     config = CConfigParameters()
     t4_fname = config.m_readNameT4InputFile()
     mcnp_fname = config.m_readNameMCNPInputFile()
     conversion(t4_fname, mcnp_fname)
     # cProfile.run('conversion(t4_fname, mcnp_fname)', 'ici.profile')
+
+if __name__ == '__main__':
+    main()
