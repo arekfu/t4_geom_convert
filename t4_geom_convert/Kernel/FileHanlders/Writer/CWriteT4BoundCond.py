@@ -24,16 +24,12 @@ class CWriteT4BoundCond(object):
         d_boundCond = CConversionBoundaryCondition().m_conversionBoundCond()
         if not d_boundCond:
             return
-        f.write("\n BOUNDARY_CONDITION \n")
-        f.write("\n")
-        f.write("\n ALL_COMPLETE \n")
-        f.write("\n")
+        f.write("\nBOUNDARY_CONDITION\n")
         f.write(str(len(d_boundCond)))
         f.write("\n")
         for k in d_boundCond.keys():
             p_typeOfBound = d_boundCond[k].typeOfBound
-            f.write("%s %s \n" %(str(k), p_typeOfBound))
-        f.write("\n")
+            f.write("ALL_COMPLETE %s %s\n" %(p_typeOfBound, k))
         f.write("END_BOUNDARY_CONDITION")
         f.write("\n")
 # CWriteT4BoundCond().m_writeT4BoundCond()

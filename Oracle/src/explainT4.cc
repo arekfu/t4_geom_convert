@@ -19,6 +19,28 @@ extern "C" {
 int strictness_level = 3; //Global variable required by T4 libraries
 
 
+void containedInVolumes(Ge_float const x, Ge_float const y, Ge_float const z)
+{
+  Ge_maille *maille = nullptr;
+  std::vector<int> numvols;
+  for(int rankvol=0; rankvol<ge_volu_tab_info.ge_nbvolu; ++rankvol) {
+    Ge_volu *volu = ge_get_volu_by_rank(rankvol);
+    if(volu->fictif) {
+      continue;
+    }
+    ST_volu_pos pos = ge_volu_pos(volu, x, y, z, maille);
+    if((pos == ST_VOLU_INT || pos == ST_VOLU_FRONT) && volu->volu_type != GE_VOLU_RESEAU) {
+      numvols.push_back(volu->numvol);
+    }
+  }
+  std::cout << "Point contained in the following volumes:";
+  for(auto const &numvol: numvols) {
+    std::cout << ' ' << numvol;
+  }
+  std::cout << std::endl;
+}
+
+
 bool explainVolume(Ge_float const x, Ge_float const y, Ge_float const z, int const numvol, std::string const &prefix)
 {
   bool success = true;
@@ -128,6 +150,7 @@ void explain(OptionsExplainT4 const &options)
     }
     std::cout << "Inspecting point (" << x << ", " << y << ", " << z
       << "), volume " << volID << "?\n";
+    containedInVolumes(x, y, z);
     explainVolume(x, y, z, volID, "");
     std::cout << std::endl;
   }

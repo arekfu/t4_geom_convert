@@ -24,16 +24,14 @@ class CWriteT4GeomComp(object):
         '''
         :brief: method writing GeomComp of the T4 input file
         '''
-        f.write("\n GEOMCOMP \n")
-        f.write("\n")
+        f.write("\nGEOMCOMP\n")
         dic_geomComp = CIntermediateGeomCompT4().m_constructGeomCompT4(self.dicVol, self.mcnp_new_dict)
         for k in dic_geomComp.keys():
             p_materialName = str(k)
             p_numberOfCell = str(dic_geomComp[k].volumeNumberMaterial)
             p_listVolumeId = dic_geomComp[k].listVolumeId
-            f.write("%s %s %s \n" % ("m" + p_materialName, p_numberOfCell,\
-                                     p_listVolumeId))
-        f.write("\n")
+            f.write("%s %s %s\n" % ("m" + p_materialName, p_numberOfCell,\
+                                    p_listVolumeId))
         f.write("END_GEOMCOMP")
         f.write("\n")
 

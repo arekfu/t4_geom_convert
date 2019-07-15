@@ -26,10 +26,7 @@ class CWriteT4Geometry(object):
         the first for the surface and the second for the volume
         This method fills a file of the geometry for the input file of T4
         '''
-        f.write("GEOMETRY \n")
-        f.write("\n")
-        f.write("TITLE title\n\n")
-        f.write("HASH_TABLE\n\n")
+        f.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
         input_file = CConfigParameters().m_readNameMCNPInputFile()
         dicCell_name = input_file + '_dicCell'
         dicSurface_name = input_file + '_dicSurface'
@@ -67,7 +64,7 @@ class CWriteT4Geometry(object):
                 s_comment = "// %s" %val.idorigin
             else:
                 s_comment = ""
-            f.write("VOLU %s %s %s ENDV %s \n" % (k, s_params, s_fictive, s_comment))
+            f.write("VOLU %s %s %s ENDV %s\n" % (k, s_params, s_fictive, s_comment))
         f.write("\n")
         f.write("ENDG")
         f.write("\n")

@@ -26,7 +26,10 @@ class CWriteT4Composition(object):
         f.write("\nCOMPOSITION\n")
         temperature = 300
         dic_composition = CIntermediateCompositionT4().m_constructCompositionT4(self.mcnp_new_dict)
-        f.write(str(len(dic_composition) + 1) + "\n")
+        n_compos = 0
+        for mat in dic_composition.values():
+            n_compos += len(mat.valueOfDensity)
+        f.write(str(n_compos + 1) + "\n")  # +1 from the m0 (void) composition
         for mat in dic_composition.values():
             s_paramMaterialComposition = ''
             l_typeDensity = mat.typeDensity
@@ -35,20 +38,19 @@ class CWriteT4Composition(object):
             list_isotope = mat.listMaterialComposition
             for element in list_isotope:
                 nameIsotope, abondanceIsotope = element
-                s_paramMaterialComposition = s_paramMaterialComposition +\
-                str(nameIsotope) + ' ' + str(abondanceIsotope) +' '
+                s_paramMaterialComposition = (s_paramMaterialComposition +
+                        str(nameIsotope) + ' ' + str(abondanceIsotope) + ' ')
             for i in range(0,len(l_densityValue)):
                 p_materialName = mat.material + '_' + l_densityValue[i]
                 if l_typeDensity[i] == 'POINT_WISE':
-                    f.write("%s %s %s %s %s \n" % (l_typeDensity[i], temperature,\
-                                                  p_materialName,
-                                                  p_numberOfIsotope,\
-                                                  s_paramMaterialComposition))
+                    f.write("%s %s %s %s %s\n" %
+                            (l_typeDensity[i], temperature, p_materialName,
+                                p_numberOfIsotope, s_paramMaterialComposition))
                 else:
-                    f.write("%s %s %s %s %s %s \n" % (l_typeDensity[i], temperature,\
-                                                  p_materialName,fabs(float(l_densityValue[i])),\
-                                                  p_numberOfIsotope,\
-                                                  s_paramMaterialComposition))
+                    f.write("%s %s %s %s %s %s\n" %
+                            (l_typeDensity[i], temperature,
+                                p_materialName,fabs(float(l_densityValue[i])),
+                                p_numberOfIsotope, s_paramMaterialComposition))
         f.write("POINT_WISE 300 m0 1 HE4 1E-30\n")
 
         f.write("\n")

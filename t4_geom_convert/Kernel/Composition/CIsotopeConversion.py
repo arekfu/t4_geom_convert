@@ -23,7 +23,7 @@ class CIsotopeConversion(object):
         :brief: method which takes a string and returns a tuple of enum and string
         '''
 
-        massNumber = self.isotopeId[-3] + self.isotopeId[-2] + self.isotopeId[-1]
+        massNumber = str(int(self.isotopeId[-3:]))
         atomicNumber = self.isotopeId[0:-3]
         atomicNumber = getattr(EIsotopeAtomicNumber, atomicNumber)
-        return(atomicNumber, massNumber)
+        return atomicNumber, massNumber

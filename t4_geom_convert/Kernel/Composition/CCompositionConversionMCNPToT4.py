@@ -38,7 +38,7 @@ class CCompositionConversionMCNPToT4(object):
                 isotopeId, fraction = element
                 atomicNumber, massNumber = CIsotopeConversion(isotopeId).m_conversionIsotope()
                 atomicNumberT4 = EIsotopeNameElement(atomicNumber.value)
-                if massNumber == '000':
+                if massNumber == '0':
                     massNumberT4 = '-NAT'
                 else:
                     massNumberT4 = massNumber
