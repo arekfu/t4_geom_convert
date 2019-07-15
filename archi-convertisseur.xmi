@@ -212,7 +212,6 @@
       </UML:Class>
       <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="RwHP4HkjVvFC" name="CCompoConversionMCNPToT4"/>
       <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="a2OdS23Uh7Cs" name="CSurfaceConversionMCNPToT4"/>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="iBxMyOkPI1mN" name="CCellConversionMCNPToT4"/>
       <UML:Association visibility="public" isSpecification="false" namespace="Logical View" xmi.id="LSCCC3JDISxJ" name="">
        <UML:Association.connection>
         <UML:AssociationEnd changeability="changeable" visibility="public" isNavigable="false" isSpecification="false" xmi.id="NvtMY5sF8H8a" type="x6nNlfVtzA0L" name="" aggregation="none"/>

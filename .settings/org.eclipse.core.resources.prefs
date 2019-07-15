@@ -36,7 +36,6 @@ encoding//t4_geom_convert/Kernel/Transformation/CSurfaceTransformed.py=utf-8
 encoding//t4_geom_convert/Kernel/Transformation/CTransformationFonction.py=utf-8
 encoding//t4_geom_convert/Kernel/Transformation/CTransformationQuad.py=utf-8
 encoding//t4_geom_convert/Kernel/Volume/CCellConversion.py=utf-8
-encoding//t4_geom_convert/Kernel/Volume/CCellConversionMCNPToT4.py=utf-8
 encoding//t4_geom_convert/Kernel/Volume/CCellMCNP.py=utf-8
 encoding//t4_geom_convert/Kernel/Volume/CDictCellMCNP.py=utf-8
 encoding//t4_geom_convert/Kernel/Volume/CDictVolumeT4.py=utf-8

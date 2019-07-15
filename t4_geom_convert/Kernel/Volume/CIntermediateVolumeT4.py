@@ -31,7 +31,7 @@ class CIntermediateVolumeT4(object):
 
     def m_constructVolumeT4(self):
         '''
-        :brief: method changing the tuple from CCellConversionMCNPToT4 in
+        :brief: method changing the tuple from CCellConversion in
         instance of the CVolumeT4 Class
         '''
 #         dic_test = dict()
