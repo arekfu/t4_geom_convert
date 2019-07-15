@@ -11,10 +11,7 @@ from .surfaces import get_surfaces
 from .cells import get_cells
 from .transforms import get_transforms
 from .parsegeom import get_ast
-from .semantics import Surface, Cell
-import ast
-from _ast import AST
-from t4_geom_convert.MIP.geom.semantics import GeomExpression
+from .semantics import Surface, Cell, GeomExpression
 
 
 def extract_surfaces(ast):
