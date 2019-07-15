@@ -22,7 +22,7 @@ volume calculations in numjuggler).
 
 """
 
-from transforms import transform_point, transform_vector
+from .transforms import transform_point, transform_vector
 from math import atan
 
 # module main entry. This is a dictionary of functions that take MCNP surface
@@ -52,9 +52,9 @@ def _normal(x, y, z):
     check1 = a*x + b*y + c*z
     check2 = _norm(a, b, c)
     if check1 != 0 or check2 == 0:
-        print x, y, z
-        print a, b, c
-        print check1, check2
+        print(x, y, z)
+        print(a, b, c)
+        print(check1, check2)
         raise ValueError('Normal vector not normal or zero')
     return a, b, c
 
@@ -82,10 +82,10 @@ def _norm(x, y, z):
 
 
 def _sphere(x, y, z, R):
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
-    R = R/1e2
+    x = x
+    y = y
+    z = z
+    R = R
     frm = ((x, y, z), (0, 0, 1))
     srf = (R, )
     pin = (x, y, z)
@@ -97,9 +97,9 @@ def _plane(x, y, z, A, B, C):
     Plane throught the point (x, y, z) with the normal (A, B, C). The latter
     must be normalized to have unit length.
     """
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
+    x = x
+    y = y
+    z = z
     frm = ((x, y, z), (A, B, C))
     srf = ()
     pin = _shift(x, y, z, A, B, C, -_offset)
@@ -107,10 +107,10 @@ def _plane(x, y, z, A, B, C):
 
 
 def _cylinder(x, y, z, r, A, B, C):
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
-    r = r/1e2
+    x = x
+    y = y
+    z = z
+    r = r
     frm = ((x, y, z), (A, B, C))
     srf = (r, )
     pin = (x, y, z)
@@ -125,14 +125,14 @@ def _cone(x, y, z, tana, A, B, C, log=False):
 
     CAD requries a point on the axis not coincident with the focus.
     """
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
+    x = x
+    y = y
+    z = z
     p = _shift(x, y, z, A, B, C, _offset)
     frm = (p, (A, B, C))
     srf = (tana*_offset, atan(tana))
     if log:
-        print '_cone', frm, srf, p
+        print('_cone', frm, srf, p)
     return 'k', frm, srf, p
 
 
@@ -142,11 +142,11 @@ def _torus(x, y, z, A, B, C, r1, r2):
     A, B, C -- normal vector to the major radius
     r1, r2  -- major and minor radii
     """
-    x = x/1e2
-    y = y/1e2
-    z = z/1e2
-    r1 = r1/1e2
-    r2 = r2/1e2
+    x = x
+    y = y
+    z = z
+    r1 = r1
+    r2 = r2
     frm = ((x, y, z), (A, B, C))
     srf = (r1, r2)
 
@@ -419,7 +419,7 @@ def xx(p):
             # this is a cone
             tana = (p[1] - p[3]) / (p[0] - p[2])  # half-angle tan
             x0 = p[0] - p[1]/tana
-            print 'xx', p, tana
+            print('xx', p, tana)
             return _cone(x0, 0, 0, abs(tana), 1, 0, 0, log=True)
     else:
         raise NotImplementedError('Not implemented for more than 2 pairs of '
@@ -447,7 +447,7 @@ def zz(p):
             # this is a cone
             tana = (p[1] - p[3]) / (p[0] - p[2])  # half-angle tan
             z0 = p[0] - p[1]/tana
-            print 'xx', p, tana
+            print('xx', p, tana)
             return _cone(0, 0, z0, abs(tana), 0, 0, 1, log=True)
     else:
         raise NotImplementedError('Not implemented for more than 2 pairs of '
@@ -486,9 +486,6 @@ def apply_transform(frm, pin, tr):
     """
     Return transformed frame frm and point pin according to transformation tr
     """
-    tr[0] = tr[0]/1e2
-    tr[1] = tr[1]/1e2
-    tr[2] = tr[2]/1e2
     p, v = frm
     pp = transform_point(p, tr)
     vp = transform_vector(v, tr)
@@ -501,7 +498,7 @@ def translate(surfaces, transform):
     Return a dictionary of surfaces, suitable for passing to CAD.
     """
     res = surfaces.__class__()  # surfaces can be an OrderedDict
-    for k, v in surfaces.items():
+    for k, v in list(surfaces.items()):
         bc, tr, stype, pl = v
         t, f, s, p = mcnp2cad[stype](pl)
         if tr:
@@ -524,16 +521,3 @@ def extract_intersections():
     expression.
     """
     return
-
-
-# if __name__ == '__main__':
-#     from sys import argv
-#     from mip import MIP
-#     from main import get_geom
-#
-#     cd, sd, td = get_geom(MIP(argv[1]))
-#     cads, rw = translate(sd, td)
-#     for k, v in cads.items():
-#         stype, frm, srf = v
-#         print k, stype, frm, srf
-#     print 'Worlds radius', rw

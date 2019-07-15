@@ -15,11 +15,11 @@ Created on 5 févr. 2019
 
 '''
 import re
-from ....MIP.geom.cells import get_cells
-from ....MIP import mip
-from ....MIP.geom.parsegeom import get_ast
+from MIP.geom.cells import get_cells
+from MIP import mip
+from MIP.geom.parsegeom import get_ast
+from MIP.geom.composition import get_materialImportance
 from ...Volume.CCellMCNP import CCellMCNP
-from ....MIP.geom.composition import get_materialImportance
 from ...Configuration.CConfigParameters import CConfigParameters
 import pickle
 from collections import OrderedDict

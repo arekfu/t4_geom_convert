@@ -15,7 +15,7 @@ dev_deps = test_deps  + ['flake8', 'pylint', 'sphinx', 'sphinx_rtd_theme']
 setup(name=name,
       author=author,
       author_email=author_email,
-      url=r'http://',
+      url=r'https://github.com/arekfu/t4-geom-convert/',
       packages=find_packages(exclude=['doc', 'tests', 'tests.*', 'Oracle']),
       python_requires='>=3.4',
       setup_requires=['pytest-runner', 'setuptools-scm'],
@@ -28,11 +28,11 @@ setup(name=name,
               'build_dir': ('setup.py', 'doc/build'),
               }
           },
-#       data_files=[('', ['README.rst'])],
-       use_scm_version=True,
-       entry_points={
-           'console_scripts': [
-               't4_geom_convert = t4_geom_convert.CLI.Converter_CLI:main'
-               ]
-           }
+      include_package_data=True,
+      use_scm_version=True,
+      entry_points={
+          'console_scripts': [
+              't4_geom_convert = t4_geom_convert.CLI.Converter_CLI:main'
+              ]
+          }
       )

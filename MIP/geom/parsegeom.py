@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pkgutil import get_data
 import re
 from codecs import open
 import tatsu
@@ -9,10 +10,9 @@ from tatsu.ast import AST
 from .semantics import GeomSemantics
 
 from os import path
-ebnf = path.join(path.dirname(__file__), 'grammars/geom.ebnf')
-# print '*** ebnf', ebnf
 
-grammar = open(ebnf, 'r').read()
+
+grammar = get_data('MIP.geom.grammars', 'geom.ebnf').decode('utf-8')
 parser = tatsu.compile(grammar)  # , left_recurion=False)
 
 # patterns to replace space denoting intersection with '*'

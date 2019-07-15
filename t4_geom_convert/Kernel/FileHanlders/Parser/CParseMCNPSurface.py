@@ -14,8 +14,8 @@ Created on 6 févr. 2019
     >>> print(dict_Surface)
 
 '''
-from ....MIP import mip
-from ....MIP.geom.surfaces import get_surfaces
+from MIP import mip
+from MIP.geom.surfaces import get_surfaces
 from ...Surface.CSurfaceMCNP import CSurfaceMCNP
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP
 from ...Configuration.CConfigParameters import CConfigParameters

@@ -14,13 +14,13 @@ Created on 6 févr. 2019
 
 '''
 
+from MIP import mip
+from MIP.geom.surfaces import get_surfaces
+from MIP.geom.transforms import get_transforms
 from ..Configuration.CConfigParameters import CConfigParameters
 from ..Transformation.CTransformationFonction import CTransformationFonction
-from ...MIP import mip
-from ...MIP.geom.surfaces import get_surfaces
 from ..Transformation.CSurfaceTransformed import CSurfaceTransformed
 from ..Surface.ESurfaceTypeMCNP import string_to_enum
-from ...MIP.geom.transforms import get_transforms
 from collections import OrderedDict
 
 class CDictSurfaceTransformed(object):

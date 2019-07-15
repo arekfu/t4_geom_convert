@@ -7,21 +7,22 @@ Created on 5 févr. 2019
 :file : CCellConversion.py
 '''
 
+from MIP.geom.semantics import GeomExpression, Surface
+from MIP.geom.transforms import to_cos, normalize_transform
+from MIP.geom.forcad import mcnp2cad
+from MIP.geom.main import extract_surfaces_list
+
 from ..Volume.CDictVolumeT4 import CDictVolumeT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
 from ..Volume.CTreeMethods import CTreeMethods
 from ..Volume.CVolumeT4 import CVolumeT4
-from ...MIP.geom.semantics import GeomExpression, Surface
 from ..Configuration.CConfigParameters import CConfigParameters
 from ..Volume.CUniverseDict import CUniverseDict
-from ...MIP.geom.transforms import to_cos, normalize_transform
 from ..Transformation.CTransformationFonction import CTransformationFonction
 from ..Transformation.CConversionSurfaceTransformed import CConversionSurfaceTransformed
 from ..Surface.CSurfaceT4 import CSurfaceT4
 from ..Surface.ESurfaceTypeMCNP import mcnp_to_mip
-from ...MIP.geom.forcad import mcnp2cad
 from math import fabs, sqrt
-from ...MIP.geom.main import extract_surfaces_list
 
 class CCellConversion(object):
     '''

@@ -14,8 +14,8 @@ Created on 6 févr. 2019
     >>> print(dict_Transform)
 
 '''
-from ....MIP import mip
-from ....MIP.geom.transforms import get_transforms
+from MIP import mip
+from MIP.geom.transforms import get_transforms
 from ...Surface.CTransformationMCNP import CTransformationMCNP
 from ...Configuration.CConfigParameters import CConfigParameters
 from collections import OrderedDict

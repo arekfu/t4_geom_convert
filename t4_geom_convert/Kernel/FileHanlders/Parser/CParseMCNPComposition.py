@@ -14,9 +14,9 @@ Created on 7 févr. 2019
     >>> print(dict_Composition)
 
 '''
-from ....MIP import mip
+from MIP import mip
+from MIP.geom.grammars.composition import get_materialComposition
 from ...Composition.CCompositionMCNP import CCompositionMCNP
-from ....MIP.geom.grammars.composition import get_materialComposition
 from ...Configuration.CConfigParameters import CConfigParameters
 from collections import OrderedDict
 

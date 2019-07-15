@@ -6,7 +6,7 @@ Created on 5 févr. 2019
 :data : 05 february 2019
 :file : CTreeMethods.py
 '''
-from ...MIP import geom
+from MIP import geom
 
 
 
