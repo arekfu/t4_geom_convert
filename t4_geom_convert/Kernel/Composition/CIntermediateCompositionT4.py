@@ -23,13 +23,13 @@ class CIntermediateCompositionT4(object):
         Constructor
         '''
 
-    def m_constructCompositionT4(self, dic_cellMCNP):
+    def constructCompositionT4(self, dic_cellMCNP):
         '''
         :brief: method changing the tuple from CCompositionConversionMCNPToT4
         in instance of the CVolumeT4 Class
         '''
         dic_newCompositionT4 = OrderedDict()
-        dic_CompositionT4 = CCompositionConversionMCNPToT4().m_conversionCompositionMCNPToT4()
+        dic_CompositionT4 = CCompositionConversionMCNPToT4().conversionCompositionMCNPToT4()
         for key,val in dic_CompositionT4.items():
             #print(key, val)
             l_listeMaterialComposition = []
@@ -61,7 +61,7 @@ class CIntermediateCompositionT4(object):
                                                        l_listeMaterialComposition)
         return dic_newCompositionT4
 
-# d = CIntermediateCompositionT4().m_constructCompositionT4()
+# d = CIntermediateCompositionT4().constructCompositionT4()
 # for keys in d.keys():
 #     print(keys)
 #     print(d[keys].typeDensity)

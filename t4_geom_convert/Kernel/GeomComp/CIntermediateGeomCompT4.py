@@ -22,7 +22,7 @@ class CIntermediateGeomCompT4(object):
         Constructor
         '''
 
-    def m_constructGeomCompT4(self, dicVol, dic_cellMCNP):
+    def constructGeomCompT4(self, dicVol, dic_cellMCNP):
         '''
         :brief: method constructing a dictionary with the id of the
         material as a key and the instance of CGeomCompT4 as a value

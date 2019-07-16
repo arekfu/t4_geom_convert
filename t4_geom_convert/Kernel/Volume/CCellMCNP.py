@@ -36,19 +36,19 @@ class CCellMCNP(object):
         self.lattice = lattice
         self.costr = costr
 
-    def m_evaluateASTMCNP(self):
+    def evaluateASTMCNP(self):
         '''
         :brief: method evaluating the syntax tree of the geometry of a cell of MCNP.
         '''
         return self.geometry.evaluate()
 
-    def m_inverseASTMCNP(self):
+    def inverseASTMCNP(self):
         '''
         :brief: method applying the De Morgan law on a syntax tree
         '''
         self.geometry = self.geometry.inverse()
     
-    def m_copy(self):
+    def copy(self):
         if hasattr(self.geometry , 'copy'):
             return CCellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.lattice, self.idorigin.copy())
         return CCellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.lattice, self.idorigin.copy())

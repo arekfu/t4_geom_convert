@@ -20,12 +20,12 @@ class CWriteT4GeomComp(object):
         '''
         self.dicVol = p_dicVol
         self.mcnp_new_dict = mcnp_new_dict
-    def m_writeT4GeomComp(self, f):
+    def writeT4GeomComp(self, f):
         '''
         :brief: method writing GeomComp of the T4 input file
         '''
         f.write("\nGEOMCOMP\n")
-        dic_geomComp = CIntermediateGeomCompT4().m_constructGeomCompT4(self.dicVol, self.mcnp_new_dict)
+        dic_geomComp = CIntermediateGeomCompT4().constructGeomCompT4(self.dicVol, self.mcnp_new_dict)
         for k in dic_geomComp.keys():
             p_materialName = str(k)
             p_numberOfCell = str(dic_geomComp[k].volumeNumberMaterial)
@@ -35,4 +35,4 @@ class CWriteT4GeomComp(object):
         f.write("END_GEOMCOMP")
         f.write("\n")
 
-# CWriteT4GeomComp().m_writeT4GeomComp()
+# CWriteT4GeomComp().writeT4GeomComp()

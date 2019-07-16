@@ -20,24 +20,24 @@ class CConversionBoundaryCondition(object):
         '''
         Constructor
         '''
-    def m_recuperateBoundaryCondition(self):
+    def recuperateBoundaryCondition(self):
         '''
         :brief: method constructing a dictionary with the id of the
         material as a key and the instance of CBoundCondT4 as a value
         '''
         d_boundCond = OrderedDict()
-        d_surface = CParseMCNPSurface().m_parsingSurface()
+        d_surface = CParseMCNPSurface().parsingSurface()
         for k, v in list(d_surface.items()):
             if v.boundaryCond != '':
                 p_typeOfBC = v.boundaryCond
                 d_boundCond[k] = CBoundCond(p_typeOfBC)
         return d_boundCond
 
-    def m_conversionBoundCond(self):
+    def conversionBoundCond(self):
         '''
         '''
         d_boundCondT4 = OrderedDict()
-        d_boundcondMCNP = self.m_recuperateBoundaryCondition()
+        d_boundcondMCNP = self.recuperateBoundaryCondition()
         for k in d_boundcondMCNP.keys():
             p_boundCondMCNP = d_boundcondMCNP[k].typeOfBound
             if p_boundCondMCNP == '*':

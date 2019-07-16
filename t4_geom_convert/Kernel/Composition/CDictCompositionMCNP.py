@@ -22,7 +22,7 @@ class CDictCompositionMCNP(MutableMapping):
         Constructor
         '''
         self.d_compositionMCNP = OrderedDict()
-        self.d_compositionMCNP = CParseMCNPComposition().m_parsingMaterialComposition()
+        self.d_compositionMCNP = CParseMCNPComposition().parsingMaterialComposition()
         
     def __getitem__(self, key):
         return self.d_compositionMCNP[key]
@@ -43,6 +43,6 @@ class CDictCompositionMCNP(MutableMapping):
         return self.d_compositionMCNP.__repr__()
     
 # for key,val in CDictCompositionMCNP().d_compositionMCNP.items() :  
-#     l = val.m_ordDict()
+#     l = val.ordDict()
 
 #     print(key, l)

@@ -10,7 +10,7 @@ Created on 7 févr. 2019
     :hide:
     >>> from CParseMCNPComposition import CParseMCNPComposition
     >>> objet_MCNPComposition = CParseMCNPComposition()
-    >>> dict_Composition = objet_MCNPCell.m_parsingMaterialComposition()
+    >>> dict_Composition = objet_MCNPCell.parsingMaterialComposition()
     >>> print(dict_Composition)
 
 '''
@@ -31,9 +31,9 @@ class CParseMCNPComposition(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
+        self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
 
-    def m_parsingMaterialComposition(self):
+    def parsingMaterialComposition(self):
         '''
         :brief method which permit to recover the information of each line
         of the block SURFACE

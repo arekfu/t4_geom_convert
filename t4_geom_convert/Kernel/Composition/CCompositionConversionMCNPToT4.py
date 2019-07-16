@@ -23,7 +23,7 @@ class CCompositionConversionMCNPToT4(object):
         Constructor
         '''
 
-    def m_conversionCompositionMCNPToT4(self):
+    def conversionCompositionMCNPToT4(self):
         '''
         :brief: method recuperate the dictionary of the composition from MCNP
         and return a dictionary of the composition for T4
@@ -33,10 +33,10 @@ class CCompositionConversionMCNPToT4(object):
         l_compositionT4 = []
         for key, val in CDictCompositionMCNP().d_compositionMCNP.items():
             l_compositionT4 = []
-            listMaterialsSurface = val.m_ordDict()
+            listMaterialsSurface = val.ordDict()
             for element in listMaterialsSurface:
                 isotopeId, fraction = element
-                atomicNumber, massNumber = CIsotopeConversion(isotopeId).m_conversionIsotope()
+                atomicNumber, massNumber = CIsotopeConversion(isotopeId).conversionIsotope()
                 atomicNumberT4 = EIsotopeNameElement(atomicNumber.value)
                 if massNumber == '0':
                     massNumberT4 = '-NAT'
@@ -47,6 +47,6 @@ class CCompositionConversionMCNPToT4(object):
             valueT4 = l_compositionT4
             obj_T4.__setitem__(key, valueT4)    
         return d_CompositionT4
-# d = CCompositionConversionMCNPToT4().m_conversionCompositionMCNPToT4()
+# d = CCompositionConversionMCNPToT4().conversionCompositionMCNPToT4()
 # for key,val in d.items():
 #     print(key,val)

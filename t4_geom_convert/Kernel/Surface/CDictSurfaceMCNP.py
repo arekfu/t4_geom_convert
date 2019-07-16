@@ -21,7 +21,7 @@ class CDictSurfaceMCNP(MutableMapping):
         Constructor
         '''
         self.d_surfaceMCNP = OrderedDict()
-        self.d_surfaceMCNP = CParseMCNPSurface().m_parsingSurface()
+        self.d_surfaceMCNP = CParseMCNPSurface().parsingSurface()
 
     def __getitem__(self, key):
         return self.d_surfaceMCNP[key]

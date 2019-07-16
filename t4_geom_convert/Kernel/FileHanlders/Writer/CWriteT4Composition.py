@@ -19,13 +19,13 @@ class CWriteT4Composition(object):
         Constructor
         '''
         self.mcnp_new_dict = mcnp_new_dict
-    def m_writeT4Composition(self, f):
+    def writeT4Composition(self, f):
         '''
         :brief: method writing composition of the T4 input file
         '''
         f.write("\nCOMPOSITION\n")
         temperature = 300
-        dic_composition = CIntermediateCompositionT4().m_constructCompositionT4(self.mcnp_new_dict)
+        dic_composition = CIntermediateCompositionT4().constructCompositionT4(self.mcnp_new_dict)
         n_compos = 0
         for mat in dic_composition.values():
             n_compos += len(mat.valueOfDensity)
@@ -58,4 +58,4 @@ class CWriteT4Composition(object):
         f.write("\n")
 
 
-# CWriteT4Composition().m_writeT4Composition()
+# CWriteT4Composition().writeT4Composition()

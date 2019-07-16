@@ -21,11 +21,11 @@ def main():
     sys.stdout.write(str(convert(args)))
     
 def convert(args):
-    CConfigParameters().m_setMCNPInputFile(args)
-    CWriteT4Geometry().m_writeT4Geometry()
-    CWriteT4Composition().m_writeT4Composition()
-    CWriteT4GeomComp().m_writeT4GeomComp()
-    CWriteT4BoundCond().m_writeT4BoundCond()
+    CConfigParameters().setMCNPInputFile(args)
+    CWriteT4Geometry().writeT4Geometry()
+    CWriteT4Composition().writeT4Composition()
+    CWriteT4GeomComp().writeT4GeomComp()
+    CWriteT4BoundCond().writeT4BoundCond()
     return('File has been converted')
 
 if __name__ == '__main__':

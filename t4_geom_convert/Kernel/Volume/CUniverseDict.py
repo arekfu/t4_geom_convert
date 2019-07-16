@@ -23,7 +23,7 @@ class CUniverseDict(object):
         self.d_cellMCNP = OrderedDict()
         self.d_cellMCNP = d_dicCellMCNP
     
-    def m_dictUniverse(self):
+    def dictUniverse(self):
         
         d_universeDict = OrderedDict()
         for k, val in self.d_cellMCNP.items():
@@ -32,6 +32,6 @@ class CUniverseDict(object):
             d_universeDict[int(val.universe)].append(k)
         return d_universeDict
 
-# p = CUniverseDict().m_dictUniverse()
+# p = CUniverseDict().dictUniverse()
 # for k in p.keys():
 #     print(k, p[k])

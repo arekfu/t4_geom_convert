@@ -29,7 +29,7 @@ class CIntermediateVolumeT4(object):
         self.dic_surface = dic_surface
         self.dic_surfaceMCNP = dic_surfaceMCNP
 
-    def m_constructVolumeT4(self):
+    def constructVolumeT4(self):
         '''
         :brief: method changing the tuple from CCellConversion in
         instance of the CVolumeT4 Class
@@ -49,23 +49,23 @@ class CIntermediateVolumeT4(object):
         listekeys = list(mcnp_dict)
         for key in mcnp_dict.keys():
 #             print('key',key)
-            new_geom = conv.m_postOrderTraversalCompl(mcnp_dict[key].geometry)
+            new_geom = conv.postOrderTraversalCompl(mcnp_dict[key].geometry)
             mcnp_dict[key].geometry = new_geom
         for key in mcnp_dict.keys():
             print('LATTICE', key, len(listekeys))
             print('*******************************************************************')
-            conv.m_postOrderLattice(key, mcnp_new_dict)
+            conv.postOrderLattice(key, mcnp_new_dict)
         conv.new_cell_key = max(int(k) for k in mcnp_new_dict) + 1
         conv.new_surf_key = max(
             max(int(k) for k in self.dic_surfaceMCNP) + 1,
             max(int(k) for k in self.dic_surface) + 1
             )
         listekeys = list(mcnp_new_dict)
-        dictUniverse = CUniverseDict(mcnp_new_dict).m_dictUniverse()
+        dictUniverse = CUniverseDict(mcnp_new_dict).dictUniverse()
         for key in listekeys:
             print('FILL', key, len(listekeys))
             print('*******************************************************************')
-            conv.m_postOrderTraversalFill(key, mcnp_new_dict,dictUniverse)
+            conv.postOrderTraversalFill(key, mcnp_new_dict,dictUniverse)
         conv.new_cell_key = max(int(k) for k in mcnp_new_dict) + 1
         conv.new_surf_key = max(
             max(int(k) for k in self.dic_surfaceMCNP) + 1,
@@ -77,14 +77,14 @@ class CIntermediateVolumeT4(object):
 #                 dic_test[key] = dict()
                 root = val.geometry
                 treeMaster = root
-                tup = conv.m_postOrderTraversalFlag(treeMaster)
+                tup = conv.postOrderTraversalFlag(treeMaster)
 #                 print('tup',tup)
-                replace = conv.m_postOrderTraversalReplace(tup)
+                replace = conv.postOrderTraversalReplace(tup)
 #                 print('replace', replace)
-                opt_tree = conv.m_postOrderTraversalOptimisation(replace)
+                opt_tree = conv.postOrderTraversalOptimisation(replace)
 #                 print('opt_tree', opt_tree)
-                surf_used |= set(self.m_surfacesUsed(opt_tree))
-                j = conv.m_postOrderTraversalConversion(opt_tree, val.idorigin)
+                surf_used |= set(self.surfacesUsed(opt_tree))
+                j = conv.postOrderTraversalConversion(opt_tree, val.idorigin)
                 objT4.volumeT4[j].fictive = ''
                 if j == key:
                     continue
@@ -98,12 +98,12 @@ class CIntermediateVolumeT4(object):
         return dic_cellT4, surf_used, mcnp_new_dict
 
 
-    def m_surfacesUsed(self, tree):
-        if CTreeMethods().m_isLeaf(tree):
+    def surfacesUsed(self, tree):
+        if CTreeMethods().isLeaf(tree):
             #print('leaf', tree)
             return [abs(tree)]
         _id, _op, *args = tree
-        result = [x for leaf in args for x in self.m_surfacesUsed(leaf)]
+        result = [x for leaf in args for x in self.surfacesUsed(leaf)]
         #print('result', tree, result)  
         return result
     

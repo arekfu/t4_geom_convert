@@ -18,7 +18,7 @@ class CIsotopeConversion(object):
         '''
         self.isotopeId = p_isotopeId
 
-    def m_conversionIsotope(self):
+    def conversionIsotope(self):
         '''
         :brief: method which takes a string and returns a tuple of enum and string
         '''

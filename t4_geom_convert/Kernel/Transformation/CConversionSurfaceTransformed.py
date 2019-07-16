@@ -23,16 +23,16 @@ class CConversionSurfaceTransformed(object):
         Constructor
         '''
 
-    def m_conversionSurfaceTransformed(self):
+    def conversionSurfaceTransformed(self):
         dic_SurfaceT4Tr = OrderedDict()
-        dicSurfaceTransformed = CDictSurfaceTransformed().m_surfaceTransformed()
+        dicSurfaceTransformed = CDictSurfaceTransformed().surfaceTransformed()
         for k, val in dicSurfaceTransformed.items():
             #print('transformation', k)
-            dic_SurfaceT4Tr[k] = self.m_conversion(val)
+            dic_SurfaceT4Tr[k] = self.conversion(val)
 
         return dic_SurfaceT4Tr, dicSurfaceTransformed
 
-    def m_conversion(self, val):
+    def conversion(self, val):
         if val.typeSurface == 'p':
             tuple_param = val.paramSurface
             point = tuple_param[0]

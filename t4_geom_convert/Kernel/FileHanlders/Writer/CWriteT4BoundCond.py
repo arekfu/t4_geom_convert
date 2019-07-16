@@ -17,11 +17,11 @@ class CWriteT4BoundCond(object):
         '''
         Constructor
         '''
-    def m_writeT4BoundCond(self, f):
+    def writeT4BoundCond(self, f):
         '''
         :brief: method writing GeomComp of the T4 input file
         '''
-        d_boundCond = CConversionBoundaryCondition().m_conversionBoundCond()
+        d_boundCond = CConversionBoundaryCondition().conversionBoundCond()
         if not d_boundCond:
             return
         f.write("\nBOUNDARY_CONDITION\n")
@@ -32,4 +32,4 @@ class CWriteT4BoundCond(object):
             f.write("ALL_COMPLETE %s %s\n" %(p_typeOfBound, k))
         f.write("END_BOUNDARY_CONDITION")
         f.write("\n")
-# CWriteT4BoundCond().m_writeT4BoundCond()
+# CWriteT4BoundCond().writeT4BoundCond()

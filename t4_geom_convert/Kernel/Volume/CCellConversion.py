@@ -42,9 +42,9 @@ class CCellConversion(object):
         self.dictSurfaceT4 = d_dictSurfaceT4
         self.dicSurfaceMCNP = d_dicSurfaceMCNP
         self.dicCellMCNP = d_dicCellMCNP
-        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
+        self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
 
-    def m_conversionEQUA(self, list_surface, fictive):
+    def conversionEQUA(self, list_surface, fictive):
         '''
         :brief: method converting a list of if of surface and return a tuple with the
         informations of the volume EQUA T4
@@ -81,7 +81,7 @@ class CCellConversion(object):
         params = ['EQUA', str_equa]
         return params, s_fictive
 
-    def m_conversionINTUNION(self, op, *ids, fictive):
+    def conversionINTUNION(self, op, *ids, fictive):
         '''
         :brief: method analyze the type of conversion needed between a T4 INTERSECTION
         and a T4 UNION and return a tuple with the information of the T4 VOLUME
@@ -92,7 +92,7 @@ class CCellConversion(object):
         if op == '*':
             params.extend(('EQUA', 'INTE'))
         if op == ':':
-            tupleForEqua = self.m_conversionEQUA([keyS+1, -(keyS+2)], fictive=True)
+            tupleForEqua = self.conversionEQUA([keyS+1, -(keyS+2)], fictive=True)
             params.extend(tupleForEqua[0])
             params.append('UNION')
         params.append(len(ids))
@@ -105,7 +105,7 @@ class CCellConversion(object):
 #         print('tuple final',tuple_final)
         return tuple_final
 
-    def m_postOrderTraversalFill(self, key, mcnp_new_dict,dictUniverse):
+    def postOrderTraversalFill(self, key, mcnp_new_dict,dictUniverse):
 
         if mcnp_new_dict[key].fillid is not None:
             new_cells = []
@@ -118,12 +118,12 @@ class CCellConversion(object):
 #                 print('second fill tr', mcnp_new_dict[key].filltr)
             mcnp_key_filltr = mcnp_new_dict[key].filltr
             for element in dictUniverse[int(mcnp_new_dict[key].fillid)]:
-                cells_to_process.extend(self.m_postOrderTraversalFill(element, mcnp_new_dict,dictUniverse))
+                cells_to_process.extend(self.postOrderTraversalFill(element, mcnp_new_dict,dictUniverse))
             for element in cells_to_process:
                 mcnp_element_geom = mcnp_new_dict[element].geometry
                 self.new_cell_key += 1
                 new_key = self.new_cell_key
-                mcnp_new_dict[new_key] = mcnp_new_dict[key].m_copy()
+                mcnp_new_dict[new_key] = mcnp_new_dict[key].copy()
 #                 print('new key cell',new_key, mcnp_new_dict[new_key].density)
                 mcnp_new_dict[new_key].fillid = None
                 mcnp_new_dict[new_key].materialID = mcnp_new_dict[element].materialID
@@ -132,24 +132,24 @@ class CCellConversion(object):
                 mcnp_new_dict[new_key].idorigin.append((element, key))
 #                 print('idorigin', key, new_key, element, mcnp_new_dict[key].idorigin, mcnp_new_dict[new_key].idorigin)
 #                 print('idorigin', id(mcnp_new_dict[key]), id(mcnp_new_dict[new_key]))
-                tree = self.m_postOrderTraversalTransform(mcnp_element_geom, mcnp_key_filltr)
+                tree = self.postOrderTraversalTransform(mcnp_element_geom, mcnp_key_filltr)
                 mcnp_new_dict[new_key].geometry = ['*', mcnp_key_geom, tree]
                 new_cells.append(new_key)
             return new_cells
         else:
-            #mcnp_new_dict[key] = mcnp_new_dict[key].m_copy()
+            #mcnp_new_dict[key] = mcnp_new_dict[key].copy()
             return [key]
 
 
-    def m_postOrderTraversalFlag(self, p_tree):
+    def postOrderTraversalFlag(self, p_tree):
         '''
         :brief: method which take a tree and return a tuple of tuple \
         with flag to decorate each tree in the tree
         '''
 
-        if not CTreeMethods().m_isLeaf(p_tree):
+        if not CTreeMethods().isLeaf(p_tree):
             op, *args = p_tree
-            new_args = [self.m_postOrderTraversalFlag(node) for node in args]
+            new_args = [self.postOrderTraversalFlag(node) for node in args]
             self.new_cell_key += 1
             new_tree = [self.new_cell_key, op]
             new_tree.extend(new_args)
@@ -157,8 +157,8 @@ class CCellConversion(object):
         else:
             return p_tree
 
-    def m_postOrderTraversalTransform(self, p_tree, p_transf):
-        if CTreeMethods().m_isLeaf(p_tree):
+    def postOrderTraversalTransform(self, p_tree, p_transf):
+        if CTreeMethods().isLeaf(p_tree):
 #             print('PTREE',p_tree)
             surfaceObject = self.dicSurfaceMCNP[abs(p_tree)]
             if not p_transf:
@@ -167,8 +167,8 @@ class CCellConversion(object):
              = surfaceObject.boundaryCond,\
              surfaceObject.typeSurface, surfaceObject.paramSurface
             idorigin = surfaceObject.idorigin + ['via tr']
-            surfaceObject = CTransformationFonction().m_transformation(p_boundCond, p_transf, p_typeSurface, l_paramSurface, idorigin)
-            surf_coll = CConversionSurfaceTransformed().m_conversion(surfaceObject)
+            surfaceObject = CTransformationFonction().transformation(p_boundCond, p_transf, p_typeSurface, l_paramSurface, idorigin)
+            surf_coll = CConversionSurfaceTransformed().conversion(surfaceObject)
             idorigin = surfaceObject.idorigin.copy()
 
             fixed_surfs = surf_coll.fixed
@@ -189,28 +189,28 @@ class CCellConversion(object):
             return new_key if p_tree >= 0 else -new_key
         else:
             op, *args = p_tree
-            new_args = [self.m_postOrderTraversalTransform(node, p_transf) for node in args]
+            new_args = [self.postOrderTraversalTransform(node, p_transf) for node in args]
             new_tree = [op]
             new_tree.extend(new_args)
             return new_tree
 
-    def m_postOrderTraversalConversion(self, p_tree, idorigin):
+    def postOrderTraversalConversion(self, p_tree, idorigin):
         '''
         :brief: method which take the tree create by m_postOrderTraversalFlag\
         and filled a dictionary (of CVolumeT4 instance)
         '''
 #         print('PTREE', p_tree)
-        # if CTreeMethods().m_isInterSurface(p_tree):
+        # if CTreeMethods().isInterSurface(p_tree):
         #     p_id, op = p_tree[0:2]
         #     children = p_tree[2:]
-        #     tupEQUA = self.m_conversionEQUA(children, fictive=True)
+        #     tupEQUA = self.conversionEQUA(children, fictive=True)
         #     params, fict = tupEQUA
         #     self.dictClassT4[p_id] = CVolumeT4(params, fict,idorigin)
         #     return p_id
-        if CTreeMethods().m_isLeaf(p_tree):
+        if CTreeMethods().isLeaf(p_tree):
             self.new_cell_key += 1
             p_id = self.new_cell_key
-            tupEQUA = self.m_conversionEQUA([p_tree], fictive=True)
+            tupEQUA = self.conversionEQUA([p_tree], fictive=True)
             params, fict = tupEQUA
             self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
             return p_id
@@ -221,25 +221,25 @@ class CCellConversion(object):
             surfs = []
             nodes = []
             for arg in args:
-                if CTreeMethods().m_isLeaf(arg):
+                if CTreeMethods().isLeaf(arg):
                     surfs.append(arg)
                 else:
                     nodes.append(arg)
             # here we know that paramsOPER starts as ['EQUA', 'INTE', ...]
             # because op == '*'
             if surfs:
-                paramsEQUA, fict = self.m_conversionEQUA(surfs, fictive=True)
+                paramsEQUA, fict = self.conversionEQUA(surfs, fictive=True)
                 params = paramsEQUA.copy()
                 if nodes:
-                    arg_ids = [self.m_postOrderTraversalConversion(node, idorigin)
+                    arg_ids = [self.postOrderTraversalConversion(node, idorigin)
                             for node in nodes]
-                    paramsOPER, _fict = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
+                    paramsOPER, _fict = self.conversionINTUNION(op, *arg_ids, fictive=True)
                     params.extend(paramsOPER[1:])  # take everything after the EQUA
             else:
                 # we assume that nodes is not empty
-                arg_ids = [self.m_postOrderTraversalConversion(node, idorigin)
+                arg_ids = [self.postOrderTraversalConversion(node, idorigin)
                         for node in nodes]
-                paramsOPER, fict = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
+                paramsOPER, fict = self.conversionINTUNION(op, *arg_ids, fictive=True)
                 params = paramsOPER.copy()  # take everything after the EQUA
             self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
             return p_id
@@ -248,38 +248,38 @@ class CCellConversion(object):
         if op != ':':
             raise ValueError('Converting cell with unexpected operator: %s'
                              % op)
-        arg_ids = [self.m_postOrderTraversalConversion(arg, idorigin)
+        arg_ids = [self.postOrderTraversalConversion(arg, idorigin)
                     for arg in args]
-        params, fict = self.m_conversionINTUNION(op, *arg_ids, fictive=True)
+        params, fict = self.conversionINTUNION(op, *arg_ids, fictive=True)
         self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
         return p_id
 
 
-    def m_postOrderTraversalOptimisation(self, p_tree):
+    def postOrderTraversalOptimisation(self, p_tree):
         '''
         :brief: method which permit to optimize the course of the cells MCNP
         '''
 
-        if CTreeMethods().m_isLeaf(p_tree):
+        if CTreeMethods().isLeaf(p_tree):
             return p_tree
         p_id, op, *args = p_tree
-        new_args = [self.m_postOrderTraversalOptimisation(node) for node in args]
+        new_args = [self.postOrderTraversalOptimisation(node) for node in args]
         new_node = [p_id, op]
         for node in new_args:
-            if CTreeMethods().m_isIntersection(node) and op == '*':
+            if CTreeMethods().isIntersection(node) and op == '*':
                 new_node.extend(node[2:])
-            elif CTreeMethods().m_isUnion(node) and op == ':':
+            elif CTreeMethods().isUnion(node) and op == ':':
                 new_node.extend(node[2:])
             else:
                 new_node.append(node)
         return new_node
 
-    def m_postOrderTraversalReplace(self, p_tree):
-        if not CTreeMethods().m_isLeaf(p_tree):
+    def postOrderTraversalReplace(self, p_tree):
+        if not CTreeMethods().isLeaf(p_tree):
             # print('replace: node {} is not a leaf'.format(p_tree))
             p_id, op, *args = p_tree
             new_tree = [p_id, op]
-            new_tree.extend(self.m_postOrderTraversalReplace(node) for node in args)
+            new_tree.extend(self.postOrderTraversalReplace(node) for node in args)
             # print('replace: new_tree = {}'.format(new_tree))
             return new_tree
 
@@ -303,7 +303,7 @@ class CCellConversion(object):
         #print('replace: replacing {} with {}'.format(p_tree, new_node))
         return GeomExpression(new_node)
     
-    def m_postOrderTraversalCompl(self, tree):
+    def postOrderTraversalCompl(self, tree):
 #         print('TREE', tree)
         if not isinstance(tree, (list, tuple)):
             return tree
@@ -311,7 +311,7 @@ class CCellConversion(object):
             geom = self.dicCellMCNP[int(tree[1])].geometry
 #             print('GEOM', geom)
 #             print('typegeom', type(geom))
-            new_geom = self.m_postOrderTraversalCompl(geom)
+            new_geom = self.postOrderTraversalCompl(geom)
 #             print('NEW GEOM', new_geom)
             return new_geom.inverse()
 #             if len(inverse) == 2:
@@ -320,11 +320,11 @@ class CCellConversion(object):
 #             return GeomExpression(inverse)
         new_tree = [tree[0]]
         for node in tree[1:]:
-            new_tree.append(self.m_postOrderTraversalCompl(node))
+            new_tree.append(self.postOrderTraversalCompl(node))
         result = GeomExpression(new_tree)
         return result
     
-    def m_listSurfaceForLat(self, cellId):
+    def listSurfaceForLat(self, cellId):
         
         listeCouple = []   
         listSurface = extract_surfaces_list(self.dicCellMCNP[cellId].geometry)
@@ -358,23 +358,23 @@ class CCellConversion(object):
             listSurface.pop(i)
         return(listeCouple)
     
-    def m_postOrderLattice(self, key, mcnp_new_dict):
+    def postOrderLattice(self, key, mcnp_new_dict):
         if mcnp_new_dict[key].lattice:
-            domaine = CConfigParameters().m_readDomainForLattice(key)
+            domaine = CConfigParameters().readDomainForLattice(key)
             mcnp_element_geom = mcnp_new_dict[key].geometry
-            list_info_surface = self.m_listSurfaceForLat(key)
+            list_info_surface = self.listSurfaceForLat(key)
             if len(list_info_surface) != len(domaine):
                 raise ValueError('Problem of domain definition for lattice in cell %s; %d diff %d' %(key,len(list_info_surface),len(domaine)))
-            vectors = self.m_latticeReciprocal(list_info_surface)
+            vectors = self.latticeReciprocal(list_info_surface)
 #             print('vectors', vectors, list(sqrt(scal(v, v)) for v in vectors))
-            translations = self.m_latticeSpan(domaine, vectors, (0., 0., 0.))
+            translations = self.latticeSpan(domaine, vectors, (0., 0., 0.))
             for transl in translations:
                 tr = list(transl) + [1.,0.,0.,0.,1.,0.,0.,0.,1.]
 #                 print('tr', tr)
-                tree = self.m_postOrderTraversalTransform(mcnp_element_geom, tr)
+                tree = self.postOrderTraversalTransform(mcnp_element_geom, tr)
                 self.new_cell_key += 1
                 new_key_cell = self.new_cell_key
-                mcnp_new_dict[new_key_cell] = mcnp_new_dict[key].m_copy()
+                mcnp_new_dict[new_key_cell] = mcnp_new_dict[key].copy()
                 mcnp_new_dict[new_key_cell].geometry = tree
                 filltr = mcnp_new_dict[new_key_cell].filltr
                 if filltr:
@@ -388,7 +388,7 @@ class CCellConversion(object):
                     mcnp_new_dict[new_key_cell].filltr = new_filltr
             del mcnp_new_dict[key]
             
-    def m_latticeReciprocal(self, liste_info_surface):
+    def latticeReciprocal(self, liste_info_surface):
         if len(liste_info_surface) == 1:
             return [rescale(1./scal(liste_info_surface[0], liste_info_surface[0]),liste_info_surface[0])]
         if len(liste_info_surface) == 2:
@@ -408,7 +408,7 @@ class CCellConversion(object):
         return [b1,b2,b3]
             
             
-    def m_latticeSpan(self, domaine, surfs, cur_transl):
+    def latticeSpan(self, domaine, surfs, cur_transl):
         if not domaine:
             return [cur_transl]
         
@@ -418,7 +418,7 @@ class CCellConversion(object):
         for i in range(int(interval[0]),int(interval[1])+1):
             delta =  rescale(i, vector)
             transl = vsum(cur_transl, delta)
-            result.extend(self.m_latticeSpan(domaine[1:], surfs[1:], transl))
+            result.extend(self.latticeSpan(domaine[1:], surfs[1:], transl))
         return result
                     
             
@@ -457,17 +457,17 @@ def vsum(v1,v2):
 #     root = val.geometry
 #     tree = root
 #     obj_conversion = CCellConversion(key*1000, objT4)
-#     tup = obj_conversion.m_postOrderTraversalFlag(tree)
-#     opt_tree = obj_conversion.m_postOrderTraversalOptimisation(tup)
+#     tup = obj_conversion.postOrderTraversalFlag(tree)
+#     opt_tree = obj_conversion.postOrderTraversalOptimisation(tup)
 #     print('**********', opt_tree)
-#     j = obj_conversion.m_postOrderTraversalConversion(opt_tree)
+#     j = obj_conversion.postOrderTraversalConversion(opt_tree)
 #     objT4.__setkey__(j, key)
 #     objT4.__setitem__(key, objT4.__getitem__(j))
 # for key, value in dic_cellT4.items():
 #     print(key, dic_cellT4[key].operator, dic_cellT4[key].param)
 
 #     if l != []:
-#         tupEqua = CCellConversion(key*1000,objT4).m_conversionEQUA(l, fictive=True)
+#         tupEqua = CCellConversion(key*1000,objT4).conversionEQUA(l, fictive=True)
 #         opT4, param, fict = tupEqua
 #         print(i,tupEqua)
 #         CCellConversion(key*1000,objT4).dictClassT4.__setitem__(i, CVolumeT4(opT4, param, fict))

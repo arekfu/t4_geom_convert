@@ -22,7 +22,7 @@ class CDictCellMCNP(MutableMapping):
         Constructor
         '''
         self.d_cellMCNP = OrderedDict()
-        self.d_cellMCNP = CParseMCNPCell().m_parsingCell()
+        self.d_cellMCNP = CParseMCNPCell().parsingCell()
 
     def __getitem__(self, key):
         return self.d_cellMCNP[key]
@@ -43,7 +43,7 @@ class CDictCellMCNP(MutableMapping):
         return self.d_cellMCNP.__repr__()
 
 # for key,val in CDictCellMCNP().d_cellMCNP.items() :
-#     l = val.m_evaluateASTMCNP().split(')')
+#     l = val.evaluateASTMCNP().split(')')
 #     #l = l[0].split('(')
 #     print(key, re.findall('\d+','(((((-1 * -2'))
 
@@ -52,7 +52,7 @@ class CDictCellMCNP(MutableMapping):
     
     
 # for key,val in CDictCellMCNP().d_cellMCNP.items() :
-#     l = val.m_evaluateASTMCNP().split(')')
+#     l = val.evaluateASTMCNP().split(')')
 #     #l = l[0].split('(')
 #     print(key, re.findall('\d+','(((((-1 * -2'))
     

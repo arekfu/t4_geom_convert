@@ -9,7 +9,7 @@ Created on 6 févr. 2019
     :hide:
     >>> from CParseMCNPSurface import CParseMCNPSurface
     >>> objet_MCNPSurface = CParseMCNPSurface()
-    >>> dict_Surface = objet_MCNPSurface.m_parsingSurface()
+    >>> dict_Surface = objet_MCNPSurface.parsingSurface()
     >>> print(dict_Surface)
 
 '''
@@ -33,9 +33,9 @@ class CDictSurfaceTransformed(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
+        self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
     
-    def m_surfaceTransformed(self):
+    def surfaceTransformed(self):
         inputCell = mip.MIP(self.inputMCNP)
         transformParsed = get_transforms(inputCell, lim=None)
 #         print(transformParsed)
@@ -48,6 +48,6 @@ class CDictSurfaceTransformed(object):
             if p_transformation:
                 enumSurface = string_to_enum(p_typeSurface)
                 idorigin.append('via transformation {}'.format(p_transformation))
-                dictSurfaceTransformed[k] = CTransformationFonction().m_transformation(p_boundCond, transformParsed[int(p_transformation)], enumSurface, l_paramSurface, idorigin)
+                dictSurfaceTransformed[k] = CTransformationFonction().transformation(p_boundCond, transformParsed[int(p_transformation)], enumSurface, l_paramSurface, idorigin)
         return dictSurfaceTransformed
 

@@ -20,7 +20,7 @@ class CTreeMethods(object):
         Constructor
         '''
 
-    def m_isLeaf(self, tree):
+    def isLeaf(self, tree):
         '''
         :brief: method which permit to know if a tree is an instance\
           of a Surface or a Geometry
@@ -33,7 +33,7 @@ class CTreeMethods(object):
         else:
             return False
 
-    def m_isInterSurface(self, tree):
+    def isInterSurface(self, tree):
         '''
         :brief: method which permit to know if a tree is an intersection \
         of Surfaces
@@ -47,7 +47,7 @@ class CTreeMethods(object):
 
         return False
 
-    def m_isIntersection(self, tree):
+    def isIntersection(self, tree):
         '''
         :brief: method which permit to know if a node is an intersection
         :return: a boolean.
@@ -58,7 +58,7 @@ class CTreeMethods(object):
 
         return False
 
-    def m_isUnion(self, tree):
+    def isUnion(self, tree):
         '''
         :brief: method which permit to know if a node is a union
         :return: a boolean.
@@ -72,4 +72,4 @@ class CTreeMethods(object):
 # for key,val in CDictCellMCNP().d_cellMCNP.items():
 #     root = val.geometry
 #     tree = root
-#     print(key, CTreeMethods().m_isInterSurface(tree))
+#     print(key, CTreeMethods().isInterSurface(tree))

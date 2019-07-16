@@ -20,15 +20,15 @@ Usage:
 def conversion(p_nameT4File, p_nameMCNPFile):
     with open(p_nameT4File, 'w') as ofile:
         writegeom = CWriteT4Geometry()
-        dicVol, mcnp_new_dict = writegeom.m_writeT4Geometry(ofile)
-        CWriteT4Composition(mcnp_new_dict).m_writeT4Composition(ofile)
-        CWriteT4GeomComp(dicVol, mcnp_new_dict).m_writeT4GeomComp(ofile)
-        CWriteT4BoundCond().m_writeT4BoundCond(ofile)
+        dicVol, mcnp_new_dict = writegeom.writeT4Geometry(ofile)
+        CWriteT4Composition(mcnp_new_dict).writeT4Composition(ofile)
+        CWriteT4GeomComp(dicVol, mcnp_new_dict).writeT4GeomComp(ofile)
+        CWriteT4BoundCond().writeT4BoundCond(ofile)
 
 def main():
     config = CConfigParameters()
-    t4_fname = config.m_readNameT4InputFile()
-    mcnp_fname = config.m_readNameMCNPInputFile()
+    t4_fname = config.readNameT4InputFile()
+    mcnp_fname = config.readNameMCNPInputFile()
     conversion(t4_fname, mcnp_fname)
     # cProfile.run('conversion(t4_fname, mcnp_fname)', 'ici.profile')
 

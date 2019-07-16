@@ -20,14 +20,14 @@ class CWriteT4Geometry(object):
         '''
         Constructor
         '''
-    def m_writeT4Geometry(self, f):
+    def writeT4Geometry(self, f):
         '''
         :brief: method separated in two part,
         the first for the surface and the second for the volume
         This method fills a file of the geometry for the input file of T4
         '''
         f.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
-        input_file = CConfigParameters().m_readNameMCNPInputFile()
+        input_file = CConfigParameters().readNameMCNPInputFile()
         dicCell_name = input_file + '_dicCell'
         dicSurface_name = input_file + '_dicSurface'
         try:
@@ -35,7 +35,7 @@ class CWriteT4Geometry(object):
                 dic_surfaceT4, dic_surfaceMCNP  = pickle.load(dicfile)
                 print('_dicSurface lu')
         except:
-            dic_surfaceT4, dic_surfaceMCNP = CIntermediateSurfaceT4().m_constructSurfaceT4()
+            dic_surfaceT4, dic_surfaceMCNP = CIntermediateSurfaceT4().constructSurfaceT4()
             with open(dicSurface_name, mode='wb') as dicfile:
                 pickle.dump((dic_surfaceT4, dic_surfaceMCNP), dicfile)
         try:
@@ -43,7 +43,7 @@ class CWriteT4Geometry(object):
                 dic_volume,surf_used, mcnp_new_dict, dic_surfaceT4 = pickle.load(dicfile)
                 print('_dicCell lu')
         except:
-            dic_volume, surf_used, mcnp_new_dict = CIntermediateVolumeT4(dic_surfaceT4, dic_surfaceMCNP).m_constructVolumeT4()
+            dic_volume, surf_used, mcnp_new_dict = CIntermediateVolumeT4(dic_surfaceT4, dic_surfaceMCNP).constructVolumeT4()
             with open(dicCell_name, mode='wb') as dicfile:
                 pickle.dump((dic_volume, surf_used, mcnp_new_dict, dic_surfaceT4), dicfile)
 #         print(len(dic_surfaceT4), len(dic_surfaceMCNP))
@@ -70,4 +70,4 @@ class CWriteT4Geometry(object):
         f.write("\n")
         return dic_volume, mcnp_new_dict
 
-# CWriteT4Geometry().m_writeT4Geometry()
+# CWriteT4Geometry().writeT4Geometry()

@@ -7,7 +7,7 @@
 .. doctest:: CIntermediateSurfaceT4
     :hide:
     >>> from CIntermediateSurfaceT4 import CIntermediateSurfaceT4
-    >>> p = CSurfaceConversionMCNPToT4().m_conversionMCNPToT4()
+    >>> p = CSurfaceConversionMCNPToT4().conversionMCNPToT4()
     >>> for key,val in p.items():
     >>> print(key, val))
 '''
@@ -31,7 +31,7 @@ class CSurfaceConversionMCNPToT4(object):
         Constructor
         '''
 
-    def m_conversionMCNPToT4(self):
+    def conversionMCNPToT4(self):
         '''
         :brief: method which convert MCNP surface and constructing the
         dictionary of Surface T4
@@ -41,14 +41,14 @@ class CSurfaceConversionMCNPToT4(object):
         dic_surface_mcnp = CDictSurfaceMCNP().d_surfaceMCNP
         for key, val in dic_surface_mcnp.items():
             try:
-                surfacesT4 = self.m_surfaceParametresConversion(key, val)
+                surfacesT4 = self.surfaceParametresConversion(key, val)
             except:
                 print(key, 'Parameters of this surface do not comply')
                 raise
             obj_T4[key] = surfacesT4
         return dic_SurfaceT4, dic_surface_mcnp
 
-    def m_surfaceParametresConversion(self, key, p_surfaceMCNP):
+    def surfaceParametresConversion(self, key, p_surfaceMCNP):
         '''
         method which take information of the MCNP Surface and return a list of
         converted surface in T4

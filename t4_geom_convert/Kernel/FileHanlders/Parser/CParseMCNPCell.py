@@ -10,7 +10,7 @@ Created on 5 févr. 2019
     :hide:
     >>> from CParseMCNPCell import CParseMCNPCell
     >>> objet_MCNPCell = CParseMCNPCell()
-    >>> dict_Cell = objet_MCNPCell.m_parsingCell()
+    >>> dict_Cell = objet_MCNPCell.parsingCell()
     >>> print(dict_Cell)
 
 '''
@@ -33,9 +33,9 @@ class CParseMCNPCell(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
+        self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
         
-    def m_parsingMaterialImportance(self):
+    def parsingMaterialImportance(self):
         '''
         :brief method which permit to recover the information of each line
         of the block SURFACE
@@ -60,7 +60,7 @@ class CParseMCNPCell(object):
                 i += 1
         return listeCellImp
 
-    def m_parsingCell(self):
+    def parsingCell(self):
         '''
         :brief method which permit to recover the information of each line of
         the block CELLS
@@ -77,7 +77,7 @@ class CParseMCNPCell(object):
             print('jai lu le fichier')
         except:
             print('pas de fichier, je parse')
-            liste_importance = self.m_parsingMaterialImportance()
+            liste_importance = self.parsingMaterialImportance()
             listeCellParser = list(cellParser.items())
             lencell = len(listeCellParser)
             for i, (k, v) in enumerate(listeCellParser):

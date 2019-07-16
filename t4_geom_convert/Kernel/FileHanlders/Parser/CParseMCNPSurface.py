@@ -10,7 +10,7 @@ Created on 6 févr. 2019
     :hide:
     >>> from CParseMCNPSurface import CParseMCNPSurface
     >>> objet_MCNPSurface = CParseMCNPSurface()
-    >>> dict_Surface = objet_MCNPSurface.m_parsingSurface()
+    >>> dict_Surface = objet_MCNPSurface.parsingSurface()
     >>> print(dict_Surface)
 
 '''
@@ -32,9 +32,9 @@ class CParseMCNPSurface(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
+        self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
 
-    def m_parsingSurface(self):
+    def parsingSurface(self):
         '''
         :brief method which permit to recover the information of each line
         of the block SURFACE

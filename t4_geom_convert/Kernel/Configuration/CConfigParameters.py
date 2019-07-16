@@ -26,7 +26,7 @@ class CConfigParameters(object):
                                      'config_parameters.ini')
 
 
-    def m_setMCNPInputFile(self, p_nameInuptFileMCNP):
+    def setMCNPInputFile(self, p_nameInuptFileMCNP):
         '''
         :brief: method writing the name of the input file MCNP in the\
         config_parameters.ini
@@ -38,7 +38,7 @@ class CConfigParameters(object):
         with open(self.confPath, 'w') as configfile:
             config.write(configfile)
 
-    def m_setT4InputFile(self, p_nameInuptFileT4):
+    def setT4InputFile(self, p_nameInuptFileT4):
         '''
         :brief: method writing the name of the input file T4 in the\
         config_parameters.ini
@@ -50,7 +50,7 @@ class CConfigParameters(object):
         with open(self.confPath, 'w') as configfile:
             config.write(configfile)
 
-    def m_readNameMCNPInputFile(self):
+    def readNameMCNPInputFile(self):
         '''
         :brief: method reading the name of the input file MCNP
         '''
@@ -59,7 +59,7 @@ class CConfigParameters(object):
         p_nameInuptFileMCNP = config[FILE][INPUT_FILE_MCNP]
         return p_nameInuptFileMCNP
 
-    def m_readNameT4InputFile(self):
+    def readNameT4InputFile(self):
         '''
         :brief: method reading the name of the input file T4
         '''
@@ -68,7 +68,7 @@ class CConfigParameters(object):
         p_nameInuptFileT4 = config[FILE][INPUT_FILE_T4]
         return p_nameInuptFileT4
 
-    def m_readDomainForLattice(self, key):
+    def readDomainForLattice(self, key):
         listeDomaine = []
         config = configparser.ConfigParser()
         config.read(self.confPath)

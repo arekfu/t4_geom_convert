@@ -21,7 +21,7 @@ class CCompositionMCNP(object):
         '''
         self.materialCompositionParameters = l_materialCompositionParameters
         
-    def m_ordDict(self):
+    def ordDict(self):
         '''
         :brief: method taking the liste of the parameters of the composition 
         in the MCNP file and return a list reordonate in list of tuple :

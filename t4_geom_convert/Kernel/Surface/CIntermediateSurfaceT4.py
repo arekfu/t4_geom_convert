@@ -10,7 +10,7 @@ Created on 6 févr. 2019
 .. doctest:: CIntermediateSurfaceT4
     :hide:
     >>> from CIntermediateSurfaceT4 import CIntermediateSurfaceT4
-    >>> dic_SurfaceT4 = CIntermediateSurfaceT4().m_constructSurfaceT4()
+    >>> dic_SurfaceT4 = CIntermediateSurfaceT4().constructSurfaceT4()
     >>> for key in p.keys():
     >>>     print('type Surface', dic_SurfaceT4[key].typeSurface)
     >>>     print('param Surface', dic_SurfaceT4[key].paramSurface)
@@ -27,15 +27,15 @@ class CIntermediateSurfaceT4(object):
     :brief: Class which associate the T4 surface with the Class CSURFACET4
     '''
 
-    def m_constructSurfaceT4(self):
+    def constructSurfaceT4(self):
         '''
         :brief: method constructing a dictionary with the id
         of the surface as a key and the instance of CSurfaceT4 as a value
         '''
         dic_newSurfaceT4 = OrderedDict()
-        dic_surfaceT4, dic_surfaceMCNP = CSurfaceConversionMCNPToT4().m_conversionMCNPToT4()
+        dic_surfaceT4, dic_surfaceMCNP = CSurfaceConversionMCNPToT4().conversionMCNPToT4()
         #print('surfaceT4')
-        dic_surfaceT4Tr, dic_surfaceMCNPTr = CConversionSurfaceTransformed().m_conversionSurfaceTransformed()
+        dic_surfaceT4Tr, dic_surfaceMCNPTr = CConversionSurfaceTransformed().conversionSurfaceTransformed()
         #print('surfaceT4Tr')
         dic_surfaceT4.update(dic_surfaceT4Tr)
         dic_surfaceMCNP.update(dic_surfaceMCNPTr)

@@ -10,7 +10,7 @@ Created on 6 févr. 2019
     :hide:
     >>> from CParseMCNPTransform import CParseMCNPTransform
     >>> objet_MCNPTransform = CParseMCNPTransform()
-    >>> dict_Transform = objet_MCNPTransform.m_parsingTransform()
+    >>> dict_Transform = objet_MCNPTransform.parsingTransform()
     >>> print(dict_Transform)
 
 '''
@@ -30,9 +30,9 @@ class CParseMCNPTransform(object):
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
-        self.inputMCNP = CConfigParameters().m_readNameMCNPInputFile()
+        self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
 
-    def m_parsingTransform(self):
+    def parsingTransform(self):
         '''
         :brief method which permit to recover the information of each line
         of the transform part of the block DATA
