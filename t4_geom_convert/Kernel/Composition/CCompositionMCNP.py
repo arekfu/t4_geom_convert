@@ -9,25 +9,25 @@ Created on 7 févr. 2019
 import math
 class CCompositionMCNP(object):
     '''
-    :brief: Class which permit to access precisely to the information 
+    :brief: Class which permit to access precisely to the information
     of the part material of the block DATA
     '''
-    
+
     def __init__(self, l_materialCompositionParameters):
         '''
         Constructor
-        :param: l_materialCompositionParameters : list of composition of 
+        :param: l_materialCompositionParameters : list of composition of
         material with id of isotope and its abondance
         '''
         self.materialCompositionParameters = l_materialCompositionParameters
-        
+
     def ordDict(self):
         '''
-        :brief: method taking the liste of the parameters of the composition 
+        :brief: method taking the liste of the parameters of the composition
         in the MCNP file and return a list reordonate in list of tuple :
         isotope, fractionOfTheIsotope
         '''
-        L = [] 
+        L = []
         for i in range(0, math.floor(len(self.materialCompositionParameters)/2.0)):
             isotope = self.materialCompositionParameters[2*i]
             if "." in isotope:

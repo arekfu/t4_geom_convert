@@ -12,4 +12,4 @@ def test_composition():
 
 @pytest.mark.parametrize("p_fname",[1,2,3])
 def test_lambda(p_fname):
-    assert p_fname < 2 
+    assert p_fname < 2

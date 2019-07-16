@@ -11,5 +11,5 @@ class TestSurfaces(object):
     '''
     :brief: Class testing Surface conversion
     '''
-    
+
     def test_

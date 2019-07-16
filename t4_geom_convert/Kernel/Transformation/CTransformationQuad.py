@@ -16,7 +16,7 @@ class CTransformationQuad(object):
         '''
         Constructor
         '''
-    
+
     def transformationQuad(self, l_paramSurface, l_paramTransformation):
         l_transfParamSurface = [0,0,0,0,0,0,0,0,0,0]
         a = l_paramSurface[0]

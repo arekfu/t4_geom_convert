@@ -34,7 +34,7 @@ class CParseMCNPCell(object):
         :param: f_inputMCNP : input file of MCNP
         '''
         self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
-        
+
     def parsingMaterialImportance(self):
         '''
         :brief method which permit to recover the information of each line
@@ -117,7 +117,7 @@ class CParseMCNPCell(object):
             with open(dicCellMCNP_name, mode='wb') as dicfile:
                 pickle.dump(dictCell, dicfile)
         return dictCell
-    
+
     def isfloat(self, value):
         try:
             float(value)

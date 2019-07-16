@@ -18,4 +18,4 @@ class CGeomCompT4(object):
         Constructor
         '''
         self.volumeNumberMaterial = p_volumeNumberMaterial
-        self.listVolumeId = l_listVolumeId 
+        self.listVolumeId = l_listVolumeId
