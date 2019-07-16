@@ -8,13 +8,13 @@ Created on 6 févr. 2019
 '''
 
 from collections import OrderedDict
-from ..Volume.CDictVolumeT4 import CDictVolumeT4
-from ..Volume.CDictCellMCNP import CDictCellMCNP
-from ..Volume.CCellConversion import CCellConversion
-from ..Volume.TreeFunctions import isLeaf
+from .CDictVolumeT4 import CDictVolumeT4
+from .CDictCellMCNP import CDictCellMCNP
+from .CCellConversion import CCellConversion
+from .TreeFunctions import isLeaf
+from .CUniverseDict import CUniverseDict
 from ..Surface.CDictSurfaceMCNP import CDictSurfaceMCNP
 from ..Configuration.CConfigParameters import CConfigParameters
-from ..Volume.CUniverseDict import CUniverseDict
 
 class CIntermediateVolumeT4(object):
     '''

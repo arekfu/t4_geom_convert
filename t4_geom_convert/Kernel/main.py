@@ -8,11 +8,11 @@ Created on 6 févr. 2019
 '''
 import argparse
 import sys
-from ..Kernel.FileHanlders.Writer.CWriteT4Geometry import CWriteT4Geometry
-from ..Kernel.FileHanlders.Writer.CWriteT4Composition import CWriteT4Composition
-from ..Kernel.FileHanlders.Writer.CWriteT4GeomComp import CWriteT4GeomComp
-from ..Kernel.FileHanlders.Writer.CWriteT4BoundCond import CWriteT4BoundCond
-from ..Kernel.Configuration.CConfigParameters import CConfigParameters
+from .FileHanlders.Writer.CWriteT4Geometry import CWriteT4Geometry
+from .FileHanlders.Writer.CWriteT4Composition import CWriteT4Composition
+from .FileHanlders.Writer.CWriteT4GeomComp import CWriteT4GeomComp
+from .FileHanlders.Writer.CWriteT4BoundCond import CWriteT4BoundCond
+from .Configuration.CConfigParameters import CConfigParameters
 
 def main():
     parser = argparse.ArgumentParser()

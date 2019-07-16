@@ -12,12 +12,12 @@ from MIP.geom.transforms import to_cos, normalize_transform
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.main import extract_surfaces_list
 
-from ..Volume.CDictVolumeT4 import CDictVolumeT4
-from ..Volume.CDictCellMCNP import CDictCellMCNP
-from ..Volume.TreeFunctions import isLeaf, isIntersection, isUnion
-from ..Volume.CVolumeT4 import CVolumeT4
+from .CDictVolumeT4 import CDictVolumeT4
+from .CDictCellMCNP import CDictCellMCNP
+from .TreeFunctions import isLeaf, isIntersection, isUnion
+from .CVolumeT4 import CVolumeT4
+from .CUniverseDict import CUniverseDict
 from ..Configuration.CConfigParameters import CConfigParameters
-from ..Volume.CUniverseDict import CUniverseDict
 from ..Transformation.CTransformationFonction import CTransformationFonction
 from ..Transformation.CConversionSurfaceTransformed import CConversionSurfaceTransformed
 from ..Surface.CSurfaceT4 import CSurfaceT4

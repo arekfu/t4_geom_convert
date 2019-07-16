@@ -7,9 +7,9 @@ Created on 6 févr. 2019
 :file : CConfigParameters..py
 '''
 import os
-from ...Kernel import Configuration
+from .. import Configuration
 import configparser
-from ...Kernel.Configuration.CMessages import INPUT_FILE_MCNP, FILE, INPUT_FILE_T4, LATTICE
+from .CMessages import INPUT_FILE_MCNP, FILE, INPUT_FILE_T4, LATTICE
 
 class CConfigParameters(object):
     '''

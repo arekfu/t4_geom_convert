@@ -5,10 +5,10 @@
 :file : CCompositionConversionMCNPToT4.py
 '''
 
-from ..Composition.CDictCompositionT4 import CDictCompositionT4
-from ..Composition.CDictCompositionMCNP import CDictCompositionMCNP
-from ..Composition.CIsotopeConversion import CIsotopeConversion
-from ..Composition.EIsotopeNameElementT4 import EIsotopeNameElement
+from .CDictCompositionT4 import CDictCompositionT4
+from .CDictCompositionMCNP import CDictCompositionMCNP
+from .CIsotopeConversion import CIsotopeConversion
+from .EIsotopeNameElementT4 import EIsotopeNameElement
 from collections import OrderedDict
 from math import fabs
 

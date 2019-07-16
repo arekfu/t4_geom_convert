@@ -6,8 +6,8 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 :file : CIntermediateCompositionT4.py
 '''
-from ..Composition.CCompositionT4 import CCompositionT4
-from ..Composition.CCompositionConversionMCNPToT4 import CCompositionConversionMCNPToT4
+from .CCompositionT4 import CCompositionT4
+from .CCompositionConversionMCNPToT4 import CCompositionConversionMCNPToT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
 from collections import OrderedDict
 

@@ -5,8 +5,8 @@
 :data : 06 february 2019
 :file : DTypeConversion.py
 '''
-from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as e_surfaceMCNP
-from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng as e_surfaceT4
+from .ESurfaceTypeMCNP import ESurfaceTypeMCNP as e_surfaceMCNP
+from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as e_surfaceT4
 
 
 '''

@@ -11,13 +11,13 @@
     >>> for key,val in p.items():
     >>> print(key, val))
 '''
-from ..Surface.CDictSurfaceMCNP import CDictSurfaceMCNP
-from ..Surface.CDictSurfaceT4 import CDictSurfaceT4
-from ..Surface.DTypeConversion import dict_conversionSurfaceType
-from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MCNPS
-from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
-from ..Surface.CSurfaceT4 import CSurfaceT4
-from ..Surface.CSurfaceCollection import CSurfaceCollection
+from .CDictSurfaceMCNP import CDictSurfaceMCNP
+from .CDictSurfaceT4 import CDictSurfaceT4
+from .DTypeConversion import dict_conversionSurfaceType
+from .ESurfaceTypeMCNP import ESurfaceTypeMCNP as MCNPS
+from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
+from .CSurfaceT4 import CSurfaceT4
+from .CSurfaceCollection import CSurfaceCollection
 from math import atan, pi, sqrt, fabs
 from collections import OrderedDict
 

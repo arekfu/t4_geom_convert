@@ -16,9 +16,9 @@ Created on 6 févr. 2019
     >>>     print('param Surface', dic_SurfaceT4[key].paramSurface)
 
 '''
-from ..Surface.CSurfaceConversionMCNPToT4 import CSurfaceConversionMCNPToT4
-from ..Surface.CSurfaceT4 import CSurfaceT4
-from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
+from .CSurfaceConversionMCNPToT4 import CSurfaceConversionMCNPToT4
+from .CSurfaceT4 import CSurfaceT4
+from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 from ..Transformation.CConversionSurfaceTransformed import CConversionSurfaceTransformed
 from collections import OrderedDict
 

@@ -6,13 +6,13 @@ Created on 6 févr. 2019
 :file : CTransformationFonction.py
 '''
 
-from MIP import mip
-from MIP.geom.forcad import translate, mcnp2cad, apply_transform
-from MIP.geom.transforms import get_transforms
+from MIP.geom.forcad import mcnp2cad, apply_transform
+
+from .CSurfaceTransformed import CSurfaceTransformed
+from .CTransformationQuad import CTransformationQuad
+
 from ..Configuration.CConfigParameters import CConfigParameters
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP, mcnp_to_mip
-from ..Transformation.CSurfaceTransformed import CSurfaceTransformed
-from ..Transformation.CTransformationQuad import CTransformationQuad
 
 class CTransformationFonction(object):
     '''

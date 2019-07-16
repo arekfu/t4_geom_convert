@@ -6,8 +6,8 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 :file : CIntermediateBoundaryCondition.py
 '''
+from .CBoundCond import CBoundCond
 from ..FileHanlders.Parser.CParseMCNPSurface import CParseMCNPSurface
-from ..BoundaryCondition.CBoundCond import CBoundCond
 from collections import OrderedDict
 
 

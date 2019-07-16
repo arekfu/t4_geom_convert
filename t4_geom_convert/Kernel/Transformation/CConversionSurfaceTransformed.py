@@ -5,7 +5,7 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 :file : CConversionSurfaceTransformed.py
 '''
-from ..Transformation.CDictSurfaceTransformed import CDictSurfaceTransformed
+from .CDictSurfaceTransformed import CDictSurfaceTransformed
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4Eng
 from ..Surface.CSurfaceT4 import CSurfaceT4
 from ..Surface.CSurfaceCollection import CSurfaceCollection

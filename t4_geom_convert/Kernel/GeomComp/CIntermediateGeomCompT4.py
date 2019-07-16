@@ -7,9 +7,9 @@ Created on 6 févr. 2019
 :file : CIntermediateGeomCompT4.py
 '''
 
-from ..GeomComp.CDictGeomCompT4 import CDictGeomCompT4
+from .CDictGeomCompT4 import CDictGeomCompT4
+from .CGeomCompT4 import CGeomCompT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
-from ..GeomComp.CGeomCompT4 import CGeomCompT4
 from collections import defaultdict, OrderedDict
 
 class CIntermediateGeomCompT4(object):

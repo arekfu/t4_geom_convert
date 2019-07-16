@@ -14,14 +14,16 @@ Created on 6 févr. 2019
 
 '''
 
+from collections import OrderedDict
+
 from MIP import mip
 from MIP.geom.surfaces import get_surfaces
 from MIP.geom.transforms import get_transforms
+
+from .CTransformationFonction import CTransformationFonction
+from .CSurfaceTransformed import CSurfaceTransformed
 from ..Configuration.CConfigParameters import CConfigParameters
-from ..Transformation.CTransformationFonction import CTransformationFonction
-from ..Transformation.CSurfaceTransformed import CSurfaceTransformed
 from ..Surface.ESurfaceTypeMCNP import string_to_enum
-from collections import OrderedDict
 
 class CDictSurfaceTransformed(object):
     '''

@@ -4,7 +4,7 @@
 :data : 06 February 2019
 :file : CIsotopeConversion.py
 '''
-from ..Composition.EIsotopeAtomicNumberMCNP import EIsotopeAtomicNumber
+from .EIsotopeAtomicNumberMCNP import EIsotopeAtomicNumber
 
 class CIsotopeConversion(object):
     '''
