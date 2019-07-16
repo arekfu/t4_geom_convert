@@ -7,7 +7,7 @@ Created on 6 févr. 2019
 :file : CDictSurfaceMCNP.py
 '''
 from collections.abc import MutableMapping
-from ..FileHanlders.Parser.CParseMCNPSurface import CParseMCNPSurface
+from ..FileHandlers.Parser.CParseMCNPSurface import CParseMCNPSurface
 from collections import OrderedDict
 
 class CDictSurfaceMCNP(MutableMapping):

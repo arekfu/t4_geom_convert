@@ -7,7 +7,7 @@ Created on 6 févr. 2019
 :file : CDictCellMCNP.py
 '''
 from collections.abc import MutableMapping
-from ..FileHanlders.Parser.CParseMCNPCell import CParseMCNPCell
+from ..FileHandlers.Parser.CParseMCNPCell import CParseMCNPCell
 from collections import OrderedDict
 
 

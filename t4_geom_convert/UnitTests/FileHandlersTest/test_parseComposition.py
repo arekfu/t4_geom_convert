@@ -5,7 +5,7 @@ Created on 18 mars 2019
 '''
 import pytest
 
-from t4_geom_convert.Kernel.FileHanlders.Parser.CParseMCNPComposition import CParseMCNPComposition
+from t4_geom_convert.Kernel.FileHandlers.Parser.CParseMCNPComposition import CParseMCNPComposition
 
 def test_composition():
     pass

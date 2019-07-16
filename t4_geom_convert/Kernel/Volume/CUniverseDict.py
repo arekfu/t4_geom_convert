@@ -6,7 +6,7 @@ Created on 6 févr. 2019
 :data : 06 February 2019
 :file : CUniverseDict.py
 '''
-from ..FileHanlders.Parser.CParseMCNPCell import CParseMCNPCell
+from ..FileHandlers.Parser.CParseMCNPCell import CParseMCNPCell
 from collections import OrderedDict
 
 
