@@ -173,8 +173,9 @@ class CSurfaceConversionMCNPToT4(object):
                 else:
                     # this is a cone
                     typeSurfaceT4 = T4S.CONEX
-                    tana = (listeParametreMCNP[1] - listeParametreMCNP[3])\
-                     / (listeParametreMCNP[0] - listeParametreMCNP[2])  # half-angle tan
+                    # half-angle tan
+                    tana = ((listeParametreMCNP[1] - listeParametreMCNP[3]) /
+                            (listeParametreMCNP[0] - listeParametreMCNP[2]))
                     x0 = listeParametreMCNP[0] - listeParametreMCNP[1]/tana
                     a = 180.*atan(tana)/pi
                     listeParametreT4 = [x0, 0, 0, fabs(a)]
@@ -216,8 +217,9 @@ class CSurfaceConversionMCNPToT4(object):
                 else:
                     # this is a cone
                     typeSurfaceT4 = T4S.CONEY
-                    tana = (listeParametreMCNP[1] - listeParametreMCNP[3])\
-                     / (listeParametreMCNP[0] - listeParametreMCNP[2])  # half-angle tan
+                    # half-angle tan
+                    tana = ((listeParametreMCNP[1] - listeParametreMCNP[3]) /
+                            (listeParametreMCNP[0] - listeParametreMCNP[2]))
                     y0 = listeParametreMCNP[0] - listeParametreMCNP[1]/tana
                     a = 180.*atan(tana)/pi
                     listeParametreT4 = [0, y0, 0, fabs(a)]
@@ -257,8 +259,9 @@ class CSurfaceConversionMCNPToT4(object):
                 else:
                     # this is a cone
                     typeSurfaceT4 = T4S.CONEZ
-                    tana = (listeParametreMCNP[1] - \
-                    listeParametreMCNP[3]) / (listeParametreMCNP[0] - listeParametreMCNP[2])  # half-angle tan
+                    # half-angle tan
+                    tana = ((listeParametreMCNP[1] - listeParametreMCNP[3]) /
+                            (listeParametreMCNP[0] - listeParametreMCNP[2]))
                     a = 180.*atan(tana)/pi
                     z0 = listeParametreMCNP[0] - listeParametreMCNP[1]/tana
                     listeParametreT4 = [0, 0, z0, fabs(a)]

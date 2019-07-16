@@ -13,8 +13,8 @@ from .CMessages import INPUT_FILE_MCNP, FILE, INPUT_FILE_T4, LATTICE
 
 class CConfigParameters(object):
     '''
-    :brief: Class fixing the constant value of the converter as the name of the file\
-    MCNP and the file T4
+    :brief: Class fixing the constant value of the converter as the name of the
+    file MCNP and the file T4
     '''
 
 
@@ -22,13 +22,13 @@ class CConfigParameters(object):
         '''
         Constructor
         '''
-        self.confPath = os.path.join(os.path.dirname(Configuration.__file__),\
+        self.confPath = os.path.join(os.path.dirname(Configuration.__file__),
                                      'config_parameters.ini')
 
 
     def setMCNPInputFile(self, p_nameInuptFileMCNP):
         '''
-        :brief: method writing the name of the input file MCNP in the\
+        :brief: method writing the name of the input file MCNP in the
         config_parameters.ini
         '''
         config = configparser.ConfigParser()
@@ -40,7 +40,7 @@ class CConfigParameters(object):
 
     def setT4InputFile(self, p_nameInuptFileT4):
         '''
-        :brief: method writing the name of the input file T4 in the\
+        :brief: method writing the name of the input file T4 in the
         config_parameters.ini
         '''
         config = configparser.ConfigParser()

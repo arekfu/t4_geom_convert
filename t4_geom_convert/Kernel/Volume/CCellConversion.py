@@ -143,8 +143,8 @@ class CCellConversion(object):
 
     def postOrderTraversalFlag(self, p_tree):
         '''
-        :brief: method which take a tree and return a tuple of tuple \
-        with flag to decorate each tree in the tree
+        :brief: method which take a tree and return a tuple of tuple with flag
+        to decorate each tree in the tree
         '''
 
         if not isLeaf(p_tree):
@@ -163,9 +163,9 @@ class CCellConversion(object):
             surfaceObject = self.dicSurfaceMCNP[abs(p_tree)]
             if not p_transf:
                 return p_tree
-            p_boundCond, p_typeSurface, l_paramSurface \
-             = surfaceObject.boundaryCond,\
-             surfaceObject.typeSurface, surfaceObject.paramSurface
+            p_boundCond = surfaceObject.boundaryCond
+            p_typeSurface = surfaceObject.typeSurface
+            l_paramSurface = surfaceObject.paramSurface
             idorigin = surfaceObject.idorigin + ['via tr']
             surfaceObject = CTransformationFonction().transformation(p_boundCond, p_transf, p_typeSurface, l_paramSurface, idorigin)
             surf_coll = CConversionSurfaceTransformed().conversion(surfaceObject)
@@ -196,7 +196,7 @@ class CCellConversion(object):
 
     def postOrderTraversalConversion(self, p_tree, idorigin):
         '''
-        :brief: method which take the tree create by m_postOrderTraversalFlag\
+        :brief: method which take the tree create by m_postOrderTraversalFlag
         and filled a dictionary (of CVolumeT4 instance)
         '''
         if isLeaf(p_tree):

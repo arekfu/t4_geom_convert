@@ -25,17 +25,14 @@ class CTransformationFonction(object):
         '''
 
     def transformation(self,p_boundCond, trpl, p_typeSurface, l_paramSurface, idorigin):
-#         print('P_TYPESURFACE',p_typeSurface)
         if not trpl:
             return CSurfaceTransformed(p_boundCond, p_typeSurface,
                                        l_paramSurface, idorigin)
         if p_typeSurface == ESurfaceTypeMCNP.GQ or p_typeSurface == 'gq':
             p_typeSurface = 'gq'
-            l_paramSurface = CTransformationQuad().transformationQuad(\
-                                l_paramSurface, trpl)
+            l_paramSurface = CTransformationQuad().transformationQuad(
+                l_paramSurface, trpl)
         else:
-#             print('typeSurface', type(p_typeSurface))
-#             print('paramSurface', l_paramSurface)
 
             if isinstance(p_typeSurface, str):
                 f = (l_paramSurface[0], l_paramSurface[1])
@@ -46,8 +43,6 @@ class CTransformationFonction(object):
                 t, f, s, p = mcnp2cad[mcnp_to_mip(p_typeSurface)](l_paramSurface)
             f, p = apply_transform(f, p, trpl)
             p_typeSurface, l_pparamSurface, l_complParam = t, f, s
-#                     p_typeSurface, l_pparamSurface, l_complParam = \
-#                     CTransformationFonction().transformation(k,surfaceParser)
             if p_typeSurface == 'k':
                 new_complParam = list(l_complParam)
                 if len(l_paramSurface) == 2 or len(l_paramSurface) == 4:
@@ -59,6 +54,5 @@ class CTransformationFonction(object):
                 l_paramSurface = l_pparamSurface[0], l_pparamSurface[1], tuple(new_complParam)
             else:
                 l_paramSurface = l_pparamSurface[0], l_pparamSurface[1], l_complParam
-#         print('CSurfaceTr', p_typeSurface, l_paramSurface)
         return CSurfaceTransformed(p_boundCond, p_typeSurface, l_paramSurface,
                                    idorigin)

@@ -17,7 +17,6 @@ class CIntermediateCompositionT4(object):
     instance of the Class CCompositionT4
     '''
 
-
     def __init__(self):
         '''
         Constructor
@@ -32,7 +31,7 @@ class CIntermediateCompositionT4(object):
         dic_CompositionT4 = CCompositionConversionMCNPToT4().conversionCompositionMCNPToT4()
         for key,val in dic_CompositionT4.items():
             #print(key, val)
-            l_listeMaterialComposition = []
+            composition = []
             l_density = []
             l_typeDensityT4 = []
             for elmt in val:
@@ -42,11 +41,10 @@ class CIntermediateCompositionT4(object):
                 if massNumber[0] == '0':
                     massNumber = massNumber[1:]
                 isotopeT4 = nameElement + massNumber
-                l_listeMaterialComposition.append((isotopeT4, abondance))
+                composition.append((isotopeT4, abondance))
             for cell in dic_cellMCNP.values():
                 if cell.importance <= 0. or cell.universe != 0 or cell.fillid is not None:
                     continue
-#                 print(cell.materialID, cell.density)
                 if int(cell.materialID) == key:
                     density = cell.density
                     if density not in l_density:
@@ -55,13 +53,7 @@ class CIntermediateCompositionT4(object):
                             l_typeDensityT4.append('DENSITY')
                         else:
                             l_typeDensityT4.append('POINT_WISE')
-            dic_newCompositionT4[key] = CCompositionT4(l_typeDensityT4, 'm'+str(key),\
-                                                       l_density,\
-                                                       len(l_listeMaterialComposition),\
-                                                       l_listeMaterialComposition)
+            dic_newCompositionT4[key] = CCompositionT4(l_typeDensityT4,
+                                                       'm'+str(key), l_density,
+                                                       composition)
         return dic_newCompositionT4
-
-# d = CIntermediateCompositionT4().constructCompositionT4()
-# for keys in d.keys():
-#     print(keys)
-#     print(d[keys].typeDensity)

@@ -46,6 +46,6 @@ class CParseMCNPTransform(object):
             l_transformationParameters = v
             l_originTransformation = l_transformationParameters[0:3]
             l_rotationTransformation = l_transformationParameters[3:12]
-            dictSurface[k] = CTransformationMCNP(l_originTransformation,\
+            dictSurface[k] = CTransformationMCNP(l_originTransformation,
                                                  l_rotationTransformation)
         return dictSurface

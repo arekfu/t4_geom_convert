@@ -30,7 +30,7 @@ class CWriteT4GeomComp(object):
             p_materialName = str(k)
             p_numberOfCell = str(dic_geomComp[k].volumeNumberMaterial)
             p_listVolumeId = dic_geomComp[k].listVolumeId
-            f.write("%s %s %s\n" % ("m" + p_materialName, p_numberOfCell,\
+            f.write("%s %s %s\n" % ("m" + p_materialName, p_numberOfCell,
                                     p_listVolumeId))
         f.write("END_GEOMCOMP")
         f.write("\n")

@@ -34,8 +34,8 @@ class CWriteT4Composition(object):
             s_paramMaterialComposition = ''
             l_typeDensity = mat.typeDensity
             l_densityValue = mat.valueOfDensity
-            p_numberOfIsotope = mat.numberOfIsotope
             list_isotope = mat.listMaterialComposition
+            p_numberOfIsotope = len(list_isotope)
             for element in list_isotope:
                 nameIsotope, abondanceIsotope = element
                 s_paramMaterialComposition = (s_paramMaterialComposition +

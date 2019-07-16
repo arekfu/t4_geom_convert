@@ -49,6 +49,6 @@ class CParseMCNPSurface(object):
             if p_transformation:
                 continue
             enumSurface = string_to_enum(p_typeSurface)
-            dictSurface[k] = CSurfaceMCNP(p_boundCond, p_transformation,\
-                                           enumSurface, l_paramSurface)
+            dictSurface[k] = CSurfaceMCNP(p_boundCond, p_transformation,
+                                          enumSurface, l_paramSurface)
         return dictSurface

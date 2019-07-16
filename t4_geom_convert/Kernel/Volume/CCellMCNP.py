@@ -14,8 +14,8 @@ class CCellMCNP(object):
     '''
 
 
-    def __init__(self, p_materialID, p_density, syntaxTreeMCNP,\
-                 p_importance, p_universe, fillid, filltr, costr, lattice, idorigin=None):
+    def __init__(self, p_materialID, p_density, syntaxTreeMCNP, p_importance,
+                 p_universe, fillid, filltr, costr, lattice, idorigin=None):
         '''
         Constructor
         :param: p_materialID : identity number of the material

@@ -11,8 +11,8 @@ from MIP.geom.semantics import GeomExpression, Surface
 
 def isLeaf(self, tree):
     '''
-    :brief: method which permit to know if a tree is an instance\
-        of a Surface or a Geometry
+    :brief: method which permit to know if a tree is an instance of a Surface
+            or a Geometry
     :return: a boolean.
     '''
     if isinstance(tree, (tuple, list, GeomExpression)):
