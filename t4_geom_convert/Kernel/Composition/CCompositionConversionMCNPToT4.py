@@ -17,7 +17,6 @@ class CCompositionConversionMCNPToT4(object):
     :brief: Class transforming materials information from MCNP in composition T4
     '''
 
-
     def __init__(self):
         '''
         Constructor
@@ -45,8 +44,5 @@ class CCompositionConversionMCNPToT4(object):
                 isotopeT4 = atomicNumberT4, massNumberT4
                 l_compositionT4.append((isotopeT4, str(fabs(float(fraction)))))
             valueT4 = l_compositionT4
-            obj_T4.__setitem__(key, valueT4)    
+            obj_T4.__setitem__(key, valueT4)
         return d_CompositionT4
-# d = CCompositionConversionMCNPToT4().conversionCompositionMCNPToT4()
-# for key,val in d.items():
-#     print(key,val)

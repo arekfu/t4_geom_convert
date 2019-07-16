@@ -41,19 +41,3 @@ class CDictCellMCNP(MutableMapping):
 
     def __repr__(self):
         return self.d_cellMCNP.__repr__()
-
-# for key,val in CDictCellMCNP().d_cellMCNP.items() :
-#     l = val.evaluateASTMCNP().split(')')
-#     #l = l[0].split('(')
-#     print(key, re.findall('\d+','(((((-1 * -2'))
-
-    def __repr__(self):
-        return self.d_cellMCNP.__repr__()
-    
-    
-# for key,val in CDictCellMCNP().d_cellMCNP.items() :
-#     l = val.evaluateASTMCNP().split(')')
-#     #l = l[0].split('(')
-#     print(key, re.findall('\d+','(((((-1 * -2'))
-    
-    

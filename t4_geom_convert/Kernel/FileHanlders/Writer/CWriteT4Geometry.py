@@ -46,11 +46,9 @@ class CWriteT4Geometry(object):
             dic_volume, surf_used, mcnp_new_dict = CIntermediateVolumeT4(dic_surfaceT4, dic_surfaceMCNP).constructVolumeT4()
             with open(dicCell_name, mode='wb') as dicfile:
                 pickle.dump((dic_volume, surf_used, mcnp_new_dict, dic_surfaceT4), dicfile)
-#         print(len(dic_surfaceT4), len(dic_surfaceMCNP))
         for key in sorted(surf_used):
             surf, _ = dic_surfaceT4[key]
             list_paramSurface = surf.paramSurface
-#             print(key, surf.typeSurface, list_paramSurface)
             s_paramSurface = ' '.join(str(element) for element in list_paramSurface)
             s_comment = '' if not surf.idorigin else '// ' + str(surf.idorigin)
             f.write("SURF %s %s %s %s\n" % (key, surf.typeSurface.name,
@@ -69,5 +67,3 @@ class CWriteT4Geometry(object):
         f.write("ENDG")
         f.write("\n")
         return dic_volume, mcnp_new_dict
-
-# CWriteT4Geometry().writeT4Geometry()

@@ -34,17 +34,12 @@ class CIntermediateSurfaceT4(object):
         '''
         dic_newSurfaceT4 = OrderedDict()
         dic_surfaceT4, dic_surfaceMCNP = CSurfaceConversionMCNPToT4().conversionMCNPToT4()
-        #print('surfaceT4')
         dic_surfaceT4Tr, dic_surfaceMCNPTr = CConversionSurfaceTransformed().conversionSurfaceTransformed()
-        #print('surfaceT4Tr')
         dic_surfaceT4.update(dic_surfaceT4Tr)
         dic_surfaceMCNP.update(dic_surfaceMCNPTr)
-        #print(dic_surfaceT4Tr)
-        #print(dic_surfaceT4)
         free_id = max(int(k) for k in dic_surfaceT4.keys()) + 1
         keyS = 100000
         for key, surf_coll in dic_surfaceT4.items():
-#             print('surface', key)
             fixed_surfs = surf_coll.fixed
             fixed_ids = []
             for surf, side in fixed_surfs:

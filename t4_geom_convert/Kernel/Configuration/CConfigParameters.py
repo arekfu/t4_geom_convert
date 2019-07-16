@@ -80,5 +80,4 @@ class CConfigParameters(object):
                 raise ValueError('Problem with lattice domain of cell %s' %key)
             else:
                 listeDomaine.append((int(partial_list[0]),int(partial_list[1])))
-#         print('listeDomaine', listeDomaine)
         return listeDomaine

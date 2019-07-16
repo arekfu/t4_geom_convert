@@ -36,17 +36,15 @@ class CDictSurfaceTransformed(object):
         :param: f_inputMCNP : input file of MCNP
         '''
         self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
-    
+
     def surfaceTransformed(self):
         inputCell = mip.MIP(self.inputMCNP)
         transformParsed = get_transforms(inputCell, lim=None)
-#         print(transformParsed)
         surfaceParser = get_surfaces(inputCell, lim=None)
         dictSurfaceTransformed = OrderedDict()
         for k, v in list(surfaceParser.items()):
             p_boundCond, p_transformation, p_typeSurface, l_paramSurface = v
             idorigin = [k]
-#             print(p_typeSurface)
             if p_transformation:
                 enumSurface = string_to_enum(p_typeSurface)
                 idorigin.append('via transformation {}'.format(p_transformation))

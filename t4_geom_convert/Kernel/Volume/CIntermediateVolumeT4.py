@@ -34,7 +34,6 @@ class CIntermediateVolumeT4(object):
         :brief: method changing the tuple from CCellConversion in
         instance of the CVolumeT4 Class
         '''
-#         dic_test = dict()
         dic_cellT4 = OrderedDict()
         objT4 = CDictVolumeT4(dic_cellT4)
         mcnp_dict = CDictCellMCNP().d_cellMCNP
@@ -48,7 +47,6 @@ class CIntermediateVolumeT4(object):
         conv = CCellConversion(free_key, free_surf_key, objT4, self.dic_surface, self.dic_surfaceMCNP, mcnp_dict)
         listekeys = list(mcnp_dict)
         for key in mcnp_dict.keys():
-#             print('key',key)
             new_geom = conv.postOrderTraversalCompl(mcnp_dict[key].geometry)
             mcnp_dict[key].geometry = new_geom
         for key in mcnp_dict.keys():
@@ -72,17 +70,12 @@ class CIntermediateVolumeT4(object):
             max(int(k) for k in self.dic_surface) + 1
             )
         for key, val in mcnp_new_dict.items():
-#             print('volume', key, val.geometry, val.importance, val.universe)
             if val.importance != 0 and val.universe == 0 and val.fillid is None:
-#                 dic_test[key] = dict()
                 root = val.geometry
                 treeMaster = root
                 tup = conv.postOrderTraversalFlag(treeMaster)
-#                 print('tup',tup)
                 replace = conv.postOrderTraversalReplace(tup)
-#                 print('replace', replace)
                 opt_tree = conv.postOrderTraversalOptimisation(replace)
-#                 print('opt_tree', opt_tree)
                 surf_used |= set(self.surfacesUsed(opt_tree))
                 j = conv.postOrderTraversalConversion(opt_tree, val.idorigin)
                 objT4.volumeT4[j].fictive = ''
@@ -90,9 +83,7 @@ class CIntermediateVolumeT4(object):
                     continue
                 objT4.__setkey__(j, key)
                 objT4.__setitem__(key, objT4.__getitem__(j))
-#                 print('j',j, key)
                 objT4.__delitem__(j)
-#         print(dic_cellT4)
         surf_used.add(100001)
         surf_used.add(100002)
         return dic_cellT4, surf_used, mcnp_new_dict
@@ -100,10 +91,7 @@ class CIntermediateVolumeT4(object):
 
     def surfacesUsed(self, tree):
         if isLeaf(tree):
-            #print('leaf', tree)
             return [abs(tree)]
         _id, _op, *args = tree
         result = [x for leaf in args for x in self.surfacesUsed(leaf)]
-        #print('result', tree, result)  
         return result
-    

@@ -31,7 +31,3 @@ class CUniverseDict(object):
         for k, val in self.d_cellMCNP.items():
             d_universeDict[int(val.universe)].append(k)
         return d_universeDict
-
-# p = CUniverseDict().dictUniverse()
-# for k in p.keys():
-#     print(k, p[k])

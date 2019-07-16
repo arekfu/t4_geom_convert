@@ -30,7 +30,6 @@ class CIntermediateCompositionT4(object):
         dic_newCompositionT4 = OrderedDict()
         dic_CompositionT4 = CCompositionConversionMCNPToT4().conversionCompositionMCNPToT4()
         for key,val in dic_CompositionT4.items():
-            #print(key, val)
             composition = []
             l_density = []
             l_typeDensityT4 = []

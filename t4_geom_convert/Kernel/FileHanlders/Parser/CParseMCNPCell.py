@@ -81,8 +81,6 @@ class CParseMCNPCell(object):
             listeCellParser = list(cellParser.items())
             lencell = len(listeCellParser)
             for i, (k, v) in enumerate(listeCellParser):
-#                 print("Parse Cell", k)
-#                 print(i, '/', lencell)
                 fillid = None
                 costr = False
                 listeparamfill = []
@@ -110,12 +108,10 @@ class CParseMCNPCell(object):
                     density = None
                 else:
                     density = material.split()[1]
-#                 print('Dens', k, density)
                 astMcnp = get_ast(geometry)
                 #importance = option
                 if importance is None:
                     importance = liste_importance[i]
-#                     print('importance',k, importance, i, liste_importance)
                 if importance != 0:
                     dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance, universe, fillid, listeparamfill, costr, lattice)
             with open(dicCellMCNP_name, mode='wb') as dicfile:

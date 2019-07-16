@@ -40,6 +40,3 @@ class CDictSurfaceMCNP(MutableMapping):
 
     def __repr__(self):
         return self.d_surfaceMCNP.__repr__()
-
-# for key,val in CDictSurfaceMCNP().d_surfaceMCNP.items() :
-#     print(key, val.typeSurface)

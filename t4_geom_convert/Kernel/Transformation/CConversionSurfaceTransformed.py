@@ -27,7 +27,6 @@ class CConversionSurfaceTransformed(object):
         dic_SurfaceT4Tr = OrderedDict()
         dicSurfaceTransformed = CDictSurfaceTransformed().surfaceTransformed()
         for k, val in dicSurfaceTransformed.items():
-            #print('transformation', k)
             dic_SurfaceT4Tr[k] = self.conversion(val)
 
         return dic_SurfaceT4Tr, dicSurfaceTransformed
@@ -81,7 +80,6 @@ class CConversionSurfaceTransformed(object):
             type_surface = ESurfaceTypeT4Eng.QUAD
             param = val.paramSurface
         if val.typeSurface =='t':
-            #print('je suis T')
             tuple_param = val.paramSurface
             point = tuple_param[0]
             unitary_vector = tuple_param[1]
@@ -90,13 +88,10 @@ class CConversionSurfaceTransformed(object):
             r1 = tuple_param[2][0]
             r2 = tuple_param[2][1]
             if math.fabs(ux)> 0.99:
-                #print('je suis tx')
                 type_surface = ESurfaceTypeT4Eng.TORUSX
             elif math.fabs(uy)> 0.99:
-                #print('je suis ty')
                 type_surface = ESurfaceTypeT4Eng.TORUSY
             elif math.fabs(uz)> 0.99:
-                #print('je suis tz')
                 type_surface = ESurfaceTypeT4Eng.TORUSZ
             else:
                 raise ValueError('Cannot convert TORUS with generic axis: %s'%unitary_vector)

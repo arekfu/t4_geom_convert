@@ -42,7 +42,6 @@ def normalize(geom):
     g = re_compl.sub(r'^(\1)', g)
     g = g.replace('#', '_')
     return g
-    #jeu de données MCNP: parfois espace entre dièse et son opérande---> enlever les espaces après l\'opérateur dièse
 
 
 def get_ast(geom):
@@ -90,10 +89,3 @@ if __name__ == '__main__':
         n += 1
         if n >= 100:
             break
-    # for n, cc in get_cards_from_file(argv[1]):
-    #     name, mat, geom, ast, opts = cc
-
-    #     print '*'*60
-    #     print n, repr(geom)
-    #     ast = get_ast(geom)
-    #     pprint.pprint(ast, indent=2, width=10)
