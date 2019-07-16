@@ -14,7 +14,7 @@ from MIP.geom.main import extract_surfaces_list
 
 from ..Volume.CDictVolumeT4 import CDictVolumeT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
-from ..Volume.CTreeMethods import CTreeMethods
+from ..Volume.TreeFunctions import isLeaf, isIntersection, isUnion
 from ..Volume.CVolumeT4 import CVolumeT4
 from ..Configuration.CConfigParameters import CConfigParameters
 from ..Volume.CUniverseDict import CUniverseDict
@@ -147,7 +147,7 @@ class CCellConversion(object):
         with flag to decorate each tree in the tree
         '''
 
-        if not CTreeMethods().isLeaf(p_tree):
+        if not isLeaf(p_tree):
             op, *args = p_tree
             new_args = [self.postOrderTraversalFlag(node) for node in args]
             self.new_cell_key += 1
@@ -158,7 +158,7 @@ class CCellConversion(object):
             return p_tree
 
     def postOrderTraversalTransform(self, p_tree, p_transf):
-        if CTreeMethods().isLeaf(p_tree):
+        if isLeaf(p_tree):
 #             print('PTREE',p_tree)
             surfaceObject = self.dicSurfaceMCNP[abs(p_tree)]
             if not p_transf:
@@ -199,15 +199,7 @@ class CCellConversion(object):
         :brief: method which take the tree create by m_postOrderTraversalFlag\
         and filled a dictionary (of CVolumeT4 instance)
         '''
-#         print('PTREE', p_tree)
-        # if CTreeMethods().isInterSurface(p_tree):
-        #     p_id, op = p_tree[0:2]
-        #     children = p_tree[2:]
-        #     tupEQUA = self.conversionEQUA(children, fictive=True)
-        #     params, fict = tupEQUA
-        #     self.dictClassT4[p_id] = CVolumeT4(params, fict,idorigin)
-        #     return p_id
-        if CTreeMethods().isLeaf(p_tree):
+        if isLeaf(p_tree):
             self.new_cell_key += 1
             p_id = self.new_cell_key
             tupEQUA = self.conversionEQUA([p_tree], fictive=True)
@@ -221,7 +213,7 @@ class CCellConversion(object):
             surfs = []
             nodes = []
             for arg in args:
-                if CTreeMethods().isLeaf(arg):
+                if isLeaf(arg):
                     surfs.append(arg)
                 else:
                     nodes.append(arg)
@@ -260,22 +252,22 @@ class CCellConversion(object):
         :brief: method which permit to optimize the course of the cells MCNP
         '''
 
-        if CTreeMethods().isLeaf(p_tree):
+        if isLeaf(p_tree):
             return p_tree
         p_id, op, *args = p_tree
         new_args = [self.postOrderTraversalOptimisation(node) for node in args]
         new_node = [p_id, op]
         for node in new_args:
-            if CTreeMethods().isIntersection(node) and op == '*':
+            if isIntersection(node) and op == '*':
                 new_node.extend(node[2:])
-            elif CTreeMethods().isUnion(node) and op == ':':
+            elif isUnion(node) and op == ':':
                 new_node.extend(node[2:])
             else:
                 new_node.append(node)
         return new_node
 
     def postOrderTraversalReplace(self, p_tree):
-        if not CTreeMethods().isLeaf(p_tree):
+        if not isLeaf(p_tree):
             # print('replace: node {} is not a leaf'.format(p_tree))
             p_id, op, *args = p_tree
             new_tree = [p_id, op]

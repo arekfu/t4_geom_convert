@@ -11,7 +11,7 @@ from collections import OrderedDict
 from ..Volume.CDictVolumeT4 import CDictVolumeT4
 from ..Volume.CDictCellMCNP import CDictCellMCNP
 from ..Volume.CCellConversion import CCellConversion
-from ..Volume.CTreeMethods import CTreeMethods
+from ..Volume.TreeFunctions import isLeaf
 from ..Surface.CDictSurfaceMCNP import CDictSurfaceMCNP
 from ..Configuration.CConfigParameters import CConfigParameters
 from ..Volume.CUniverseDict import CUniverseDict
@@ -99,7 +99,7 @@ class CIntermediateVolumeT4(object):
 
 
     def surfacesUsed(self, tree):
-        if CTreeMethods().isLeaf(tree):
+        if isLeaf(tree):
             #print('leaf', tree)
             return [abs(tree)]
         _id, _op, *args = tree
