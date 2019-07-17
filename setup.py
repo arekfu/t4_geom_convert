@@ -19,7 +19,7 @@ setup(name=name,
       packages=find_packages(exclude=['doc', 'tests', 'tests.*', 'Oracle']),
       python_requires='>=3.4',
       setup_requires=['pytest-runner', 'setuptools-scm'],
-      install_requires=['TatSu==4.3.0'],
+      install_requires=['TatSu==4.3.0', 'numpy', 'scipy'],
       tests_require=test_deps,
       extras_require={'dev': dev_deps},
       command_options={
