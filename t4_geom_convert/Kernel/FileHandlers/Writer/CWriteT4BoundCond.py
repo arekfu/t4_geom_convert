@@ -32,4 +32,3 @@ class CWriteT4BoundCond(object):
             f.write("ALL_COMPLETE %s %s\n" %(p_typeOfBound, k))
         f.write("END_BOUNDARY_CONDITION")
         f.write("\n")
-# CWriteT4BoundCond().writeT4BoundCond()

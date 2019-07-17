@@ -52,4 +52,3 @@ class CCellMCNP(object):
         if hasattr(self.geometry , 'copy'):
             return CCellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.lattice, self.idorigin.copy())
         return CCellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr.copy(), self.costr, self.lattice, self.idorigin.copy())
-

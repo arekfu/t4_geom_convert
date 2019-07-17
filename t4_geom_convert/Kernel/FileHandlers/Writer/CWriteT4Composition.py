@@ -56,6 +56,3 @@ class CWriteT4Composition(object):
         f.write("\n")
         f.write("END_COMPOSITION")
         f.write("\n")
-
-
-# CWriteT4Composition().writeT4Composition()

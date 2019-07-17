@@ -50,4 +50,3 @@ class CDictSurfaceTransformed(object):
                 idorigin.append('via transformation {}'.format(p_transformation))
                 dictSurfaceTransformed[k] = CTransformationFonction().transformation(p_boundCond, transformParsed[int(p_transformation)], enumSurface, l_paramSurface, idorigin)
         return dictSurfaceTransformed
-

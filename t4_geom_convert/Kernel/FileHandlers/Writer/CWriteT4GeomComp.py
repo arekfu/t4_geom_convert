@@ -34,5 +34,3 @@ class CWriteT4GeomComp(object):
                                     p_listVolumeId))
         f.write("END_GEOMCOMP")
         f.write("\n")
-
-# CWriteT4GeomComp().writeT4GeomComp()

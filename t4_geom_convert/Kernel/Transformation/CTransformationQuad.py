@@ -54,10 +54,6 @@ class CTransformationQuad(object):
                       [0, 0, 1, -z],
                       [0,   0,   0,   1]])
         M = np.matmul(R,Q)
-#         M = np.array([[r11, r12, r13, x],
-#                       [r21, r22, r23, y],
-#                       [r31, r32, r33, z],
-#                       [0,   0,   0,   1]])
         if np.linalg.det(M) != 0:
             iM = np.linalg.inv(M)
             Atransf  = np.matmul(M.T, np.matmul(A, M))
