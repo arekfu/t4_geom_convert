@@ -185,7 +185,6 @@ def parse_args(argv):
 
 def main():
     '''Main entry point for the CLI tool.'''
-    print('t4_geom_convert {}\n'.format(__version__))
     args = parse_args(sys.argv[1:])
     conversion(args)
 
