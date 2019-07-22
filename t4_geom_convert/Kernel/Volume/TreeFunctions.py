@@ -9,7 +9,7 @@ Created on 5 févr. 2019
 from MIP.geom.semantics import GeomExpression, Surface
 
 
-def isLeaf(self, tree):
+def isLeaf(tree):
     '''
     :brief: method which permit to know if a tree is an instance of a Surface
             or a Geometry
@@ -22,7 +22,7 @@ def isLeaf(self, tree):
     else:
         return False
 
-def isIntersection(self, tree):
+def isIntersection(tree):
     '''
     :brief: method which permit to know if a node is an intersection
     :return: a boolean.
@@ -33,7 +33,7 @@ def isIntersection(self, tree):
 
     return False
 
-def isUnion(self, tree):
+def isUnion(tree):
     '''
     :brief: method which permit to know if a node is a union
     :return: a boolean.

@@ -7,7 +7,6 @@ Created on 6 févr. 2019
 :file : CIntermediateBoundaryCondition.py
 '''
 from .CBoundCond import CBoundCond
-from ..FileHandlers.Parser.CParseMCNPSurface import CParseMCNPSurface
 from collections import OrderedDict
 
 
@@ -16,18 +15,19 @@ class CConversionBoundaryCondition(object):
     '''
 
 
-    def __init__(self):
+    def __init__(self, dic_surf_mcnp):
         '''
         Constructor
         '''
+        self.dic_surf_mcnp = dic_surf_mcnp
+
     def recuperateBoundaryCondition(self):
         '''
         :brief: method constructing a dictionary with the id of the
         material as a key and the instance of CBoundCondT4 as a value
         '''
         d_boundCond = OrderedDict()
-        d_surface = CParseMCNPSurface().parsingSurface()
-        for k, v in list(d_surface.items()):
+        for k, v in list(self.dic_surf_mcnp.items()):
             if v.boundaryCond != '':
                 p_typeOfBC = v.boundaryCond
                 d_boundCond[k] = CBoundCond(p_typeOfBC)

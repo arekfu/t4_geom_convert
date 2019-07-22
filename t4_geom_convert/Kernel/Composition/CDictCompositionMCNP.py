@@ -7,7 +7,7 @@ Created on 6 févr. 2019
 :file : CDictCompositionMCNP.py
 '''
 from collections.abc import MutableMapping
-from ..FileHandlers.Parser.CParseMCNPComposition import CParseMCNPComposition
+from ..FileHandlers.Parser.ParseMCNPComposition import parseMCNPComposition
 from collections import OrderedDict
 
 
@@ -17,12 +17,11 @@ class CDictCompositionMCNP(MutableMapping):
      material composition from MCNP
     '''
 
-    def __init__(self):
+    def __init__(self, mcnpParser):
         '''
         Constructor
         '''
-        self.d_compositionMCNP = OrderedDict()
-        self.d_compositionMCNP = CParseMCNPComposition().parsingMaterialComposition()
+        self.d_compositionMCNP = parseMCNPComposition(mcnpParser)
 
     def __getitem__(self, key):
         return self.d_compositionMCNP[key]

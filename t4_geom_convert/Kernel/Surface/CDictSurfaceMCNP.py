@@ -4,11 +4,11 @@ Created on 6 févr. 2019
 
 :author: Sogeti
 :data : 06 February 2019
-:file : CDictSurfaceMCNP.py
 '''
 from collections.abc import MutableMapping
-from ..FileHandlers.Parser.CParseMCNPSurface import CParseMCNPSurface
+from ..FileHandlers.Parser.ParseMCNPSurface import parseMCNPSurface
 from collections import OrderedDict
+
 
 class CDictSurfaceMCNP(MutableMapping):
     '''
@@ -16,12 +16,11 @@ class CDictSurfaceMCNP(MutableMapping):
     listing surface from MCNP
     '''
 
-    def __init__(self):
+    def __init__(self, mcnpParser):
         '''
         Constructor
         '''
-        self.d_surfaceMCNP = OrderedDict()
-        self.d_surfaceMCNP = CParseMCNPSurface().parsingSurface()
+        self.d_surfaceMCNP = parseMCNPSurface(mcnpParser)
 
     def __getitem__(self, key):
         return self.d_surfaceMCNP[key]

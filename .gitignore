@@ -20,4 +20,3 @@ tmp_GEO*
 .eggs
 __pycache__
 *.egg-info
-t4_geom_convert/Kernel/Configuration/config_parameters.ini

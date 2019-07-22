@@ -6,7 +6,6 @@ Created on 6 févr. 2019
 :data : 06 February 2019
 :file : CUniverseDict.py
 '''
-from ..FileHandlers.Parser.CParseMCNPCell import CParseMCNPCell
 from collections import OrderedDict
 
 
@@ -20,7 +19,6 @@ class CUniverseDict(object):
         '''
         Constructor
         '''
-        self.d_cellMCNP = OrderedDict()
         self.d_cellMCNP = d_dicCellMCNP
 
     def dictUniverse(self):

@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 
 from .blocks import get_block_positions
 from .cards import get_cards
@@ -103,14 +102,11 @@ class MIP(object):
     """
     def __init__(self, fname, firstblock=None):
 
-        print(datetime.now().isoformat())
         # Text from the input file
         self.text = open(fname, 'r').read()
-        print(datetime.now().isoformat())
 
         # Dictioary of indices describing position of blocks
         self.bi = get_block_positions(self.text, firstblock=firstblock)
-        print(datetime.now().isoformat())
         return
 
     def block(self, bid):

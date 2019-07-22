@@ -17,12 +17,11 @@ class CDictCellMCNP(MutableMapping):
     cell from MCNP
     '''
 
-    def __init__(self):
+    def __init__(self, mcnpParser, cell_cache_path):
         '''
         Constructor
         '''
-        self.d_cellMCNP = OrderedDict()
-        self.d_cellMCNP = CParseMCNPCell().parsingCell()
+        self.d_cellMCNP = CParseMCNPCell(mcnpParser, cell_cache_path).parsingCell()
 
     def __getitem__(self, key):
         return self.d_cellMCNP[key]

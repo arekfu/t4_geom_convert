@@ -4,7 +4,6 @@ Created on 6 févr. 2019
 
 :author: Sogeti
 :data : 06 February 2019
-:file : CDictSurfaceT4.py
 '''
 from collections.abc import MutableMapping
 

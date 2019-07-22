@@ -6,9 +6,8 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 :file : CSurfaceMCNP.py
 '''
-from ..FileHandlers.Parser.CParseMCNPTransform import CParseMCNPTransform
 
-class CSurfaceMCNP(object):
+class CSurfaceMCNP:
     '''
     :brief: Class which permit to access precisely to the information of the block SURFACE of MCNP
     '''

@@ -17,7 +17,7 @@ setup(name=name,
       author_email=author_email,
       url=r'https://github.com/arekfu/t4-geom-convert/',
       packages=find_packages(exclude=['doc', 'tests', 'tests.*', 'Oracle']),
-      python_requires='>=3.4',
+      python_requires='>=3.5',
       setup_requires=['pytest-runner', 'setuptools-scm'],
       install_requires=['TatSu==4.3.0', 'numpy', 'scipy'],
       tests_require=test_deps,
@@ -32,7 +32,7 @@ setup(name=name,
       use_scm_version=True,
       entry_points={
           'console_scripts': [
-              't4_geom_convert = t4_geom_convert.CLI.Converter_CLI:main'
+              't4_geom_convert = t4_geom_convert.main:main'
               ]
           }
       )

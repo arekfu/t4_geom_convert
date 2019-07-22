@@ -25,7 +25,7 @@ class CDictVolumeT4(object):
     def __setitem__(self, key, value):
         self.volumeT4[key] = value
 
-    def __setkey__(self, key_old, key_new):
+    def set_key(self, key_old, key_new):
         self.volumeT4[key_old].id = key_new
 
     def __delitem__(self, key):

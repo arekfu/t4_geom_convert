@@ -13,18 +13,17 @@ from MIP.geom.forcad import mcnp2cad
 from MIP.geom.main import extract_surfaces_list
 
 from .CDictVolumeT4 import CDictVolumeT4
-from .CDictCellMCNP import CDictCellMCNP
 from .TreeFunctions import isLeaf, isIntersection, isUnion
 from .CVolumeT4 import CVolumeT4
 from .CUniverseDict import CUniverseDict
 from ..Configuration.CConfigParameters import CConfigParameters
-from ..Transformation.CTransformationFonction import CTransformationFonction
-from ..Transformation.CConversionSurfaceTransformed import CConversionSurfaceTransformed
+from ..Transformation.Transformation import transformation
+from ..Transformation.ConversionSurfaceTransformed import conversionSurfaceParams
 from ..Surface.CSurfaceT4 import CSurfaceT4
 from ..Surface.ESurfaceTypeMCNP import mcnp_to_mip
 from math import fabs, sqrt
 
-class CCellConversion(object):
+class CCellConversion:
     '''
     :brief: Class which contains methods to convert the Cell of MCNP in T4 Volume
     '''
@@ -42,7 +41,6 @@ class CCellConversion(object):
         self.dictSurfaceT4 = d_dictSurfaceT4
         self.dicSurfaceMCNP = d_dicSurfaceMCNP
         self.dicCellMCNP = d_dicCellMCNP
-        self.inputMCNP = CConfigParameters().readNameMCNPInputFile()
 
     def conversionEQUA(self, list_surface, fictive):
         '''
@@ -159,8 +157,10 @@ class CCellConversion(object):
             p_typeSurface = surfaceObject.typeSurface
             l_paramSurface = surfaceObject.paramSurface
             idorigin = surfaceObject.idorigin + ['via tr']
-            surfaceObject = CTransformationFonction().transformation(p_boundCond, p_transf, p_typeSurface, l_paramSurface, idorigin)
-            surf_coll = CConversionSurfaceTransformed().conversion(surfaceObject)
+            surfaceObject = transformation(p_boundCond, p_transf,
+                                           p_typeSurface, l_paramSurface,
+                                           idorigin)
+            surf_coll = conversionSurfaceParams(surfaceObject)
             idorigin = surfaceObject.idorigin.copy()
 
             fixed_surfs = surf_coll.fixed
@@ -304,7 +304,6 @@ class CCellConversion(object):
             surf = listSurface.pop(0)
             param = self.dicSurfaceMCNP[abs(surf)].paramSurface
             typeSurface = self.dicSurfaceMCNP[abs(surf)].typeSurface
-            print('PARAM',surf, cellId, typeSurface, param)
             if isinstance(typeSurface, str):
                 f = (param[0], param[1])
             else:
@@ -329,9 +328,13 @@ class CCellConversion(object):
             listSurface.pop(i)
         return(listeCouple)
 
-    def postOrderLattice(self, key, mcnp_new_dict):
+    def postOrderLattice(self, key, lattice_params, mcnp_new_dict):
         if mcnp_new_dict[key].lattice:
-            domaine = CConfigParameters().readDomainForLattice(key)
+            try:
+                domaine = lattice_params[key]
+            except KeyError:
+                raise ValueError('no --lattice option provided for lattice '
+                                 'cell {}'.format(key)) from None
             mcnp_element_geom = mcnp_new_dict[key].geometry
             list_info_surface = self.listSurfaceForLat(key)
             if len(list_info_surface) != len(domaine):
