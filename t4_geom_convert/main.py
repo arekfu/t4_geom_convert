@@ -168,10 +168,10 @@ def parse_args(argv):
                            'association')
     g_general.add_argument('--skip-boundary-conditions', action='store_true',
                            help='skip conversion of the boundary conditions')
-    g_general.add_argument('--skip-surface-cache', action='store_true',
-                           help='do not read the surface cache')
-    g_general.add_argument('--skip-cell-cache', action='store_true',
-                           help='do not read the cell cache')
+    g_general.add_argument('--cache', action='store_true',
+                           help='read/write surfaces, cells etc. from a disk '
+                           'cache (avoids parsing, mostly for debug)',
+                           default=False)
 
     # lattice args
     g_lattice = parser.add_argument_group('arguments for the conversion of '

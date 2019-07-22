@@ -22,12 +22,12 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
     input_file = Path(args.input)
     t4_vol_cache_path = input_file.with_suffix('.volumes.cache')
     t4_surf_cache_path = input_file.with_suffix('.surfaces.cache')
-    if args.skip_cell_cache:
+    if args.cache:
         mcnp_cell_cache_path = input_file.with_suffix('.mcnp.cache')
     else:
         mcnp_cell_cache_path = None
 
-    if args.skip_surface_cache:
+    if not args.cache:
         dic_surfaceT4, dic_surfaceMCNP = constructSurfaceT4(mcnpParser)
     else:
         try:
@@ -44,7 +44,7 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 pickle.dump((dic_surfaceT4, dic_surfaceMCNP), dicfile)
                 print(' done', flush=True)
 
-    if args.skip_cell_cache:
+    if not args.cache:
         dic_volume, surf_used, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP)
     else:
         try:
