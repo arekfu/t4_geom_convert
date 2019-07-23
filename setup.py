@@ -12,14 +12,29 @@ pkg_copyright = u'2019, ' + author
 test_deps = ['pytest', 'pytest-cov', 'pytest-xdist', 'pytest-timeout']
 dev_deps = test_deps  + ['flake8', 'pylint', 'sphinx', 'sphinx_rtd_theme']
 
+with open('README.md') as readme:
+    long_description = readme.read()
+
 setup(name=name,
       author=author,
       author_email=author_email,
       url=r'https://github.com/arekfu/t4-geom-convert/',
+      description='A tool to convert MCNP geometries into the TRIPOLI-4® '
+      'format',
+      long_description=long_description,
+      long_description_content_type='text/markdown',
       packages=find_packages(exclude=['doc', 'tests', 'tests.*', 'Oracle']),
-      python_requires='>=3.5',
+      python_requires='>=3.5, <4',
       setup_requires=['pytest-runner', 'setuptools-scm'],
-      install_requires=['TatSu==4.3.0', 'numpy', 'scipy'],
+      classifiers=[
+          "Programming Language :: Python :: 3",
+          "Development Status :: 3 - Alpha",
+          "Environment :: Console",
+          "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+          "Operating System :: POSIX :: Linux",
+          "Topic :: Scientific/Engineering :: Physics",
+          ],
+      install_requires=['TatSu==4.3.0', 'numpy'],
       tests_require=test_deps,
       extras_require={'dev': dev_deps},
       command_options={
