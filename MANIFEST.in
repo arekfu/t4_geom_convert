@@ -1,1 +1,3 @@
 include MIP/geom/grammars/geom.ebnf
+prune Oracle
+prune t4_geom_convert/UnitTests
