@@ -18,7 +18,7 @@ with open('README.md') as readme:
 setup(name=name,
       author=author,
       author_email=author_email,
-      url=r'https://github.com/arekfu/t4-geom-convert/',
+      url=r'https://github.com/arekfu/t4_geom_convert/',
       description='A tool to convert MCNP geometries into the TRIPOLI-4® '
       'format',
       long_description=long_description,

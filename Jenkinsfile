@@ -27,7 +27,7 @@ pipeline {
   agent { label 'T4' }
 
   environment {
-    projectName = 't4-geom-convert'
+    projectName = 't4_geom_convert'
     SRC = "${env.WORKSPACE}/src"
     VENV = "${env.WORKSPACE}/venv"
     ORACLE_BUILD = "${env.WORKSPACE}/oracle-build"
