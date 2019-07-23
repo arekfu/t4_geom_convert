@@ -20,3 +20,6 @@ tmp_GEO*
 .eggs
 __pycache__
 *.egg-info
+build
+dist
+TODO

@@ -182,9 +182,15 @@ A couple of limitations are due to MIP/TatSu:
 
 - [ ] MIP does not support TatSu>4.3.0 (something breaks, but I'm not sure what
       exactly yet)
-- [ ] Input files cannot contain unusual (!) characters such as `&`; you need
-      to remove these characters from your input file before attempting the
-      conversion
+- [ ] Input files cannot contain unusual or non-ASCII characters such as `&` or
+      `é`; you need to remove these characters from your input file before
+      attempting the conversion
+- [ ] Spaces are not permitted in a cell definition between a complement
+      operator `#` and its argument:
+      - good: `#42`
+      - good: `#(123 -124)`
+      - bad: `# 42`
+      - bad: `# (123 -124)`
 
 Your help is welcome! Feel free to open an issue if you would like to implement
 a new feature or contribute to the project in any way.
