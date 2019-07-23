@@ -5,7 +5,7 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 :file : CTransformationQuad.py
 '''
-from numpy.random.mtrand import np
+import numpy as np
 
 class CTransformationQuad(object):
     '''
