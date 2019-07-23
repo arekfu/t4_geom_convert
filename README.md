@@ -1,7 +1,7 @@
 t4_geom_convert
 ===============
 
-[![PyPI version](https://badge.fury.io/py/t4_geom_convert.svg)](https://badge.fury.io/py/t4_geom_convert)
+[![PyPI version](https://badge.fury.io/py/t4-geom-convert.svg)](https://badge.fury.io/py/t4-geom-convert)
 
 This repository contains the development version of `t4_geom_convert`, a Python
 tool to convert [MCNP] geometries into the [TRIPOLI-4®] format.
