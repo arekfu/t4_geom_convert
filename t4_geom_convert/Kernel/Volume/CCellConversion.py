@@ -16,7 +16,6 @@ from .CDictVolumeT4 import CDictVolumeT4
 from .TreeFunctions import isLeaf, isIntersection, isUnion
 from .CVolumeT4 import CVolumeT4
 from .CUniverseDict import CUniverseDict
-from ..Configuration.CConfigParameters import CConfigParameters
 from ..Transformation.Transformation import transformation
 from ..Transformation.ConversionSurfaceTransformed import conversionSurfaceParams
 from ..Surface.CSurfaceT4 import CSurfaceT4
