@@ -30,24 +30,24 @@ If you want to install the latest stable version, just type the following
 command in a terminal:
 
 ```
-$ pip install t4_geom_convert
+$ pip3 install t4_geom_convert
 ```
 
 You can also install the latest development version with
 
 ```
-$ pip install git+https://github.com/arekfu/t4_geom_convert.git@next
+$ pip3 install git+https://github.com/arekfu/t4_geom_convert.git@next
 ```
 
-You might want to pass the `--user` option to `pip` for a local install. Even
+You might want to pass the `--user` option to `pip3` for a local install. Even
 better, you can create a virtual environment and install `t4_geom_convert`
 there with
 
 ```
 $ python3 -m venv /path/to/some/folder
 $ source /path/to/some/folder/bin/activate
-$ pip install -U pip setuptools
-$ pip install t4_geom_convert
+$ pip3 install -U pip setuptools
+$ pip3 install t4_geom_convert
 ```
 
 ### Dependencies
