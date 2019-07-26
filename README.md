@@ -173,8 +173,8 @@ may be able to do in the future (in roughly decreasing order of likelihood):
       (mostly lattices)
 - [ ] Recognize and automatically suppress empty cells (they may be generated
       by lattice development or fill development)
-      - Use a linear programming solver for cells bounded by planes?
-      - Use a SAT solver in the general case?
+  - Use a linear programming solver for cells bounded by planes?
+  - Use a SAT solver in the general case?
 - [ ] Convert (some) MCNP source definitions
 - [ ] Convert (some) MCNP tally definitions
 
@@ -187,10 +187,10 @@ A couple of limitations are due to MIP/TatSu:
       attempting the conversion
 - [ ] Spaces are not permitted in a cell definition between a complement
       operator `#` and its argument:
-      - good: `#42`
-      - good: `#(123 -124)`
-      - bad: `# 42`
-      - bad: `# (123 -124)`
+  - good: `#42`
+  - good: `#(123 -124)`
+  - bad: `# 42`
+  - bad: `# (123 -124)`
 
 Your help is welcome! Feel free to open an issue if you would like to implement
 a new feature or contribute to the project in any way.
