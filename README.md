@@ -151,6 +151,7 @@ Here is a list of some things that `t4_geom_convert` cannot currently do, but
 may be able to do in the future (in roughly decreasing order of likelihood):
 
 - [ ] Convert SQ surfaces
+- [ ] Import the title of the MCNP input file
 - [ ] Handle affine transformations with `m=-1` (the last parameter of the
       affine transformation)
 - [ ] Optimize fills with negative universes (do not intersect with the
@@ -161,6 +162,7 @@ may be able to do in the future (in roughly decreasing order of likelihood):
 - [ ] Convert MCNP macrobodies
 - [ ] Convert cell temperatures
 - [ ] Convert hexagonal lattices
+- [ ] Import comments describing the MCNP cells/surfaces
 - [ ] Provide a way to specify lattice fill ranges per enclosing cell(s) (this
       needs to be specified in such a way that it works with nested lattices,
       too)
