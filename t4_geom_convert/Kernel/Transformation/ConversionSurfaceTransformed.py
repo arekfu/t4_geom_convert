@@ -59,7 +59,7 @@ def conversionSurfaceParams(val):
         type_surface = ESurfaceTypeT4Eng.CONE
         nappe = tuple_param[2][2]
         cone = CSurfaceT4(type_surface, param)
-        if nappe is None:
+        if nappe is None or nappe == 0:
             return CSurfaceCollection(cone)
         D = -(ux*x + uy*y + uz*z)
         paramPlane = [ux,uy,uz,D]

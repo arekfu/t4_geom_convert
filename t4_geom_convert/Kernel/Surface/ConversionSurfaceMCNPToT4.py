@@ -59,6 +59,9 @@ def _surfaceParametresConversion(key, p_surfaceMCNP):
             return CSurfaceCollection(coneT4)
         if len(listeParametreMCNP) == 3:
             side = int(listeParametreMCNP[-1])
+            if side == 0:
+                return CSurfaceCollection(coneT4)
+            side = 1 if side > 0 else -1
             plane_idorigin = idorigin + ['aux plane for nappe {}'.format(side)]
             planeT4 = CSurfaceT4(T4S.PLANEX, [listeParametreMCNP[0]],
                                     idorigin=plane_idorigin)
@@ -75,6 +78,9 @@ def _surfaceParametresConversion(key, p_surfaceMCNP):
             return CSurfaceCollection(coneT4)
         if len(listeParametreMCNP) == 3:
             side = int(listeParametreMCNP[-1])
+            if side == 0:
+                return CSurfaceCollection(coneT4)
+            side = 1 if side > 0 else -1
             plane_idorigin = idorigin + ['aux plane for nappe {}'.format(side)]
             planeT4 = CSurfaceT4(T4S.PLANEY, [listeParametreMCNP[0]],
                                     idorigin=plane_idorigin)
@@ -91,6 +97,9 @@ def _surfaceParametresConversion(key, p_surfaceMCNP):
             return CSurfaceCollection(coneT4)
         if len(listeParametreMCNP) == 3:
             side = int(listeParametreMCNP[-1])
+            if side == 0:
+                return CSurfaceCollection(coneT4)
+            side = 1 if side > 0 else -1
             plane_idorigin = idorigin + ['aux plane for nappe {}'.format(side)]
             planeT4 = CSurfaceT4(T4S.PLANEZ, [listeParametreMCNP[0]],
                                     idorigin=plane_idorigin)
@@ -109,6 +118,9 @@ def _surfaceParametresConversion(key, p_surfaceMCNP):
             return CSurfaceCollection(coneT4)
         if len(listeParametreMCNP) == 5:
             side = int(listeParametreMCNP[-1])
+            if side == 0:
+                return CSurfaceCollection(coneT4)
+            side = 1 if side > 0 else -1
             plane_idorigin = idorigin + ['aux plane for nappe {}'.format(side)]
             if typeSurfaceMCNP == MCNPS.K_X:
                 planeT4 = CSurfaceT4(T4S.PLANEX,
