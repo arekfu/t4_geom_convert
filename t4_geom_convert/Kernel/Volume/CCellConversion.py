@@ -20,6 +20,7 @@ from ..Transformation.Transformation import transformation
 from ..Transformation.ConversionSurfaceTransformed import conversionSurfaceParams
 from ..Surface.CSurfaceT4 import CSurfaceT4
 from ..Surface.ESurfaceTypeMCNP import mcnp_to_mip
+from ..VectUtils import vsum, rescale, scal, vect
 from math import fabs, sqrt
 
 class CCellConversion:
@@ -391,28 +392,3 @@ class CCellConversion:
             transl = vsum(cur_transl, delta)
             result.extend(self.latticeSpan(domaine[1:], surfs[1:], transl))
         return result
-
-
-def scal(v1, v2):
-    a1, b1, c1 = v1
-    a2, b2, c2 = v2
-    result = a1*a2 + b1*b2 + c1*c2
-    return float(result)
-
-def vect(v1,v2):
-    x1, y1, z1 = v1
-    x2, y2, z2 = v2
-    result = (y1*z2-z1*y2,x2*z1-x1*z2,x1*y2-y1*x2)
-    return result
-
-def mixed(v1,v2,v3):
-    return scal(v1, vect(v2, v3))
-
-def rescale(a,v1):
-    x1, y1, z1 = v1
-    return (a*x1, a*y1, a*z1)
-
-def vsum(v1,v2):
-    x1, y1, z1 = v1
-    x2, y2, z2 = v2
-    return (x1+x2, y1+y2, z1+z2)

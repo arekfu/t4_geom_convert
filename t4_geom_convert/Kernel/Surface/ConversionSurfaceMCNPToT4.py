@@ -10,6 +10,7 @@ from .ESurfaceTypeMCNP import ESurfaceTypeMCNP as MCNPS
 from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 from .CSurfaceT4 import CSurfaceT4
 from .CSurfaceCollection import CSurfaceCollection
+from ..VectUtils import vdiff, vect, scal, rescale
 from math import atan, pi, sqrt, fabs
 from collections import OrderedDict
 
@@ -278,6 +279,11 @@ def _surfaceParametresConversion(key, p_surfaceMCNP):
     elif typeSurfaceMCNP == MCNPS.P and len(listeParametreMCNP) == 4:
         listeParametreT4 = [listeParametreMCNP[0], listeParametreMCNP[1],
                             listeParametreMCNP[2], -listeParametreMCNP[3]]
+    elif typeSurfaceMCNP == MCNPS.P and len(listeParametreMCNP) == 9:
+        point1 = listeParametreMCNP[0:3]
+        point2 = listeParametreMCNP[3:6]
+        point3 = listeParametreMCNP[6:9]
+        listeParametreT4 = planeParamsFromPoints(point1, point2, point3)
     elif typeSurfaceMCNP == MCNPS.S and len(listeParametreMCNP) == 4:
         listeParametreT4 = listeParametreMCNP
     elif (typeSurfaceMCNP in (MCNPS.C_X, MCNPS.C_Y, MCNPS.C_Z)
@@ -302,3 +308,26 @@ def _surfaceParametresConversion(key, p_surfaceMCNP):
 
     surf = CSurfaceT4(typeSurfaceT4, listeParametreT4, idorigin=idorigin)
     return CSurfaceCollection(surf)
+
+
+def planeParamsFromPoints(pt1, pt2, pt3):
+    '''Compute the parameters `(a ,b, c, d)` of the plane passing through the
+    three given points `pt1`, `pt2`, `pt3`.
+
+    The equation of the plane is written in the TRIPOLI-4 form as
+
+    .. math::
+
+        a x + b y + c z + d = 0
+    '''
+    d12 = vdiff(pt1, pt2)
+    d13 = vdiff(pt1, pt3)
+    normal = vect(d12, d13)
+    normal_len2 = scal(normal, normal)
+    if normal_len2 <= 1e-10:
+        raise ValueError('Cannot convert plane from three points because the '
+                         'points are collinear or almost so: {}, {}, {}'
+                         .format(pt1, pt2, pt3))
+    unit_normal = rescale(1./sqrt(normal_len2), normal)
+    pos = -scal(unit_normal, pt1)
+    return [unit_normal[0], unit_normal[1], unit_normal[2], pos]
