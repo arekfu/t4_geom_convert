@@ -136,19 +136,14 @@ def _cone(x, y, z, tana, A, B, C, log=False):
     return 'k', frm, srf, p
 
 
-def _torus(x, y, z, A, B, C, r1, r2):
+def _torus(x, y, z, A, B, C, r1, r2, r3):
     """
     x, y, z -- coordinates of the center
     A, B, C -- normal vector to the major radius
     r1, r2  -- major and minor radii
     """
-    x = x
-    y = y
-    z = z
-    r1 = r1
-    r2 = r2
     frm = ((x, y, z), (A, B, C))
-    srf = (r1, r2)
+    srf = (r1, r2, r3)
 
     # Point inside
     n1, n2, n3 = _normal(A, B, C)
@@ -367,35 +362,37 @@ def k_z(p):
     return _cone(p[0], p[1], p[2], p[3]**0.5, 0, 0, 1)
 
 
-def _check_torus(p):
-    x, y, z, r1, r2, r3 = p
-    if r2 != r3:
-        raise NotImplementedError('Cannot convert torus with B != C')
-    return x, y, z, r1, r2
-
-
 def tx(p):
     """"
     Torus defined by `tx` surface.
     """
-    x, y, z, r1, r2 = _check_torus(p)
-    return _torus(x, y, z, 1, 0, 0, r1, r2)
+    if len(p) == 5:
+        x, y, z, r1, r2 = p
+        return _torus(x, y, z, 1, 0, 0, r1, r2, r2)
+    x, y, z, r1, r2, r3 = p
+    return _torus(x, y, z, 1, 0, 0, r1, r2, r3)
 
 
 def ty(p):
     """"
     Torus defined by `ty` surface.
     """
-    x, y, z, r1, r2 = _check_torus(p)
-    return _torus(x, y, z, 0, 1, 0, r1, r2)
+    if len(p) == 5:
+        x, y, z, r1, r2 = p
+        return _torus(x, y, z, 0, 1, 0, r1, r2, r2)
+    x, y, z, r1, r2, r3 = p
+    return _torus(x, y, z, 0, 1, 0, r1, r2, r3)
 
 
 def tz(p):
     """"
     Torus defined by `tz` surface.
     """
-    x, y, z, r1, r2 = _check_torus(p)
-    return _torus(x, y, z, 0, 0, 1, r1, r2)
+    if len(p) == 5:
+        x, y, z, r1, r2 = p
+        return _torus(x, y, z, 0, 0, 1, r1, r2, r2)
+    x, y, z, r1, r2, r3 = p
+    return _torus(x, y, z, 0, 0, 1, r1, r2, r3)
 
 
 def xx(p):
