@@ -9,6 +9,7 @@ import re
 from MIP.geom.cells import get_cells
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.composition import get_materialImportance
+from MIP.geom.transforms import get_transforms
 from ...Volume.CCellMCNP import CCellMCNP
 import pickle
 from collections import OrderedDict
@@ -84,6 +85,7 @@ class CParseMCNPCell:
         lencell = len(listeCellParser)
         fmt_string = '\rparsing MCNP cell {{:{}d}}/{}'.format(len(str(lencell)),
                                                               lencell)
+        transforms = get_transforms(self.mcnpParser)
         for i, (k, v) in enumerate(listeCellParser):
             print(fmt_string.format(i+1), end='', flush=True)
             fillid = None
@@ -104,6 +106,13 @@ class CParseMCNPCell:
                     fillid = int(float(elt.split('=')[1]))
                     while option_liste and '=' not in option_liste[0]:
                         listeparamfill.append(float(option_liste.pop(0)))
+                    # now handle the case where the number of the
+                    # transformation was given instead of the transformation
+                    # parameters
+                    if len(listeparamfill) == 1:
+                        trid = int(listeparamfill[0])
+                        listeparamfill = transforms[trid]
+                        costr = False  # cosine already calculated by MIP
                 if 'u=' in elt:
                     universe = int(float(elt.split('=')[1]))
                 if 'lat=' in elt:
