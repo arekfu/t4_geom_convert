@@ -7,7 +7,8 @@ import re
 """
 
 re_comment = re.compile('^\s{0,4}[cC](\s|$)')
-re_continuation = re.compile('^\s{5,}')
+re_continuation_spaces = re.compile('^\s{5,}')
+re_continuation_prev = re.compile('[^$]*&$')
 
 
 # Function used at two places below
@@ -87,8 +88,8 @@ def is_continuation(l, prev=None):
     """
     # If l has 5 or more leading spaces, it is a continuation independently
     # on prev
-    if re_continuation.match(l):
+    if re_continuation_spaces.match(l):
         return True
-    elif prev and '&' in prev:
+    elif prev and re_continuation_prev.match(prev):
         return True
     return False
