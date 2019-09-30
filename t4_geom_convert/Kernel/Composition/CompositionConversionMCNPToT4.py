@@ -9,6 +9,7 @@ from collections import OrderedDict
 from .CDictCompositionMCNP import CDictCompositionMCNP
 from .CIsotopeConversion import CIsotopeConversion
 from .EIsotopeNameElementT4 import EIsotopeNameElement
+from .Abundances import Abundances
 
 
 def compositionConversionMCNPToT4(mcnp_parser):
@@ -17,12 +18,20 @@ def compositionConversionMCNPToT4(mcnp_parser):
     and return a dictionary of the composition for T4
     '''
     d_composition_t4 = OrderedDict()
-    l_composition_t4 = []
     dict_compo_mcnp = CDictCompositionMCNP(mcnp_parser).d_compositionMCNP
     for key, val in dict_compo_mcnp.items():
+        atom_fracs = None
         l_composition_t4 = []
-        for element in val.ordDict():
-            isotope_id, fraction = element
+        for isotope_id, fraction in val.ordDict():
+            positive_fraction = not fraction.lstrip().startswith('-')
+            if atom_fracs is None:
+                atom_fracs = positive_fraction
+            elif positive_fraction != atom_fracs:
+                raise ValueError('All isotope abundances in a material must '
+                                 'have the same sign (atomic or weight '
+                                 'fractions) in M{}'
+                                 .format(key))
+
             atomic_number, mass_number = (CIsotopeConversion(isotope_id)
                                           .conversionIsotope())
             atomic_number_t4 = EIsotopeNameElement(atomic_number.value)
@@ -32,8 +41,7 @@ def compositionConversionMCNPToT4(mcnp_parser):
                 mass_number_t4 = mass_number
             isotope_t4 = atomic_number_t4, mass_number_t4
             l_composition_t4.append((isotope_t4, str_fabs(fraction)))
-        value_t4 = l_composition_t4
-        d_composition_t4[key] = value_t4
+        d_composition_t4[key] = Abundances(l_composition_t4, atom_fracs)
     return d_composition_t4
 
 

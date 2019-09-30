@@ -14,7 +14,7 @@ class CCompositionT4(object):
 
 
     def __init__(self, p_typeDensity, p_material, p_valueOfDensity,
-                 l_listMaterialComposition):
+                 l_listMaterialComposition, nb_atom):
         '''
         Constructor
         '''
@@ -22,3 +22,4 @@ class CCompositionT4(object):
         self.material = p_material
         self.valueOfDensity = p_valueOfDensity
         self.listMaterialComposition = l_listMaterialComposition
+        self.nb_atom = nb_atom
