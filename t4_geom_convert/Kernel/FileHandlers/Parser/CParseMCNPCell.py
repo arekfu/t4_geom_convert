@@ -130,10 +130,3 @@ class CParseMCNPCell:
                 dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance, universe, fillid, listeparamfill, costr, lattice)
         print('... done', flush=True)
         return dictCell
-
-    def isfloat(self, value):
-        try:
-            float(value)
-            return True
-        except:
-            return False
