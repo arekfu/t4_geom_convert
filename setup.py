@@ -9,7 +9,8 @@ author = u'Davide Mancusi, Martin Maurey'
 author_email = u'davide.mancusi@cea.fr'
 pkg_copyright = u'2019, ' + author
 
-test_deps = ['pytest', 'pytest-cov', 'pytest-xdist', 'pytest-timeout']
+test_deps = ['pytest', 'pytest-cov', 'pytest-xdist', 'pytest-timeout',
+             'hypothesis']
 dev_deps = test_deps  + ['flake8', 'pylint', 'sphinx', 'sphinx_rtd_theme']
 
 with open('README.md') as readme:

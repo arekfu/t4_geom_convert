@@ -5,9 +5,9 @@ Created on 6 févr. 2019
 :author: Sogeti
 :data : 06 february 2019
 '''
-from math import fabs
 
 from ...Composition.ConstructCompositionT4 import constructCompositionT4
+from ...Composition.CompositionConversionMCNPToT4 import str_fabs
 
 
 def writeT4Composition(mcnpParser, mcnp_new_dict, ofile):
@@ -27,26 +27,23 @@ def writeT4Composition(mcnpParser, mcnp_new_dict, ofile):
                   .format(len(str(n_mcnp_compos)), n_mcnp_compos))
     for j, mat in enumerate(dic_composition.values()):
         print(fmt_string.format(j+1), end='', flush=True)
-        s_paramMaterialComposition = ''
         l_typeDensity = mat.typeDensity
         l_densityValue = mat.valueOfDensity
         list_isotope = mat.listMaterialComposition
         p_numberOfIsotope = len(list_isotope)
-        for element in list_isotope:
-            nameIsotope, abondanceIsotope = element
-            s_paramMaterialComposition = (s_paramMaterialComposition +
-                    str(nameIsotope) + ' ' + str(abondanceIsotope) + ' ')
+        isotopes_str = '\n  '.join(name + ' ' + abundance
+                                   for name, abundance in list_isotope)
         for typ, density in zip(l_typeDensity, l_densityValue):
             p_materialName = mat.material + '_' + density
             if typ == 'POINT_WISE':
-                ofile.write("%s %s %s %s %s\n" %
-                            (typ, temperature, p_materialName,
-                             p_numberOfIsotope, s_paramMaterialComposition))
+                ofile.write("{} {:d} {} {:d} {}\n"
+                            .format(typ, temperature, p_materialName,
+                                    p_numberOfIsotope, isotopes_str))
             else:
-                ofile.write("%s %s %s %s %s %s\n" %
-                            (typ, temperature,
-                             p_materialName,fabs(float(density)),
-                             p_numberOfIsotope, s_paramMaterialComposition))
+                ofile.write("{} {:d} {} {} {:d} {}\n"
+                            .format(typ, temperature,
+                                    p_materialName, str_fabs(density),
+                                    p_numberOfIsotope, isotopes_str))
     ofile.write("POINT_WISE 300 m0 1 HE4 1E-30\n")
     print('... done', flush=True)
 
