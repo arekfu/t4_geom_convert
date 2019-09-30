@@ -6,36 +6,36 @@
 
 from collections import OrderedDict
 
-from .CDictCompositionT4 import CDictCompositionT4
 from .CDictCompositionMCNP import CDictCompositionMCNP
 from .CIsotopeConversion import CIsotopeConversion
 from .EIsotopeNameElementT4 import EIsotopeNameElement
 
 
-def compositionConversionMCNPToT4(mcnpParser):
+def compositionConversionMCNPToT4(mcnp_parser):
     '''
     :brief: method recuperate the dictionary of the composition from MCNP
     and return a dictionary of the composition for T4
     '''
-    d_CompositionT4 = OrderedDict()
-    obj_T4 = CDictCompositionT4(d_CompositionT4)
-    l_compositionT4 = []
-    for key, val in CDictCompositionMCNP(mcnpParser).d_compositionMCNP.items():
-        l_compositionT4 = []
-        listMaterialsSurface = val.ordDict()
-        for element in listMaterialsSurface:
-            isotopeId, fraction = element
-            atomicNumber, massNumber = CIsotopeConversion(isotopeId).conversionIsotope()
-            atomicNumberT4 = EIsotopeNameElement(atomicNumber.value)
-            if massNumber == '0':
-                massNumberT4 = '-NAT'
+    d_composition_t4 = OrderedDict()
+    l_composition_t4 = []
+    dict_compo_mcnp = CDictCompositionMCNP(mcnp_parser).d_compositionMCNP
+    for key, val in dict_compo_mcnp.items():
+        l_composition_t4 = []
+        for element in val.ordDict():
+            isotope_id, fraction = element
+            atomic_number, mass_number = (CIsotopeConversion(isotope_id)
+                                          .conversionIsotope())
+            atomic_number_t4 = EIsotopeNameElement(atomic_number.value)
+            if mass_number == '0':
+                mass_number_t4 = '-NAT'
             else:
-                massNumberT4 = massNumber
-            isotopeT4 = atomicNumberT4, massNumberT4
-            l_compositionT4.append((isotopeT4, str_fabs(fraction)))
-        valueT4 = l_compositionT4
-        obj_T4[key] = valueT4
-    return d_CompositionT4
+                mass_number_t4 = mass_number
+            isotope_t4 = atomic_number_t4, mass_number_t4
+            l_composition_t4.append((isotope_t4, str_fabs(fraction)))
+        value_t4 = l_composition_t4
+        d_composition_t4[key] = value_t4
+    return d_composition_t4
+
 
 def str_fabs(number_str):
     '''Remove the leading minus sign (if any) from a string representing a
