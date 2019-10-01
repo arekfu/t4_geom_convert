@@ -150,19 +150,19 @@ Current limitations
 Here is a list of some things that `t4_geom_convert` cannot currently do, but
 may be able to do in the future (in roughly decreasing order of likelihood):
 
-- [ ] Convert SQ surfaces
-- [ ] Import the title of the MCNP input file
+- [ ] Convert SQ surfaces (tracked in issue #11)
+- [ ] Import the title of the MCNP input file (tracked in issue #5)
 - [ ] Handle affine transformations with `m=-1` (the last parameter of the
-      affine transformation)
+      affine transformation) (tracked in issue #12)
 - [ ] Optimize fills with negative universes (do not intersect with the
-      enclosing cell)
+      enclosing cell) (tracked in issue #13)
 - [ ] Warn about isotopes that are missing from the TRIPOLI-4 dictionary
       (currently you need to edit the converted file by hand and remove the
       occurrences of the missing isotopes)
 - [ ] Convert MCNP macrobodies
 - [ ] Convert cell temperatures
 - [ ] Convert hexagonal lattices
-- [ ] Import comments describing the MCNP cells/surfaces
+- [ ] Import comments describing the MCNP cells/surfaces (tracked in issue #9)
 - [ ] Provide a way to specify lattice fill ranges per enclosing cell(s) (this
       needs to be specified in such a way that it works with nested lattices,
       too)
@@ -184,18 +184,24 @@ A couple of limitations are due to MIP/TatSu:
 
 - [ ] MIP does not support TatSu>4.3.0 (something breaks, but I'm not sure what
       exactly yet)
-- [ ] Input files cannot contain unusual or non-ASCII characters such as `&` or
-      `é`; you need to remove these characters from your input file before
-      attempting the conversion
-- [ ] Spaces are not permitted in a cell definition between a complement
-      operator `#` and its argument:
-  - good: `#42`
-  - good: `#(123 -124)`
-  - bad: `# 42`
-  - bad: `# (123 -124)`
+- [X] ~~Input files cannot contain unusual or non-ASCII characters such as `&`
+      or `é`; you need to remove these characters from your input file before
+      attempting the conversion~~
+
+  **Fixed upstream**
+- [X] ~~Spaces are not permitted in a cell definition between a complement
+      operator `#` and its argument:~~
+  - ~~good: `#42`~~
+  - ~~good: `#(123 -124)`~~
+  - ~~bad: `# 42`~~
+  - ~~bad: `# (123 -124)`~~
+
+  **Fixed in issue #10**
 
 Your help is welcome! Feel free to open an issue if you would like to implement
 a new feature or contribute to the project in any way.
+
+The full changelog is [here](CHANGELOG.md).
 
 
 Reporting bugs
