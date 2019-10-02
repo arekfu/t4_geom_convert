@@ -92,6 +92,9 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
         tup = conv.postOrderTraversalFlag(treeMaster)
         replace = conv.postOrderTraversalReplace(tup)
         opt_tree = conv.postOrderTraversalOptimisation(replace)
+        if opt_tree is None:
+            # the cell is empty, do not emit a converted cell
+            continue
         surf_used |= set(_surfacesUsed(opt_tree))
         j = conv.postOrderTraversalConversion(opt_tree, val.idorigin)
         objT4.volumeT4[j].fictive = ''

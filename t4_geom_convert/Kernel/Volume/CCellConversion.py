@@ -256,6 +256,20 @@ class CCellConversion:
                 new_node.extend(node[2:])
             else:
                 new_node.append(node)
+
+        # we check if the cell is an intersection and contains the same surface
+        # with opposite signs; in that case we do not emit the cell at all,
+        # because it would be empty and because TRIPOLI-4 does not like
+        # surfaces to appear with both signs at the same time
+        if op != '*':
+            return new_node
+        pluses = {surf for surf in new_node[2:]
+                    if isLeaf(surf) and surf > 0}
+        minuses = {-surf for surf in new_node[2:]
+                    if isLeaf(surf) and surf < 0}
+        if pluses & minuses:
+            return None
+
         return new_node
 
     def postOrderTraversalReplace(self, p_tree):
