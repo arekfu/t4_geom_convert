@@ -122,7 +122,7 @@ $ t4_geom_convert --lattice 1,-1:1,-4:4 <mcnp_input>
           i-range upper bound ───┘
 ```
 
-This result in the following TRIPOLI-4 geometry (X-Y cut), where a few cell
+This results in the following TRIPOLI-4 geometry (X-Y cut), where a few cell
 indices have been annotated:
 ![example of converted geometry with lattices][lattice_example]
 
