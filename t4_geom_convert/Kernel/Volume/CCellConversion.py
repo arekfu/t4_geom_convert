@@ -16,7 +16,7 @@ from .TreeFunctions import isLeaf, isIntersection, isUnion
 from .CVolumeT4 import CVolumeT4
 from .Lattice import latticeReciprocal, LatticeSpec, latticeVector
 from ..Transformation.Transformation import transformation
-from ..Transformation.ConversionSurfaceTransformed import conversionSurfaceParams
+from ..Surface.ConversionSurfaceMCNPToT4 import conversionSurfaceParams
 from ..Surface.CSurfaceT4 import CSurfaceT4
 from ..Surface.ESurfaceTypeMCNP import mcnp_to_mip
 from ..VectUtils import rescale, scal
@@ -126,7 +126,8 @@ class CCellConversion:
                 new_cell.idorigin = element_cell.idorigin.copy()
                 new_cell.idorigin.append((element, key))
                 mcnp_new_dict[new_key] = new_cell
-                tree = self.postOrderTraversalTransform(mcnp_element_geom, mcnp_key_filltr)
+                tree = self.postOrderTraversalTransform(mcnp_element_geom,
+                                                        mcnp_key_filltr)
                 mcnp_new_dict[new_key].geometry = ['*', mcnp_key_geom, tree]
                 new_cells.append(new_key)
             return new_cells
@@ -151,18 +152,19 @@ class CCellConversion:
             return p_tree
 
     def postOrderTraversalTransform(self, p_tree, p_transf):
+        if not p_transf:
+            return p_tree
+
         if isLeaf(p_tree):
             surfaceObject = self.dicSurfaceMCNP[abs(p_tree)]
-            if not p_transf:
-                return p_tree
             p_boundCond = surfaceObject.boundaryCond
             p_typeSurface = surfaceObject.typeSurface
-            l_paramSurface = surfaceObject.paramSurface
+            frame = surfaceObject.paramSurface
+            compl_param = surfaceObject.complParam
             idorigin = surfaceObject.idorigin + ['via tr']
-            surfaceObject = transformation(p_boundCond, p_transf,
-                                           p_typeSurface, l_paramSurface,
-                                           idorigin)
-            surf_coll = conversionSurfaceParams(surfaceObject)
+            surfaceObject = transformation(p_transf, p_typeSurface, frame,
+                                           compl_param, p_boundCond, idorigin)
+            surf_coll = conversionSurfaceParams(p_tree, surfaceObject)
             idorigin = surfaceObject.idorigin.copy()
 
             fixed_surfs = surf_coll.fixed
@@ -322,14 +324,9 @@ class CCellConversion:
         while list_surface:
             surf_id_1, surf_id_2 = list_surface[0:2]
             surf_1 = self.dicSurfaceMCNP[abs(surf_id_1)]
-            _t, frame, _s, _p = \
-                mcnp2cad[mcnp_to_mip(surf_1.typeSurface)](surf_1.paramSurface)
-            point = frame[0]
-            normal = frame[1]
+            point, normal = surf_1.paramSurface
             surf_2 = self.dicSurfaceMCNP[abs(surf_id_2)]
-            _t, frame, _s, _p = \
-                mcnp2cad[mcnp_to_mip(surf_2.typeSurface)](surf_2.paramSurface)
-            point2 = frame[0]
+            point2, _normal2 = surf_2.paramSurface
             point_diff = (float(point[0])-float(point2[0]),
                           float(point[1])-float(point2[1]),
                           float(point[2])-float(point2[2]))

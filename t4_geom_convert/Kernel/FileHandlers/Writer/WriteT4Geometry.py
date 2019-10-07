@@ -65,7 +65,10 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
         surf, _ = dic_surfaceT4[key]
         list_paramSurface = surf.paramSurface
         s_paramSurface = ' '.join(str(element) for element in list_paramSurface)
-        s_comment = '' if not surf.idorigin else '// ' + str(surf.idorigin)
+        if surf.idorigin:
+            s_comment = '// ' + '; '.join(map(str, surf.idorigin))
+        else:
+            s_comment = ''
         ofile.write("SURF %s %s %s %s\n" % (key, surf.typeSurface.name,
                                         s_paramSurface, s_comment))
     ofile.write("\n")
@@ -74,7 +77,7 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
         s_params = ' '.join(str(param) for param in val.params)
         s_fictive = val.fictive
         if val.idorigin:
-            s_comment = "// %s" %val.idorigin
+            s_comment = '// ' + '; '.join(map(str, val.idorigin))
         else:
             s_comment = ""
         ofile.write("VOLU %s %s %s ENDV %s\n" % (k, s_params, s_fictive, s_comment))

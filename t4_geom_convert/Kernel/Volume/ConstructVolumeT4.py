@@ -64,13 +64,14 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
     dictUniverse = CUniverseDict(mcnp_new_dict).dictUniverse()
     fill_keys = [key for key, value in mcnp_new_dict.items()
                  if value.fillid is not None]
-    n_fill_keys = len(fill_keys)
-    fmt_string = ('\rdeveloping fill {{:{}d}}/{} (cell {{}})'
-                  .format(len(str(n_fill_keys)), n_fill_keys))
-    for i, key in enumerate(fill_keys):
-        print(fmt_string.format(i+1, key), end='', flush=True)
-        conv.postOrderTraversalFill(key, mcnp_new_dict, dictUniverse)
-    print('... done', flush=True)
+    if fill_keys:
+        n_fill_keys = len(fill_keys)
+        fmt_string = ('\rdeveloping fill {{:{}d}}/{} (cell {{}})'
+                    .format(len(str(n_fill_keys)), n_fill_keys))
+        for i, key in enumerate(fill_keys):
+            print(fmt_string.format(i+1, key), end='', flush=True)
+            conv.postOrderTraversalFill(key, mcnp_new_dict, dictUniverse)
+        print('... done', flush=True)
 
     # update volume and surface free keys
     conv.new_cell_key = max(int(k) for k in mcnp_new_dict) + 1

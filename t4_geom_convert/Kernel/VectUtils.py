@@ -4,6 +4,8 @@
 :date: 2019-09-19
 '''
 
+from math import sqrt
+
 def scal(v1, v2):
     '''Yields the scalar product of `v1` and `v2`.'''
     a1, b1, c1 = v1
@@ -48,3 +50,25 @@ def vdiff(v1, v2):
     x1, y1, z1 = v1
     x2, y2, z2 = v2
     return (x1-x2, y1-y2, z1-z2)
+
+def planeParamsFromPoints(pt1, pt2, pt3):
+    '''Compute the parameters `(a ,b, c, d)` of the plane passing through the
+    three given points `pt1`, `pt2`, `pt3`.
+
+    The equation of the plane is written in the MCNP form as
+
+    .. math::
+
+        a x + b y + c z - d = 0
+    '''
+    d12 = vdiff(pt1, pt2)
+    d13 = vdiff(pt1, pt3)
+    normal = vect(d12, d13)
+    normal_len2 = scal(normal, normal)
+    if normal_len2 <= 1e-10:
+        raise ValueError('Cannot convert plane from three points because the '
+                         'points are collinear or almost so: {}, {}, {}'
+                         .format(pt1, pt2, pt3))
+    unit_normal = rescale(1./sqrt(normal_len2), normal)
+    pos = scal(unit_normal, pt1)
+    return [unit_normal[0], unit_normal[1], unit_normal[2], pos]

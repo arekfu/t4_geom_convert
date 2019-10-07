@@ -8,7 +8,6 @@ Created on 6 févr. 2019
 from .ConversionSurfaceMCNPToT4 import conversionSurfaceMCNPToT4
 from .CSurfaceT4 import CSurfaceT4
 from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
-from ..Transformation.ConversionSurfaceTransformed import conversionSurfaceTransformed
 from collections import OrderedDict
 
 
@@ -19,9 +18,6 @@ def constructSurfaceT4(mcnpParser):
     '''
     dic_newSurfaceT4 = OrderedDict()
     dic_surfaceT4, dic_surfaceMCNP = conversionSurfaceMCNPToT4(mcnpParser)
-    dic_surfaceT4Tr, dic_surfaceMCNPTr = conversionSurfaceTransformed(mcnpParser)
-    dic_surfaceT4.update(dic_surfaceT4Tr)
-    dic_surfaceMCNP.update(dic_surfaceMCNPTr)
     free_id = max(int(k) for k in dic_surfaceT4.keys()) + 1
     keyS = 100000
     n_surfaces = len(dic_surfaceT4)

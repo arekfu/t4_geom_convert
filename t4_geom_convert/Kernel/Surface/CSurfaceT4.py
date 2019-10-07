@@ -22,3 +22,8 @@ class CSurfaceT4:
         self.typeSurface = p_typeSurface
         self.paramSurface = l_paramSurface
         self.idorigin = idorigin.copy() if idorigin is not None else []
+
+    def __repr__(self):
+        return 'CSurfaceT4({!r}, {!r}, {!r})'.format(self.typeSurface,
+                                                     self.paramSurface,
+                                                     self.idorigin)

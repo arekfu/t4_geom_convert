@@ -30,7 +30,7 @@ from math import atan
 mcnp2cad = {}
 
 # Offset to define a point 'below' a surface
-_offset = 1e-2
+_offset = 0
 
 
 def _normal(x, y, z):
@@ -117,7 +117,7 @@ def _cylinder(x, y, z, r, A, B, C):
     return 'c', frm, srf, pin
 
 
-def _cone(x, y, z, tana, A, B, C, log=False):
+def _cone(x, y, z, tana, A, B, C, nappe=None, log=False):
     """
     x, y, z -- cone focus coordinates,
     A, B, C -- cone axis direction, normalized to unit length
@@ -130,7 +130,7 @@ def _cone(x, y, z, tana, A, B, C, log=False):
     z = z
     p = _shift(x, y, z, A, B, C, _offset)
     frm = (p, (A, B, C))
-    srf = (tana*_offset, atan(tana))
+    srf = (tana*_offset, atan(tana), nappe)
     if log:
         print('_cone', frm, srf, p)
     return 'k', frm, srf, p
@@ -154,6 +154,13 @@ def _torus(x, y, z, A, B, C, r1, r2, r3):
     pin = (xi, yi, zi)
 
     return 't', frm, srf, pin
+
+
+def gq(params):
+    frm = None, None
+    srf = params.copy()
+
+    return 'gq', frm, srf, None
 
 
 ################################################################################
@@ -324,42 +331,48 @@ def kz(p):
     """
     Cone defined by `kz` surface.
     """
-    return _cone(0, 0, p[0], p[1]**0.5, 0, 0, 1)
+    nappe = p[-1] if len(p) == 3 else None
+    return _cone(0, 0, p[0], p[1]**0.5, 0, 0, 1, nappe)
 
 
 def ky(p):
     """
     Cone defined by `ky` surface.
     """
-    return _cone(0, p[0], 0, p[1]**0.5, 0, 1, 0)
+    nappe = p[-1] if len(p) == 3 else None
+    return _cone(0, p[0], 0, p[1]**0.5, 0, 1, 0, nappe)
 
 
 def kx(p):
     """
     Cone defined by `kx` surface.
     """
-    return _cone(p[0], 0, 0, p[1]**0.5, 1, 0, 0)
+    nappe = p[-1] if len(p) == 3 else None
+    return _cone(p[0], 0, 0, p[1]**0.5, 1, 0, 0, nappe)
 
 
 def k_x(p):
     """
     Cone defined by `k/x` surface.
     """
-    return _cone(p[0], p[1], p[2], p[3]**0.5, 1, 0, 0)
+    nappe = p[-1] if len(p) == 5 else None
+    return _cone(p[0], p[1], p[2], p[3]**0.5, 1, 0, 0, nappe)
 
 
 def k_y(p):
     """
     Cone defined by `k/y` surface.
     """
-    return _cone(p[0], p[1], p[2], p[3]**0.5, 0, 1, 0)
+    nappe = p[-1] if len(p) == 5 else None
+    return _cone(p[0], p[1], p[2], p[3]**0.5, 0, 1, 0, nappe)
 
 
 def k_z(p):
     """
     Cone defined by `k/z` surface.
     """
-    return _cone(p[0], p[1], p[2], p[3]**0.5, 0, 0, 1)
+    nappe = p[-1] if len(p) == 5 else None
+    return _cone(p[0], p[1], p[2], p[3]**0.5, 0, 0, 1, nappe)
 
 
 def tx(p):
@@ -399,7 +412,7 @@ def xx(p):
     """
     Surface defined by `x` surface.
     """
-    # The meaning depends on lentgth of p and their relative position.
+    # The meaning depends on length of p and their relative position.
     if len(p) == 2:
         # only one pair is given. This is a px plane
         return px(p)
@@ -416,8 +429,36 @@ def xx(p):
             # this is a cone
             tana = (p[1] - p[3]) / (p[0] - p[2])  # half-angle tan
             x0 = p[0] - p[1]/tana
-            print('xx', p, tana)
-            return _cone(x0, 0, 0, abs(tana), 1, 0, 0, log=True)
+            nappe = 1 if x0 < p[0] else -1
+            return _cone(x0, 0, 0, abs(tana), 1, 0, 0, nappe)
+    else:
+        raise NotImplementedError('Not implemented for more than 2 pairs of '
+                                  'axis-symmetric surface')
+
+
+def yy(p):
+    """
+    Surface defined by `y` surface.
+    """
+    # The meaning depends on length of p and their relative position.
+    if len(p) == 2:
+        # only one pair is given. This is a px plane
+        return py(p)
+    elif len(p) == 4:
+        # Two points are given. This can be a px plane, a cx cylinder or a kx
+        # cone.
+        if p[0] == p[2]:
+            # this is a plane
+            return py(p)
+        elif p[1] == p[3]:
+            # this is a cylinder
+            return cy((p[1], ))
+        else:
+            # this is a cone
+            tana = (p[1] - p[3]) / (p[0] - p[2])  # half-angle tan
+            y0 = p[0] - p[1]/tana
+            nappe = 1 if y0 < p[0] else -1
+            return _cone(0, y0, 0, abs(tana), 0, 1, 0, nappe)
     else:
         raise NotImplementedError('Not implemented for more than 2 pairs of '
                                   'axis-symmetric surface')
@@ -427,7 +468,7 @@ def zz(p):
     """
     Surface defined by `z` surface.
     """
-    # The meaning depends on lentgth of p and their relative position.
+    # The meaning depends on length of p and their relative position.
     if len(p) == 2:
         # only one pair is given. This is a px plane
         return pz(p)
@@ -444,8 +485,8 @@ def zz(p):
             # this is a cone
             tana = (p[1] - p[3]) / (p[0] - p[2])  # half-angle tan
             z0 = p[0] - p[1]/tana
-            print('xx', p, tana)
-            return _cone(0, 0, z0, abs(tana), 0, 0, 1, log=True)
+            nappe = 1 if z0 < p[0] else -1
+            return _cone(0, 0, z0, abs(tana), 0, 0, 1, nappe)
     else:
         raise NotImplementedError('Not implemented for more than 2 pairs of '
                                   'axis-symmetric surface')
@@ -477,17 +518,26 @@ mcnp2cad['ty'] = ty
 mcnp2cad['tz'] = tz
 mcnp2cad['x'] = xx
 mcnp2cad['z'] = zz
+mcnp2cad['gq'] = gq
 
 
 def apply_transform(frm, pin, tr):
     """
     Return transformed frame frm and point pin according to transformation tr
     """
+    frmp = transform_frame(frm)
+    pinp = transform_point(pin, tr)
+    return frmp, pinp
+
+
+def transform_frame(frm, tr):
+    """
+    Return transformed frame frm according to transformation tr
+    """
     p, v = frm
     pp = transform_point(p, tr)
     vp = transform_vector(v, tr)
-    pinp = transform_point(pin, tr)
-    return (pp, vp), pinp
+    return pp, vp
 
 
 def translate(surfaces, transform):
