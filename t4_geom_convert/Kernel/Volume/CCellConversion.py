@@ -16,11 +16,12 @@ from .CDictVolumeT4 import CDictVolumeT4
 from .TreeFunctions import isLeaf, isIntersection, isUnion
 from .CVolumeT4 import CVolumeT4
 from .CUniverseDict import CUniverseDict
+from .Lattice import latticeReciprocal, latticeIndices, latticeVectors
 from ..Transformation.Transformation import transformation
 from ..Transformation.ConversionSurfaceTransformed import conversionSurfaceParams
 from ..Surface.CSurfaceT4 import CSurfaceT4
 from ..Surface.ESurfaceTypeMCNP import mcnp_to_mip
-from ..VectUtils import vsum, rescale, scal, vect
+from ..VectUtils import rescale, scal
 from math import fabs, sqrt
 
 class CCellConversion:
@@ -345,17 +346,18 @@ class CCellConversion:
     def postOrderLattice(self, key, lattice_params, mcnp_new_dict):
         if mcnp_new_dict[key].lattice:
             try:
-                domaine = lattice_params[key]
+                domain = lattice_params[key]
             except KeyError:
                 raise ValueError('no --lattice option provided for lattice '
                                  'cell {}'.format(key)) from None
             mcnp_element_geom = mcnp_new_dict[key].geometry
             list_info_surface = self.listSurfaceForLat(key)
-            if len(list_info_surface) != len(domaine):
-                raise ValueError('Problem of domain definition for lattice in cell %s; %d diff %d' %(key,len(list_info_surface),len(domaine)))
-            vectors = self.latticeReciprocal(list_info_surface)
-            translations = self.latticeSpan(domaine, vectors, (0., 0., 0.))
-            for transl in translations:
+            if len(list_info_surface) != len(domain):
+                raise ValueError('Problem of domain definition for lattice in cell %s; %d diff %d' %(key,len(list_info_surface),len(domain)))
+            lat_base_vectors = latticeReciprocal(list_info_surface)
+            lat_indices = latticeIndices(domain)
+            lat_translations = latticeVectors(lat_base_vectors, lat_indices)
+            for transl in lat_translations:
                 tr = list(transl) + [1.,0.,0.,0.,1.,0.,0.,0.,1.]
                 tree = self.postOrderTraversalTransform(mcnp_element_geom, tr)
                 self.new_cell_key += 1
@@ -373,36 +375,3 @@ class CCellConversion:
                                   for i,x in enumerate(filltr)]
                     mcnp_new_dict[new_key_cell].filltr = new_filltr
             del mcnp_new_dict[key]
-
-    def latticeReciprocal(self, liste_info_surface):
-        if len(liste_info_surface) == 1:
-            return [rescale(1./scal(liste_info_surface[0], liste_info_surface[0]),liste_info_surface[0])]
-        if len(liste_info_surface) == 2:
-            a1,a2 = liste_info_surface
-            a1_2=scal(a1, a1)
-            a2_2 = scal(a2, a2)
-            a1_a2 = scal(a1, a2)
-            dem = a1_2*a2_2-a1_a2**2
-            b1 = vsum(rescale(a2_2/dem, a1), rescale(-a1_a2/dem,a2))
-            b2 = vsum(rescale(a1_2/dem, a2), rescale(-a1_a2/dem,a1))
-            return [b1,b2]
-        a1, a2, a3 = liste_info_surface
-        dem = scal(a1, vect(a2, a3))
-        b1 = rescale(1./dem, vect(a2, a3))
-        b2 = rescale(1./dem, vect(a3, a1))
-        b3 = rescale(1./dem, vect(a1, a2))
-        return [b1,b2,b3]
-
-
-    def latticeSpan(self, domaine, surfs, cur_transl):
-        if not domaine:
-            return [cur_transl]
-
-        result = []
-        interval = domaine[0]
-        vector = surfs[0]
-        for i in range(int(interval[0]),int(interval[1])+1):
-            delta =  rescale(i, vector)
-            transl = vsum(cur_transl, delta)
-            result.extend(self.latticeSpan(domaine[1:], surfs[1:], transl))
-        return result

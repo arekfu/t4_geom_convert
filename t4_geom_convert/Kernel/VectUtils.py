@@ -32,11 +32,16 @@ def rescale(a, v1):
     x1, y1, z1 = v1
     return (a*x1, a*y1, a*z1)
 
-def vsum(v1, v2):
-    '''Return the vector sum of `v1` and `v2`.'''
-    x1, y1, z1 = v1
-    x2, y2, z2 = v2
-    return (x1+x2, y1+y2, z1+z2)
+def vsum(*args):
+    '''Return the vector sum of its arguments.'''
+    xsum = 0.
+    ysum = 0.
+    zsum = 0.
+    for vec in args:
+        xsum += vec[0]
+        ysum += vec[1]
+        zsum += vec[2]
+    return xsum, ysum, zsum
 
 def vdiff(v1, v2):
     '''Return the vector difference of `v1` and `v2` (`v1-v2`).'''
