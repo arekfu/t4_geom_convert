@@ -16,6 +16,7 @@ from .Kernel.FileHandlers.Writer.WriteT4Geometry import writeT4Geometry
 from .Kernel.FileHandlers.Writer.WriteT4Composition import writeT4Composition
 from .Kernel.FileHandlers.Writer.WriteT4GeomComp import writeT4GeomComp
 from .Kernel.FileHandlers.Writer.WriteT4BoundCond import writeT4BoundCond
+from .Kernel.Volume.Lattice import parse_ranges
 
 
 def parse_lattice(lattice_list):
@@ -83,28 +84,11 @@ in option '100,'
             raise ValueError('cell number {!r} is not an integer in option '
                              '{!r}'.format(head, option)) from None
 
-        bounds_list = []
-        for rang in rest:
-            bounds = rang.split(':')
-            if len(bounds) != 2:
-                raise ValueError('needs exactly 2 colon-separated range '
-                                 'bounds in argument {!r} in option {!r}'
-                                 .format(rang, option))
-            try:
-                start = int(bounds[0])
-            except ValueError:
-                raise ValueError('range bound {!r} is not an integer in '
-                                 'option {!r}'
-                                 .format(bounds[0], option)) from None
-            try:
-                end = int(bounds[1])
-            except ValueError:
-                raise ValueError('range bound {!r} is not an integer in '
-                                 'option {!r}'
-                                 .format(bounds[1], option)) from None
-            bounds_list.append((start, end))
-
-        lattice_params[cell] = bounds_list
+        try:
+            lattice_params[cell] = parse_ranges(rest)
+        except ValueError as err:
+            # add information about the failing option
+            raise ValueError('{} in option {!r}'.format(err, option)) from None
 
     return lattice_params
 

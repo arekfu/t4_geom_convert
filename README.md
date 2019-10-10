@@ -91,7 +91,7 @@ input:
 
 ```
 A lattice example
-1 0  1 -2 3 -4 IMP:N=1 U=2 LAT=1
+1 0  -2 1 -4 3 IMP:N=1 U=2 LAT=1
 10 1 -1. -10 IMP:N=1 FILL=2
 1000 0 10 IMP:N=0
 
@@ -139,10 +139,68 @@ and for three-dimensional lattices it is
 ```
 
 Note that the `ijk` axes are not necessarily the same as the coordinate axes.
+The orientation of the lattice axes is specified by MCNP (see the *Lattice
+indexing* paragraph in the User's Manual) and it is determined by the order in
+which the surfaces of the unit cell appear specified. In our example, the first
+surface appearing in the definition of the unit cell is surface `2`; therefore,
+surface `2` separates the unit cell (0, 0) from cell (1, 0); the next surface
+(`1`) separates the unit cell from cell (-1, 0); the following surfaces, `4`
+and `3`, separate the unit cell from cells (0, 1) and (0, -1), respectively.
 
 A lattice unit cell may appear as a fill pattern in several enclosing cells. It
 is currently not possible to specify different fill ranges for each of them.
 
+
+### Fully-specified lattices
+
+MCNP provides a syntax for the specification of lattice with heterogeneous
+cells. An example is
+
+```
+A lattice example
+c cells
+2 0  -21 u=2 imp:n=1
+21 0  21 u=2 imp:n=1
+3 0  -31 u=3 imp:n=1
+31 0  31 u=3 imp:n=1
+10 0  -2 1 3 -4  lat=1 u=20 IMP:N=1
+        FILL=-1:1 -4:4
+c       i=-1   i=0   i=1
+        2      3     2   $ j=-4
+        2      3     2   $ j=-3
+        2      3     2   $ j=-2
+        2      3     2   $ j=-1
+        2      3     2   $ j=0
+        3      3     2   $ j=1
+        3      3     2   $ j=2
+        3      3     2   $ j=3
+        3      3     2   $ j=4
+100 1 -1. -10 IMP:N=1 FILL=20
+1000 0 10 IMP:N=0
+
+1 PX -1.5
+2 PX 1.5
+3 PY -0.5
+4 PY 0.5
+10 SO 4
+21 SO 0.4
+31 SO 0.1
+
+m1 13027 1.
+```
+
+The `FILL=-1:1 -4:4` option indicates the range of indices where cells will be
+specified. The universes filling the cells are detailed in the table below,
+which by convention loops over the leftmost (`i`) axis first. This syntax is
+supported by `t4_geom_convert` and does *not* require a `--lattice` option. One
+restriction applies: none of the subcells may be filled with the universe of
+the lattice cell itself. This syntax indicates to MCNP that the cell should be
+filled with the material of the lattice cell. Using `0` as a universe number
+for the subcells is supported and results in no subcell being generated.
+
+Here is how the example above is converted and rendered in TRIPOLI-4:
+![example of converted geometry with fully-specified
+lattice][lattice_fully_specified]
 
 Current limitations
 -------------------
@@ -161,6 +219,8 @@ may be able to do in the future (in roughly decreasing order of likelihood):
       occurrences of the missing isotopes)
 - [ ] Convert MCNP macrobodies
 - [ ] Convert cell temperatures
+- [ ] In the fully-specified lattice syntax, handle the case where the subcell
+      universe is equal to the universe of the lattice cell.
 - [ ] Convert hexagonal lattices
 - [ ] Import comments describing the MCNP cells/surfaces (tracked in issue #9)
 - [ ] Provide a way to specify lattice fill ranges per enclosing cell(s) (this
@@ -225,3 +285,4 @@ Licence, version 3](COPYING).
 [bugs]: https://github.com/arekfu/t4_geom_convert/issues
 [EUROfusion]: https://www.euro-fusion.org/
 [lattice_example]: pics/lattice_example.png
+[lattice_fully_specified]: pics/lattice_fully_specified.png

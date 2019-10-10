@@ -11,6 +11,7 @@ from MIP.geom.parsegeom import get_ast
 from MIP.geom.composition import get_materialImportance
 from MIP.geom.transforms import get_transforms
 from ...Volume.CCellMCNP import CCellMCNP
+from ...Volume.Lattice import parse_ranges, LatticeSpec
 import pickle
 from collections import OrderedDict
 
@@ -20,13 +21,14 @@ class CParseMCNPCell:
     :brief: Class which parse the block CELLS.
     '''
 
-    def __init__(self, mcnpParser, cell_cache_path):
+    def __init__(self, mcnpParser, cell_cache_path, lattice_params):
         '''
         Constructor
         :param: f_inputMCNP : input file of MCNP
         '''
         self.mcnpParser = mcnpParser
         self.cell_cache_path = cell_cache_path
+        self.lattice_params = lattice_params.copy()
 
     def parsingMaterialImportance(self):
         '''
@@ -86,9 +88,10 @@ class CParseMCNPCell:
         fmt_string = '\rparsing MCNP cell {{:{}d}}/{}'.format(len(str(lencell)),
                                                               lencell)
         transforms = get_transforms(self.mcnpParser)
-        for i, (k, v) in enumerate(listeCellParser):
+        for i, (key, v) in enumerate(listeCellParser):
             print(fmt_string.format(i+1), end='', flush=True)
-            fillid = None
+            fillid_bounds = None
+            fillid_universes = None
             costr = False
             listeparamfill = []
             importance = None
@@ -103,7 +106,33 @@ class CParseMCNPCell:
                 if ('fill=' or '*fill=') in elt:
                     if '*' in elt:
                         costr = True
-                    fillid = int(float(elt.split('=')[1]))
+                    first_arg = elt.split('=')[1]
+                    if ':' in first_arg:
+                        str_bounds = [first_arg]
+                        while option_liste and ':' in option_liste[0]:
+                            str_bounds.append(option_liste.pop(0))
+                        bounds = parse_ranges(str_bounds)
+                        fill_universes = []
+                        for _ in range(bounds.size()):
+                            if not option_liste:
+                                msg = ('expected {} universe specifications '
+                                       'after FILL keyword, found {}'
+                                       .format(bounds.size(),
+                                               len(fill_universes)))
+                                raise ValueError(msg)
+                            elt = option_liste.pop(0)
+                            try:
+                                fill_universe = int(elt)
+                            except ValueError:
+                                msg = ('expected an integer in universe '
+                                       'specifications, found {}'
+                                       .format(elt))
+                                raise ValueError(msg) from None
+                            fill_universes.append(fill_universe)
+                        fillid_bounds = bounds
+                        fillid_universes = fill_universes
+                    else:
+                        fillid_universes = int(float(first_arg))
                     while option_liste and '=' not in option_liste[0]:
                         listeparamfill.append(float(option_liste.pop(0)))
                     # now handle the case where the number of the
@@ -126,7 +155,27 @@ class CParseMCNPCell:
             #importance = option
             if importance is None:
                 importance = liste_importance[i]
+            if fillid_bounds is None and fillid_universes is None:
+                # case of no FILL, no LAT
+                fillid = None
+            elif lattice:
+                # case of FILL=n and LAT=1
+                if isinstance(fillid_universes, int):
+                    try:
+                        fillid_bounds = self.lattice_params[key]
+                    except KeyError:
+                        msg = ('no --lattice option provided for '
+                                'lattice cell {}'.format(key))
+                        raise ValueError(msg) from None
+                    fillid_universes = [fillid_universes]*fillid_bounds.size()
+                fillid = LatticeSpec(fillid_bounds, fillid_universes)
+            else:
+                # case of FILL=n without LAT=1
+                assert fillid_bounds is None
+                fillid = fillid_universes
             if importance != 0:
-                dictCell[k] = CCellMCNP(materialID, density, astMcnp, importance, universe, fillid, listeparamfill, costr, lattice)
+                dictCell[key] = CCellMCNP(materialID, density, astMcnp,
+                                          importance, universe, fillid,
+                                          listeparamfill, costr, lattice)
         print('... done', flush=True)
         return dictCell

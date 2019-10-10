@@ -8,15 +8,13 @@ Created on 5 févr. 2019
 '''
 
 from MIP.geom.semantics import GeomExpression, Surface
-from MIP.geom.transforms import to_cos, normalize_transform
+from MIP.geom.transforms import to_cos
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.main import extract_surfaces_list
 
-from .CDictVolumeT4 import CDictVolumeT4
 from .TreeFunctions import isLeaf, isIntersection, isUnion
 from .CVolumeT4 import CVolumeT4
-from .CUniverseDict import CUniverseDict
-from .Lattice import latticeReciprocal, latticeIndices, latticeVectors
+from .Lattice import latticeReciprocal, LatticeSpec, latticeVector
 from ..Transformation.Transformation import transformation
 from ..Transformation.ConversionSurfaceTransformed import conversionSurfaceParams
 from ..Surface.CSurfaceT4 import CSurfaceT4
@@ -102,34 +100,37 @@ class CCellConversion:
         tuple_final = params, s_fictive
         return tuple_final
 
-    def postOrderTraversalFill(self, key, mcnp_new_dict,dictUniverse):
+    def postOrderTraversalFill(self, key, mcnp_new_dict, dictUniverse):
 
-        if mcnp_new_dict[key].fillid is not None:
+        cell = mcnp_new_dict[key]
+        if cell.fillid is not None:
             new_cells = []
             cells_to_process = []
-            mcnp_key_geom = mcnp_new_dict[key].geometry
-            if mcnp_new_dict[key].costr:
-                mcnp_new_dict[key].filltr[3:] = list(map(to_cos, mcnp_new_dict[key].filltr[3:]))
-                mcnp_new_dict[key].costr = False
-            mcnp_key_filltr = mcnp_new_dict[key].filltr
-            for element in dictUniverse[int(mcnp_new_dict[key].fillid)]:
+            mcnp_key_geom = cell.geometry
+            if cell.costr:
+                cell.filltr[3:] = list(map(to_cos, cell.filltr[3:]))
+                cell.costr = False
+            mcnp_key_filltr = cell.filltr
+            universe = int(cell.fillid)
+            for element in dictUniverse[universe]:
                 cells_to_process.extend(self.postOrderTraversalFill(element, mcnp_new_dict,dictUniverse))
             for element in cells_to_process:
-                mcnp_element_geom = mcnp_new_dict[element].geometry
+                element_cell = mcnp_new_dict[element]
+                mcnp_element_geom = element_cell.geometry
                 self.new_cell_key += 1
                 new_key = self.new_cell_key
-                mcnp_new_dict[new_key] = mcnp_new_dict[key].copy()
-                mcnp_new_dict[new_key].fillid = None
-                mcnp_new_dict[new_key].materialID = mcnp_new_dict[element].materialID
-                mcnp_new_dict[new_key].density = mcnp_new_dict[element].density
-                mcnp_new_dict[new_key].idorigin = mcnp_new_dict[element].idorigin.copy()
-                mcnp_new_dict[new_key].idorigin.append((element, key))
+                new_cell = cell.copy()
+                new_cell.fillid = None
+                new_cell.materialID = element_cell.materialID
+                new_cell.density = element_cell.density
+                new_cell.idorigin = element_cell.idorigin.copy()
+                new_cell.idorigin.append((element, key))
+                mcnp_new_dict[new_key] = new_cell
                 tree = self.postOrderTraversalTransform(mcnp_element_geom, mcnp_key_filltr)
                 mcnp_new_dict[new_key].geometry = ['*', mcnp_key_geom, tree]
                 new_cells.append(new_key)
             return new_cells
         else:
-            #mcnp_new_dict[key] = mcnp_new_dict[key].copy()
             return [key]
 
 
@@ -310,68 +311,62 @@ class CCellConversion:
         result = GeomExpression(new_tree)
         return result
 
-    def listSurfaceForLat(self, cellId):
+    def listSurfaceForLat(self, cell):
 
-        listeCouple = []
-        listSurface = extract_surfaces_list(self.dicCellMCNP[cellId].geometry)
-        #check len(listeSurface) = 2,4,6
-        while listSurface:
-            surf = listSurface.pop(0)
-            param = self.dicSurfaceMCNP[abs(surf)].paramSurface
-            typeSurface = self.dicSurfaceMCNP[abs(surf)].typeSurface
-            if isinstance(typeSurface, str):
-                f = (param[0], param[1])
-            else:
-                _t, f, _s, _p = mcnp2cad[mcnp_to_mip(typeSurface)](param)
-            #transformation
-            normalVector = f[1]
-            for i,surf2 in enumerate(listSurface):
-                param2 = self.dicSurfaceMCNP[abs(surf2)].paramSurface
-                typeSurface2 = self.dicSurfaceMCNP[abs(surf2)].typeSurface
-                if isinstance(typeSurface2, str):
-                    f2 = (param2[0], param2[1])
-                else:
-                    _t, f2, _s, _p = mcnp2cad[mcnp_to_mip(typeSurface2)](param2)
-                point_final = (float(f2[0][0])-float(f[0][0]), float(f2[0][1])-float(f[0][1]), float(f2[0][2])-float(f[0][2]))
-                distance = fabs(scal(point_final, normalVector))
-                normalVector2 = f2[1]
-                if fabs(scal(normalVector, normalVector2)) >= 0.99:
-                    listeCouple.append(rescale(1./distance, normalVector))
-                    break
-            else:
-                raise ValueError('No parallel surface found %d' %surf )
-            listSurface.pop(i)
-        return(listeCouple)
+        list_surface = extract_surfaces_list(self.dicCellMCNP[cell].geometry)
+        if len(list_surface) not in (2, 4, 6):
+            raise ValueError('Lattice base cell {} has {} surfaces; 2, 4 or 6 '
+                             'were expected'.format(cell, len(list_surface)))
 
-    def postOrderLattice(self, key, lattice_params, mcnp_new_dict):
-        if mcnp_new_dict[key].lattice:
-            try:
-                domain = lattice_params[key]
-            except KeyError:
-                raise ValueError('no --lattice option provided for lattice '
-                                 'cell {}'.format(key)) from None
-            mcnp_element_geom = mcnp_new_dict[key].geometry
+        base_vecs = []
+        while list_surface:
+            surf_id_1, surf_id_2 = list_surface[0:2]
+            surf_1 = self.dicSurfaceMCNP[abs(surf_id_1)]
+            _t, frame, _s, _p = \
+                mcnp2cad[mcnp_to_mip(surf_1.typeSurface)](surf_1.paramSurface)
+            point = frame[0]
+            normal = frame[1]
+            surf_2 = self.dicSurfaceMCNP[abs(surf_id_2)]
+            _t, frame, _s, _p = \
+                mcnp2cad[mcnp_to_mip(surf_2.typeSurface)](surf_2.paramSurface)
+            point2 = frame[0]
+            point_diff = (float(point[0])-float(point2[0]),
+                          float(point[1])-float(point2[1]),
+                          float(point[2])-float(point2[2]))
+            distance = scal(point_diff, normal)
+            base_vecs.append(rescale(1./distance, normal))
+            list_surface = list_surface[2:]
+        return base_vecs
+
+    def postOrderLattice(self, key, mcnp_new_dict):
+        cell = mcnp_new_dict[key]
+        if cell.lattice:
+            assert isinstance(cell.fillid, LatticeSpec)
+            domain = cell.fillid
+            mcnp_element_geom = cell.geometry
             list_info_surface = self.listSurfaceForLat(key)
-            if len(list_info_surface) != len(domain):
-                raise ValueError('Problem of domain definition for lattice in cell %s; %d diff %d' %(key,len(list_info_surface),len(domain)))
+            if len(list_info_surface) != len(domain.bounds):
+                raise ValueError('Problem of domain definition for lattice in cell %s; %d != %d' %(key,len(list_info_surface),len(domain.bounds)))
             lat_base_vectors = latticeReciprocal(list_info_surface)
-            lat_indices = latticeIndices(domain)
-            lat_translations = latticeVectors(lat_base_vectors, lat_indices)
-            for transl in lat_translations:
-                tr = list(transl) + [1.,0.,0.,0.,1.,0.,0.,0.,1.]
+            for index, universe in domain.items():
+                if universe == 0:
+                    continue
+                transl = latticeVector(lat_base_vectors, index)
+                tr = list(transl) + [1., 0., 0., 0., 1., 0., 0., 0., 1.]
                 tree = self.postOrderTraversalTransform(mcnp_element_geom, tr)
                 self.new_cell_key += 1
-                new_key_cell = self.new_cell_key
-                mcnp_new_dict[new_key_cell] = mcnp_new_dict[key].copy()
-                mcnp_new_dict[new_key_cell].geometry = tree
-                filltr = mcnp_new_dict[new_key_cell].filltr
+                new_cell = cell.copy()
+                new_cell.fillid = universe
+                new_cell.geometry = tree
+                filltr = new_cell.filltr
                 if filltr:
                     new_filltr = [x if i>2 else x+tr[i]
                                   for i,x in enumerate(filltr)]
-                    mcnp_new_dict[new_key_cell].filltr = new_filltr
                 else:
                     filltr = [0.,0.,0.,1.,0.,0.,0.,1.,0.,0.,0.,1.]
                     new_filltr = [x if i>2 else x+tr[i]
                                   for i,x in enumerate(filltr)]
-                    mcnp_new_dict[new_key_cell].filltr = new_filltr
+                new_cell.filltr = new_filltr
+                new_cell.lattice = False
+                mcnp_new_dict[self.new_cell_key] = new_cell
             del mcnp_new_dict[key]

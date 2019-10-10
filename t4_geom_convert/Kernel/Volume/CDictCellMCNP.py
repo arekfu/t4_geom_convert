@@ -17,11 +17,12 @@ class CDictCellMCNP(MutableMapping):
     cell from MCNP
     '''
 
-    def __init__(self, mcnpParser, cell_cache_path):
+    def __init__(self, mcnpParser, cell_cache_path, lattice_params):
         '''
         Constructor
         '''
-        self.d_cellMCNP = CParseMCNPCell(mcnpParser, cell_cache_path).parsingCell()
+        self.d_cellMCNP = CParseMCNPCell(mcnpParser, cell_cache_path,
+                                         lattice_params).parsingCell()
 
     def __getitem__(self, key):
         return self.d_cellMCNP[key]

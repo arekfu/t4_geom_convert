@@ -22,7 +22,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
     '''
     dic_cellT4 = OrderedDict()
     objT4 = CDictVolumeT4(dic_cellT4)
-    mcnp_dict = CDictCellMCNP(mcnpParser, cell_cache_path).d_cellMCNP
+    mcnp_dict = CDictCellMCNP(mcnpParser, cell_cache_path, lattice_params).d_cellMCNP
 
     mcnp_new_dict = mcnp_dict.copy()
     free_key = max(int(k) for k in mcnp_dict) + 1
@@ -50,7 +50,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
                     .format(len(str(n_lat_cells)), n_lat_cells))
         for i, key in enumerate(lat_cells):
             print(fmt_string.format(i+1, key), end='', flush=True)
-            conv.postOrderLattice(key, lattice_params, mcnp_new_dict)
+            conv.postOrderLattice(key, mcnp_new_dict)
         print('... done', flush=True)
 
     # update volume and surface free keys

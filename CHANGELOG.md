@@ -5,6 +5,8 @@ v0.2.0
 * Add support for 0 as a cone sheet specifier (fixes issue #2)
 * Add support for elliptic tori in MIP (fixes issue #3)
 * Handle the specification of `FILL` transformations by ID (fixes issue #4)
+* Partially handle conversion of lattices in fully-specified form (fixes issue
+  #16)
 * Fix parsing of cell card options starting with `*FILL` in MIP
 * Fix detection of line continuation
 * Preserve the precision of isotope concentrations in the MCNP file
