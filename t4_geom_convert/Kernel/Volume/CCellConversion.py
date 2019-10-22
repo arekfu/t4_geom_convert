@@ -8,7 +8,6 @@ Created on 5 févr. 2019
 '''
 
 from MIP.geom.semantics import GeomExpression, Surface
-from MIP.geom.transforms import to_cos
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.main import extract_surfaces_list
 
@@ -100,22 +99,19 @@ class CCellConversion:
         tuple_final = params, s_fictive
         return tuple_final
 
-    def postOrderTraversalFill(self, key, mcnp_new_dict, dictUniverse):
+    def postOrderTraversalFill(self, key, dictUniverse):
 
-        cell = mcnp_new_dict[key]
+        cell = self.dicCellMCNP[key]
         if cell.fillid is not None:
             new_cells = []
             cells_to_process = []
             mcnp_key_geom = cell.geometry
-            if cell.costr:
-                cell.filltr[3:] = list(map(to_cos, cell.filltr[3:]))
-                cell.costr = False
             mcnp_key_filltr = cell.filltr
             universe = int(cell.fillid)
             for element in dictUniverse[universe]:
-                cells_to_process.extend(self.postOrderTraversalFill(element, mcnp_new_dict,dictUniverse))
+                cells_to_process.extend(self.postOrderTraversalFill(element, dictUniverse))
             for element in cells_to_process:
-                element_cell = mcnp_new_dict[element]
+                element_cell = self.dicCellMCNP[element]
                 mcnp_element_geom = element_cell.geometry
                 self.new_cell_key += 1
                 new_key = self.new_cell_key
@@ -123,12 +119,18 @@ class CCellConversion:
                 new_cell.fillid = None
                 new_cell.materialID = element_cell.materialID
                 new_cell.density = element_cell.density
+                # new_trcl = element_cell.trcl.copy()
+                # if cell.trcl is not None:
+                #     new_trcl.extend(cell.trcl)
+                # new_cell.trcl = new_trcl
                 new_cell.idorigin = element_cell.idorigin.copy()
                 new_cell.idorigin.append((element, key))
-                mcnp_new_dict[new_key] = new_cell
+                self.dicCellMCNP[new_key] = new_cell
                 tree = self.postOrderTraversalTransform(mcnp_element_geom,
                                                         mcnp_key_filltr)
-                mcnp_new_dict[new_key].geometry = ['*', mcnp_key_geom, tree]
+                if cell.trcl:
+                    tree = self.applyTRCL(cell.trcl, tree)
+                self.dicCellMCNP[new_key].geometry = ['*', mcnp_key_geom, tree]
                 new_cells.append(new_key)
             return new_cells
         else:
@@ -182,7 +184,7 @@ class CCellConversion:
             self.dictSurfaceT4[new_key] = (surf, fixed_ids)
             self.dicSurfaceMCNP[new_key] = surfaceObject
 
-            return new_key if p_tree >= 0 else -new_key
+            return Surface(new_key) if p_tree >= 0 else Surface(-new_key)
         else:
             op, *args = p_tree
             new_args = [self.postOrderTraversalTransform(node, p_transf) for node in args]
@@ -304,8 +306,8 @@ class CCellConversion:
         if not isinstance(tree, (list, tuple)):
             return tree
         if tree[0] == '^':
-            geom = self.dicCellMCNP[int(tree[1])].geometry
-            new_geom = self.postOrderTraversalCompl(geom)
+            cell = self.dicCellMCNP[int(tree[1])]
+            new_geom = self.postOrderTraversalCompl(cell.geometry)
             return new_geom.inverse()
         new_tree = [tree[0]]
         for node in tree[1:]:
@@ -335,8 +337,8 @@ class CCellConversion:
             list_surface = list_surface[2:]
         return base_vecs
 
-    def postOrderLattice(self, key, mcnp_new_dict):
-        cell = mcnp_new_dict[key]
+    def developLattice(self, key):
+        cell = self.dicCellMCNP[key]
         if cell.lattice:
             assert isinstance(cell.fillid, LatticeSpec)
             domain = cell.fillid
@@ -357,13 +359,20 @@ class CCellConversion:
                 new_cell.geometry = tree
                 filltr = new_cell.filltr
                 if filltr:
-                    new_filltr = [x if i>2 else x+tr[i]
-                                  for i,x in enumerate(filltr)]
+                    new_filltr = tuple(x if i>2 else x+tr[i]
+                                       for i, x in enumerate(filltr))
                 else:
                     filltr = [0.,0.,0.,1.,0.,0.,0.,1.,0.,0.,0.,1.]
-                    new_filltr = [x if i>2 else x+tr[i]
-                                  for i,x in enumerate(filltr)]
+                    new_filltr = tuple(x if i>2 else x+tr[i]
+                                       for i, x in enumerate(filltr))
                 new_cell.filltr = new_filltr
                 new_cell.lattice = False
-                mcnp_new_dict[self.new_cell_key] = new_cell
-            del mcnp_new_dict[key]
+                self.dicCellMCNP[self.new_cell_key] = new_cell
+            del self.dicCellMCNP[key]
+
+    def applyTRCL(self, trcls, geometry):
+        if not trcls:
+            return geometry
+        for trcl in trcls:
+            geometry = self.postOrderTraversalTransform(geometry, trcl)
+        return geometry

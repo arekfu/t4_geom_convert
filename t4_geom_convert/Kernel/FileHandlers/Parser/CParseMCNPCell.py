@@ -9,7 +9,7 @@ import re
 from MIP.geom.cells import get_cells
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.composition import get_materialImportance
-from MIP.geom.transforms import get_transforms
+from MIP.geom.transforms import get_transforms, to_cos
 from ...Volume.CCellMCNP import CCellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
 import pickle
@@ -93,20 +93,22 @@ class CParseMCNPCell:
             fillid_bounds = None
             fillid_universes = None
             costr = False
+            costrcl = False
             listeparamfill = []
+            listeparamtrcl = []
             importance = None
             lattice = False
             universe = 0
             material, geometry, option = v
-            option_liste = option.lower().replace('(','').replace(')','').split()
+            option_liste = option.lower().replace('(',' ').replace(')',' ').replace('=', ' ').split()
             while option_liste:
                 elt = option_liste.pop(0)
                 if 'imp:n' in elt:
-                    importance = float(elt.split('=')[1])
-                if ('fill=' or '*fill=') in elt:
+                    importance = float(option_liste.pop(0))
+                elif 'fill' in elt:
                     if '*' in elt:
                         costr = True
-                    first_arg = elt.split('=')[1]
+                    first_arg = option_liste.pop(0)
                     if ':' in first_arg:
                         str_bounds = [first_arg]
                         while option_liste and ':' in option_liste[0]:
@@ -133,7 +135,7 @@ class CParseMCNPCell:
                         fillid_universes = fill_universes
                     else:
                         fillid_universes = int(float(first_arg))
-                    while option_liste and '=' not in option_liste[0]:
+                    while option_liste and option_liste[0][0] in '0123456789.+-':
                         listeparamfill.append(float(option_liste.pop(0)))
                     # now handle the case where the number of the
                     # transformation was given instead of the transformation
@@ -141,11 +143,37 @@ class CParseMCNPCell:
                     if len(listeparamfill) == 1:
                         trid = int(listeparamfill[0])
                         listeparamfill = transforms[trid]
-                        costr = False  # cosine already calculated by MIP
-                if 'u=' in elt:
-                    universe = int(float(elt.split('=')[1]))
-                if 'lat=' in elt:
+                        # no need to apply to_cos, MIP takes care of it
+                    elif len(listeparamfill) == 3:
+                        listeparamfill += [1., 0., 0.,
+                                           0., 1., 0.,
+                                           0., 0., 1.]
+                    elif costr:
+                        listeparamfill[3:] = list(map(to_cos,
+                                                      listeparamfill[3:]))
+                elif 'lat' in elt:
                     lattice = True
+                elif 'trcl' in elt:
+                    if '*' in elt:
+                        costrcl = True
+                    while option_liste and option_liste[0][0] in '0123456789.+-':
+                        listeparamtrcl.append(float(option_liste.pop(0)))
+                    # now handle the case where the number of the
+                    # transformation was given instead of the transformation
+                    # parameters
+                    if len(listeparamtrcl) == 1:
+                        trid = int(listeparamtrcl[0])
+                        listeparamtrcl = transforms[trid]
+                        # no need to apply to_cos, MIP takes care of it
+                    elif len(listeparamtrcl) == 3:
+                        listeparamtrcl += [1., 0., 0.,
+                                           0., 1., 0.,
+                                           0., 0., 1.]
+                    elif costr:
+                        listeparamtrcl[3:] = list(map(to_cos,
+                                                      listeparamtrcl[3:]))
+                elif 'u' in elt:
+                    universe = int(float(option_liste.pop(0)))
             materialID = material.split()[0]
             if int(materialID) == 0:
                 density = None
@@ -174,8 +202,10 @@ class CParseMCNPCell:
                 assert fillid_bounds is None
                 fillid = fillid_universes
             if importance != 0:
+                trcl = [] if not listeparamtrcl else [tuple(listeparamtrcl)]
                 dictCell[key] = CCellMCNP(materialID, density, astMcnp,
                                           importance, universe, fillid,
-                                          listeparamfill, costr, lattice)
+                                          tuple(listeparamfill), lattice,
+                                          trcl)
         print('... done', flush=True)
         return dictCell
