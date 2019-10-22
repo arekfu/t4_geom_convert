@@ -17,18 +17,6 @@
 
 using namespace std;
 
-namespace {
-  std::ios_base::openmode fileMode(PTRACFormat const format)
-  {
-    if(format == PTRACFormat::ASCII) {
-      return std::ios_base::in;
-    } else {
-      assert(format == PTRACFormat::ASCII);
-      return std::ios_base::in | std::ios_base::binary;
-    }
-  }
-}
-
 MCNPGeometry::MCNPGeometry(const string &inputPath) :
   nps(-1),
   inputPath(inputPath),
@@ -144,27 +132,9 @@ map<unsigned long, string> &MCNPGeometry::getCell2Density()
 *                                  *
 ************************************/
 
-MCNPPTRAC::MCNPPTRAC(std::string const &ptracPath, PTRACFormat const ptracFormat) :
-  nbPointsRead(0),
-  nbDataCellMaterialLine(0),
-  ptracFile(ptracPath, fileMode(ptracFormat))
+MCNPPTRAC::MCNPPTRAC() :
+  nbPointsRead(0)
 {
-  if(ptracFile.fail()) {
-    std::cerr << "PTRAC file " << ptracPath << " not found." << endl;
-    exit(EXIT_FAILURE);
-  }
-  // The number of header lines must be 8!!
-  goThroughHeaderPTRAC(8);
-}
-
-void MCNPPTRAC::getNextLinePtrac()
-{
-  getline(ptracFile, currentLine);
-}
-
-bool MCNPPTRAC::finishedReading()
-{
-  return currentLine.empty();
 }
 
 void MCNPPTRAC::incrementNbPointsRead()
@@ -177,7 +147,43 @@ long MCNPPTRAC::getNbPointsRead()
   return nbPointsRead;
 }
 
-pair<int, int> MCNPPTRAC::readPointEvent()
+void MCNPPTRACASCII::getNextLinePtrac()
+{
+  getline(ptracFile, currentLine);
+}
+
+bool MCNPPTRACASCII::finishedReading()
+{
+  return currentLine.empty();
+}
+
+PTRACRecord const &MCNPPTRAC::getPTRACRecord() const
+{
+  return record;
+}
+
+
+/************************************
+*                                  *
+*  methods of the MCNPPTRACASCII class  *
+*                                  *
+************************************/
+
+MCNPPTRACASCII::MCNPPTRACASCII(std::string const &ptracPath) :
+  MCNPPTRAC(),
+  nbDataCellMaterialLine(0),
+  ptracFile(ptracPath)
+{
+  if(ptracFile.fail()) {
+    std::cerr << "PTRAC file " << ptracPath << " not found." << endl;
+    exit(EXIT_FAILURE);
+  }
+  // The number of header lines must be 8!!
+  goThroughHeaderPTRAC(8);
+}
+
+
+pair<int, int> MCNPPTRACASCII::readPointEvent()
 {
   istringstream iss(currentLine);
   int pointID, eventID;
@@ -185,7 +191,7 @@ pair<int, int> MCNPPTRAC::readPointEvent()
   return {pointID, eventID};
 }
 
-pair<int, int> MCNPPTRAC::readCellMaterial()
+pair<int, int> MCNPPTRACASCII::readCellMaterial()
 {
   istringstream iss(currentLine);
   int dummy, volumeID, materialID;
@@ -196,7 +202,7 @@ pair<int, int> MCNPPTRAC::readCellMaterial()
   return {volumeID, materialID};
 }
 
-std::vector<double> MCNPPTRAC::readPoint()
+std::vector<double> MCNPPTRACASCII::readPoint()
 {
   istringstream iss(currentLine);
   double pointX, pointY, pointZ;
@@ -204,7 +210,7 @@ std::vector<double> MCNPPTRAC::readPoint()
   return {pointX, pointY, pointZ};
 }
 
-bool MCNPPTRAC::readNextPtracData(long maxReadPoint)
+bool MCNPPTRACASCII::readNextPtracData(long maxReadPoint)
 {
   if ((ptracFile && !ptracFile.eof()) && (getNbPointsRead() <= maxReadPoint)) {
     getline(ptracFile, currentLine);
@@ -227,7 +233,7 @@ bool MCNPPTRAC::readNextPtracData(long maxReadPoint)
   }
 }
 
-void MCNPPTRAC::goThroughHeaderPTRAC(int nHeaderLines)
+void MCNPPTRACASCII::goThroughHeaderPTRAC(int nHeaderLines)
 {
   string line5, line6;
   for (int ii = 0; ii < nHeaderLines; ii++) {
@@ -243,7 +249,7 @@ void MCNPPTRAC::goThroughHeaderPTRAC(int nHeaderLines)
   checkDataFromLine6Ptrac(line6, nbData);
 }
 
-int MCNPPTRAC::getDataFromLine5Ptrac(const string &line5)
+int MCNPPTRACASCII::getDataFromLine5Ptrac(const string &line5)
 {
   int nbDataPointEventLine;
   istringstream iss(line5);
@@ -252,7 +258,7 @@ int MCNPPTRAC::getDataFromLine5Ptrac(const string &line5)
   return nbData;
 }
 
-void MCNPPTRAC::checkDataFromLine6Ptrac(const string &line6, int nbData)
+void MCNPPTRACASCII::checkDataFromLine6Ptrac(const string &line6, int nbData)
 {
   vector<int> data(nbData);
   const int cellIDPtracCode = 17;
@@ -265,9 +271,4 @@ void MCNPPTRAC::checkDataFromLine6Ptrac(const string &line6, int nbData)
     std::cerr << "PTRAC file format not suitable. Please see Oracle/data/slapb file for example..." << endl;
     exit(EXIT_FAILURE);
   }
-}
-
-PTRACRecord const &MCNPPTRAC::getPTRACRecord() const
-{
-  return record;
 }

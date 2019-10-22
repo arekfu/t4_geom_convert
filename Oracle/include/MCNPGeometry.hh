@@ -28,19 +28,44 @@ struct PTRACRecord {
 class MCNPPTRAC
 {
   protected:
-    std::string currentLine;
     long nbPointsRead;
+    PTRACRecord record;
+
+  public:
+    MCNPPTRAC();
+    virtual ~MCNPPTRAC() {};
+
+    /**
+     * If the maximum number of read points has not been reached: reads the next
+     * particle, event, volume, material, position in PTRAC file.
+     *
+     * @returns true if successful, false otherwise.
+     */
+    virtual bool readNextPtracData(long maxReadPoint) = 0;
+
+    /**
+     * Increments the number of points read so far.
+     */
+    void incrementNbPointsRead();
+    long getNbPointsRead();
+
+    PTRACRecord const &getPTRACRecord() const;
+};
+
+
+class MCNPPTRACASCII : public MCNPPTRAC
+{
+  protected:
+    std::string currentLine;
     int nbDataCellMaterialLine;
     std::ifstream ptracFile;
-    PTRACRecord record;
 
   public:
 
     /**
      * @param[in] ptracPath MCNP ptrac file path.
-     * @param[in] ptracFormat format for the PTRAC file
      */
-    MCNPPTRAC(std::string const &ptracPath, const PTRACFormat ptracFormat);
+    MCNPPTRACASCII(std::string const &ptracPath);
 
     /**
      * If the maximum number of read points has not been reached: reads the next
@@ -49,10 +74,6 @@ class MCNPPTRAC
      * @returns true if successful, false otherwise.
      */
     bool readNextPtracData(long maxReadPoint);
-
-    long getNbPointsRead();
-
-    PTRACRecord const &getPTRACRecord() const;
 
   protected:
     /**
@@ -119,10 +140,6 @@ class MCNPPTRAC
      * @returns true if the whole block data has been read, false otherwise
      */
     bool finishedReading();
-    /**
-     * Increments the number of points read so far.
-     */
-    void incrementNbPointsRead();
 };
 
 
@@ -205,7 +222,6 @@ public:
 
   const std::string &getInputPath();
   long getNPS();
-  std::ifstream &getPtracFile();
   const std::vector<int> &getVolumeList();
   void setVolumeList(const std::vector<int> &volumeList);
   std::map<unsigned long, std::string> &getCell2Density();

@@ -21,7 +21,7 @@ public:
   {
     // code here will execute just before the test ensues
     MCNPg1 = new MCNPGeometry("input_slab");
-    MCNPptrac = new MCNPPTRAC("slabp", PTRACFormat::ASCII);
+    MCNPptrac = new MCNPPTRACASCII("slabp");
   }
 
   void TearDown()

@@ -27,6 +27,7 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <memory>
 
 using namespace std;
 int strictness_level = 3; //Global variable required by T4 libraries
@@ -35,7 +36,12 @@ Statistics compare_geoms(const OptionsCompare &options)
 {
   T4Geometry t4Geom(options.filenames[0]);
   MCNPGeometry mcnpGeom(options.filenames[1]);
-  MCNPPTRAC mcnpPtrac(options.filenames[2], options.ptracFormat);
+  std::unique_ptr<MCNPPTRAC> mcnpPtrac;
+  if(options.ptracFormat == PTRACFormat::ASCII) {
+    mcnpPtrac.reset(new MCNPPTRACASCII(options.filenames[2]));
+  } else {
+    throw std::invalid_argument("Unrecognized PTRAC format");
+  }
   Statistics stats;
 
   stats.setNbT4Volumes(t4Geom.getVolumes()->get_nb_vol());
@@ -78,7 +84,7 @@ Statistics compare_geoms(const OptionsCompare &options)
   unsigned long countPoints = 0;
   auto current = std::chrono::system_clock::now();
   auto previous = current;
-  while(mcnpPtrac.readNextPtracData(maxSampledPts)) {
+  while(mcnpPtrac->readNextPtracData(maxSampledPts)) {
 
     ++countPoints;
 
@@ -89,7 +95,7 @@ Statistics compare_geoms(const OptionsCompare &options)
       previous = current;
     }
 
-    auto const &record = mcnpPtrac.getPTRACRecord();
+    auto const &record = mcnpPtrac->getPTRACRecord();
     auto const &point = record.point;
     long rank = t4Geom.getVolumes()->which_volume(point);
     std::string compo = t4Geom.getCompos()->get_name_from_volume(rank);
