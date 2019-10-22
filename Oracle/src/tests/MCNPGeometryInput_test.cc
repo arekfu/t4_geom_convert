@@ -16,15 +16,18 @@ class MCNPtestInput : public ::testing::Test
 
 public:
   MCNPGeometry *MCNPg1;
+  MCNPPTRAC *MCNPptrac;
   void SetUp()
   {
     // code here will execute just before the test ensues
-    MCNPg1 = new MCNPGeometry("slabp", "input_slab");
+    MCNPg1 = new MCNPGeometry("input_slab");
+    MCNPptrac = new MCNPPTRAC("slabp", PTRACFormat::ASCII);
   }
 
   void TearDown()
   {
     delete MCNPg1;
+    delete MCNPptrac;
   }
 };
 
@@ -43,18 +46,8 @@ TEST_F(MCNPtestInput, isComment)
 TEST_F(MCNPtestInput, AssociateCell2Density)
 {
   MCNPg1->parseINP();
-  ASSERT_EQ(MCNPg1->getCell2Density()[1001], "347_-2.7");
-  ASSERT_EQ(MCNPg1->getCell2Density()[2001], "346_-2.7");
-  ASSERT_EQ(MCNPg1->getCell2Density()[3001], "345_-2.7");
-}
-
-TEST_F(MCNPtestInput, AssociateMaterialDensity)
-{
-  MCNPg1->parseINP();
-  MCNPg1->goThroughHeaderPTRAC(8);
-  MCNPg1->readNextPtracData(20000);
-  ASSERT_EQ(MCNPg1->getMaterialDensity(), "345_-2.7");
-
-  MCNPg1->readNextPtracData(20000);
-  ASSERT_EQ(MCNPg1->getMaterialDensity(), "346_-2.7");
+  ASSERT_EQ(MCNPg1->getCellDensity(1000), "0_void");
+  ASSERT_EQ(MCNPg1->getCellDensity(1001), "347_-2.7");
+  ASSERT_EQ(MCNPg1->getCellDensity(2001), "346_-2.7");
+  ASSERT_EQ(MCNPg1->getCellDensity(3001), "345_-2.7");
 }

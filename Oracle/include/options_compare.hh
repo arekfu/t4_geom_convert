@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "PTRACFormat.hh"
 
 void help();
 
@@ -17,6 +18,7 @@ public:
   long npoints;
   double delta;
   bool guessMaterialAssocs;
+  PTRACFormat ptracFormat;
 
   OptionsCompare();
   void get_opts(int, char **);

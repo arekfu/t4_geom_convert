@@ -59,7 +59,7 @@ TEST_F(T4test, WeakEquivalenceNOK)
 
 TEST_F(T4test, WeakEquivalenceOK)
 {
-  MCNPGeometry mcnpGeom("slabp", "input_slab");
+  MCNPGeometry mcnpGeom("input_slab");
   vector<double> point(3);
 
   t4Geom->addEquivalence("345_-2.7", "ALU1");
@@ -67,18 +67,16 @@ TEST_F(T4test, WeakEquivalenceOK)
 
   long rank = t4Geom->getVolumes()->which_volume(point);
   std::string compo = t4Geom->getCompos()->get_name_from_volume(rank);
-  mcnpGeom.setCellMaterial({3001, 1});
   mcnpGeom.addCell2Density(3001, {345, "-2.7"});
-  ASSERT_TRUE(t4Geom->weakEquivalence(mcnpGeom.getMaterialDensity(), compo));
+  ASSERT_TRUE(t4Geom->weakEquivalence(mcnpGeom.getCellDensity(3001), compo));
 
   t4Geom->addEquivalence("345-2.7", "ALU3"); //should be ALU2 and test will give false.
   point = {0.43281, -1.3670, -0.096474};
 
   rank = t4Geom->getVolumes()->which_volume(point);
   compo = t4Geom->getCompos()->get_name_from_volume(rank);
-  mcnpGeom.setCellMaterial({2001, 2});
   mcnpGeom.addCell2Density(2001, {345, "-2.7"});
-  ASSERT_FALSE(t4Geom->weakEquivalence(mcnpGeom.getMaterialDensity(), compo));
+  ASSERT_FALSE(t4Geom->weakEquivalence(mcnpGeom.getCellDensity(2001), compo));
 }
 
 TEST_F(T4test, DistanceToSurface)

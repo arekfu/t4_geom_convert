@@ -34,7 +34,8 @@ int strictness_level = 3; //Global variable required by T4 libraries
 Statistics compare_geoms(const OptionsCompare &options)
 {
   T4Geometry t4Geom(options.filenames[0]);
-  MCNPGeometry mcnpGeom(options.filenames[2], options.filenames[1]);
+  MCNPGeometry mcnpGeom(options.filenames[1]);
+  MCNPPTRAC mcnpPtrac(options.filenames[2], options.ptracFormat);
   Statistics stats;
 
   stats.setNbT4Volumes(t4Geom.getVolumes()->get_nb_vol());
@@ -49,9 +50,6 @@ Statistics compare_geoms(const OptionsCompare &options)
   if (options.verbosity > 0) {
     cout << "delta is " << options.delta << endl;
   }
-
-  // The number of header lines must be 8 !!
-  mcnpGeom.goThroughHeaderPTRAC(8);
 
   if(!options.guessMaterialAssocs) {
     auto const &compos = t4Geom.getCompos()->get_compo_map();
@@ -80,7 +78,7 @@ Statistics compare_geoms(const OptionsCompare &options)
   unsigned long countPoints = 0;
   auto current = std::chrono::system_clock::now();
   auto previous = current;
-  while (mcnpGeom.readNextPtracData(maxSampledPts)) {
+  while(mcnpPtrac.readNextPtracData(maxSampledPts)) {
 
     ++countPoints;
 
@@ -91,7 +89,8 @@ Statistics compare_geoms(const OptionsCompare &options)
       previous = current;
     }
 
-    vector<double> point = mcnpGeom.getPointXyz();
+    auto const &record = mcnpPtrac.getPTRACRecord();
+    auto const &point = record.point;
     long rank = t4Geom.getVolumes()->which_volume(point);
     std::string compo = t4Geom.getCompos()->get_name_from_volume(rank);
 
@@ -100,8 +99,8 @@ Statistics compare_geoms(const OptionsCompare &options)
     } else {
       stats.recordCoveredRank(rank);
 
-      string materialDensityKey = mcnpGeom.getMaterialDensity();
-      int cID = mcnpGeom.getCellID();
+      unsigned long cID = record.cellID;
+      string materialDensityKey = mcnpGeom.getCellDensity(cID);
       if (!t4Geom.materialInMap(materialDensityKey) && options.guessMaterialAssocs) {
         if (options.verbosity > 0) {
           cout << "at point: (" << point[0] << ", " << point[1] << ", " << point[2]
@@ -118,8 +117,8 @@ Statistics compare_geoms(const OptionsCompare &options)
           if (dist <= options.delta) {
             stats.incrementIgnore();
           } else {
-            int pID = mcnpGeom.getPointID();
-            int mID = mcnpGeom.getMaterialID();
+            int pID = record.pointID;
+            int mID = record.materialID;
             stats.incrementFailure();
             stats.recordFailure(point, rank, pID, cID, mID, dist);
             if (options.verbosity > 0) {
@@ -128,7 +127,7 @@ Statistics compare_geoms(const OptionsCompare &options)
                    << "y = " << point[1] << endl
                    << "z = " << point[2] << endl;
               cout << "T4 rank: " << rank << "   T4 compo: " << compo << endl;
-              cout << "MCNP cellID: " << mcnpGeom.getCellID() << "   MCNP compo: " << materialDensityKey << endl;
+              cout << "MCNP cellID: " << record.cellID << "   MCNP compo: " << materialDensityKey << endl;
             }
           }
         }

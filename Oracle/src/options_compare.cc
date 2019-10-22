@@ -31,6 +31,7 @@ void help()
   edit_help_option("-n, --npts", "Maximum number of tested points.");
   edit_help_option("-d, --delta", "Distance to the nearest surface below which a failed test is ignored.");
   edit_help_option("-g, --guess-material-assocs", "guess the materials correspondence based on the first few points");
+  edit_help_option("--binary,---ascii", "Specify the format of the MCNP PTRAC file");
 
   std::cout << endl;
 }
@@ -41,7 +42,8 @@ OptionsCompare::OptionsCompare() : help(false),
                                    verbosity(0),
                                    npoints(2000000),
                                    delta(1.0E-7),
-                                   guessMaterialAssocs(false)
+                                   guessMaterialAssocs(false),
+                                   ptracFormat(PTRACFormat::ASCII)
 {
 }
 
@@ -60,14 +62,14 @@ void OptionsCompare::get_opts(int argc, char **argv)
     for (int i = 1; i < argc; i++) {
       string opt(argv[i]);
 
-      if (opt.compare("--help") == 0 || opt.compare("-h") == 0) {
+      if (opt == "--help" || opt == "-h") {
         help = true;
         return;
-      } else if (opt.compare("--verbose") == 0 || opt.compare("-V") == 0) {
+      } else if (opt == "--verbose" || opt == "-V") {
         ++verbosity;
-      } else if (opt.compare("--guess-material-assocs") == 0 || opt.compare("-g") == 0) {
+      } else if (opt == "--guess-material-assocs" || opt == "-g") {
         guessMaterialAssocs = true;
-      } else if (opt.compare("--npts") == 0 || opt.compare("-n") == 0) {
+      } else if (opt == "--npts" || opt == "-n") {
         int nv = 1;
         check_argv(argc, i + nv);
         npoints = int_of_string(argv[i + 1]);
@@ -76,7 +78,7 @@ void OptionsCompare::get_opts(int argc, char **argv)
           npoints = 100;
         }
         i += nv;
-      } else if (opt.compare("--delta") == 0 || opt.compare("-d") == 0) {
+      } else if (opt == "--delta" || opt == "-d") {
         int nv = 1;
         check_argv(argc, i + nv);
         istringstream os(argv[i + 1]);
@@ -86,6 +88,10 @@ void OptionsCompare::get_opts(int argc, char **argv)
           delta = 1.0e-7;
         }
         i += nv;
+      } else if (opt == "--binary") {
+        ptracFormat = PTRACFormat::BINARY;
+      } else if (opt == "--ascii") {
+        ptracFormat = PTRACFormat::ASCII;
       } else {
         filenames.push_back(opt);
       }
