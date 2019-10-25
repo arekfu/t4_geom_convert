@@ -352,11 +352,15 @@ class CCellConversion:
                     continue
                 transl = latticeVector(lat_base_vectors, index)
                 tr = list(transl) + [1., 0., 0., 0., 1., 0., 0., 0., 1.]
-                tree = self.postOrderTraversalTransform(mcnp_element_geom, tr)
-                self.new_cell_key += 1
+
                 new_cell = cell.copy()
-                new_cell.fillid = universe
+                tree = self.postOrderTraversalTransform(mcnp_element_geom, tr)
                 new_cell.geometry = tree
+                if universe == cell.universe:
+                    new_cell.fillid = None
+                    new_cell.materialID = cell.materialID
+                else:
+                    new_cell.fillid = universe
                 filltr = new_cell.filltr
                 if filltr:
                     new_filltr = tuple(x if i>2 else x+tr[i]
@@ -367,6 +371,7 @@ class CCellConversion:
                                        for i, x in enumerate(filltr))
                 new_cell.filltr = new_filltr
                 new_cell.lattice = False
+                self.new_cell_key += 1
                 self.dicCellMCNP[self.new_cell_key] = new_cell
             del self.dicCellMCNP[key]
 

@@ -11,7 +11,7 @@ from .CDictVolumeT4 import CDictVolumeT4
 from .CDictCellMCNP import CDictCellMCNP
 from .CCellConversion import CCellConversion
 from .TreeFunctions import isLeaf
-from .CUniverseDict import CUniverseDict
+from .ByUniverse import by_universe
 
 
 def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
@@ -74,7 +74,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
         )
 
     # treat FILL
-    dictUniverse = CUniverseDict(mcnp_dict).dictUniverse()
+    dict_universe = by_universe(mcnp_dict)
     fill_keys = [key for key, value in mcnp_dict.items()
                  if value.fillid is not None]
     if fill_keys:
@@ -83,7 +83,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
                     .format(len(str(n_fill_keys)), n_fill_keys))
         for i, key in enumerate(fill_keys):
             print(fmt_string.format(i+1, key), end='', flush=True)
-            conv.postOrderTraversalFill(key, dictUniverse)
+            conv.postOrderTraversalFill(key, dict_universe)
         print('... done', flush=True)
 
     # update volume and surface free keys
