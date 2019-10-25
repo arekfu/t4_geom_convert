@@ -11,32 +11,23 @@
 
 using namespace std;
 
-class MCNPtestPtrac : public ::testing::Test
+class MCNPtestPtracASCII : public ::testing::Test
 {
 
 public:
-  MCNPGeometry *MCNPg1;
   MCNPPTRAC *MCNPptrac;
   void SetUp()
   {
-    // code here will execute just before the test ensues
-    MCNPg1 = new MCNPGeometry("input_slab");
     MCNPptrac = new MCNPPTRACASCII("slabp");
   }
 
   void TearDown()
   {
-    delete MCNPg1;
     delete MCNPptrac;
   }
 };
 
-TEST_F(MCNPtestPtrac, createObject)
-{
-  ASSERT_EQ(MCNPg1->getInputPath(), "input_slab");
-}
-
-TEST_F(MCNPtestPtrac, ReadFirstData)
+TEST_F(MCNPtestPtracASCII, ReadFirstData)
 {
   MCNPptrac->readNextPtracData(1000);
   auto const &record = MCNPptrac->getPTRACRecord();
@@ -49,7 +40,7 @@ TEST_F(MCNPtestPtrac, ReadFirstData)
   ASSERT_DOUBLE_EQ(record.point[2], 1.0883);
 }
 
-TEST_F(MCNPtestPtrac, ReadAll)
+TEST_F(MCNPtestPtracASCII, ReadAll)
 {
   int ii = 1;
   while (ii <= 1000) {
@@ -70,3 +61,57 @@ TEST_F(MCNPtestPtrac, ReadAll)
 
   ASSERT_EQ(MCNPptrac->getNbPointsRead(), 1000);
 }
+
+
+class MCNPtestPtracBinary : public ::testing::Test
+{
+
+public:
+  MCNPPTRAC *MCNPptrac;
+  void SetUp()
+  {
+    MCNPptrac = new MCNPPTRACBinary("slabbinp");
+  }
+
+  void TearDown()
+  {
+    delete MCNPptrac;
+  }
+};
+
+TEST_F(MCNPtestPtracBinary, ReadFirstData)
+{
+  MCNPptrac->readNextPtracData(1000);
+  auto const &record = MCNPptrac->getPTRACRecord();
+  ASSERT_EQ(record.pointID, 1);
+  ASSERT_EQ(record.eventID, 1000);
+  ASSERT_EQ(record.cellID, 3001);
+  ASSERT_EQ(record.materialID, 1);
+  ASSERT_DOUBLE_EQ(record.point[0], 12.02427913688436);
+  ASSERT_DOUBLE_EQ(record.point[1], -72.881828858643473);
+  ASSERT_DOUBLE_EQ(record.point[2], 1.0882843926953107);
+}
+
+TEST_F(MCNPtestPtracBinary, ReadAll)
+{
+  int ii = 1;
+  while (ii <= 1000) {
+    MCNPptrac->readNextPtracData(2000);
+    ii++;
+  }
+
+  auto const &record = MCNPptrac->getPTRACRecord();
+  ASSERT_EQ(record.pointID, 1000);
+  ASSERT_EQ(record.eventID, 1000);
+
+  ASSERT_EQ(record.cellID, 1001);
+  ASSERT_EQ(record.materialID, 3);
+
+  ASSERT_DOUBLE_EQ(record.point[0], -2.2580291076456316);
+  ASSERT_DOUBLE_EQ(record.point[1], 18.880472384323852);
+  ASSERT_DOUBLE_EQ(record.point[2], -1.2855986393557863);
+
+  ASSERT_EQ(MCNPptrac->getNbPointsRead(), 1000);
+}
+
+

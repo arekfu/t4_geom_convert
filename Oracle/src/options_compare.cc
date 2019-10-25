@@ -43,7 +43,7 @@ OptionsCompare::OptionsCompare() : help(false),
                                    npoints(2000000),
                                    delta(1.0E-7),
                                    guessMaterialAssocs(false),
-                                   ptracFormat(PTRACFormat::ASCII)
+                                   ptracFormat(PTRACFormat::BINARY)
 {
 }
 

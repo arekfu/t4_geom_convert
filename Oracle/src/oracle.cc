@@ -39,6 +39,8 @@ Statistics compare_geoms(const OptionsCompare &options)
   std::unique_ptr<MCNPPTRAC> mcnpPtrac;
   if(options.ptracFormat == PTRACFormat::ASCII) {
     mcnpPtrac.reset(new MCNPPTRACASCII(options.filenames[2]));
+  } else if(options.ptracFormat == PTRACFormat::BINARY) {
+    mcnpPtrac.reset(new MCNPPTRACBinary(options.filenames[2]));
   } else {
     throw std::invalid_argument("Unrecognized PTRAC format");
   }

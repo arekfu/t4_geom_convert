@@ -10,17 +10,14 @@
 
 #include "MCNPGeometry.hh"
 #include "help.hh"
-#include <cstdio>
-#include <cstdlib>
 #include <cassert>
 #include <unistd.h>
 
 using namespace std;
 
-MCNPGeometry::MCNPGeometry(const string &inputPath) :
-  nps(-1),
-  inputPath(inputPath),
-  inputFile(inputPath)
+MCNPGeometry::MCNPGeometry(const string &inputPath) : nps(-1),
+                                                      inputPath(inputPath),
+                                                      inputFile(inputPath)
 {
   if (inputFile.fail()) {
     std::cerr << "INP file not found." << endl;
@@ -69,7 +66,7 @@ void MCNPGeometry::parseINP()
 {
   if (inputFile) {
     while (getline(inputFile, currentLine)) {
-      if(finishedReading()) {
+      if (finishedReading()) {
         break;
       }
       if (!isLineAComment(currentLine) && isdigit(currentLine[0])) {
@@ -125,15 +122,13 @@ map<unsigned long, string> &MCNPGeometry::getCell2Density()
   return cell2Density;
 }
 
-
 /************************************
 *                                  *
 *  methods of the MCNPPTRAC class  *
 *                                  *
 ************************************/
 
-MCNPPTRAC::MCNPPTRAC() :
-  nbPointsRead(0)
+MCNPPTRAC::MCNPPTRAC() : nbPointsRead(0)
 {
 }
 
@@ -162,26 +157,23 @@ PTRACRecord const &MCNPPTRAC::getPTRACRecord() const
   return record;
 }
 
-
-/************************************
-*                                  *
+/*****************************************
+*                                       *
 *  methods of the MCNPPTRACASCII class  *
-*                                  *
-************************************/
+*                                       *
+*****************************************/
 
-MCNPPTRACASCII::MCNPPTRACASCII(std::string const &ptracPath) :
-  MCNPPTRAC(),
-  nbDataCellMaterialLine(0),
-  ptracFile(ptracPath)
+MCNPPTRACASCII::MCNPPTRACASCII(std::string const &ptracPath) : MCNPPTRAC(),
+                                                               nbDataCellMaterialLine(0),
+                                                               ptracFile(ptracPath)
 {
-  if(ptracFile.fail()) {
+  if (ptracFile.fail()) {
     std::cerr << "PTRAC file " << ptracPath << " not found." << endl;
     exit(EXIT_FAILURE);
   }
   // The number of header lines must be 8!!
   goThroughHeaderPTRAC(8);
 }
-
 
 pair<int, int> MCNPPTRACASCII::readPointEvent()
 {
@@ -222,8 +214,8 @@ bool MCNPPTRACASCII::readNextPtracData(long maxReadPoint)
       auto const point = readPoint();
       incrementNbPointsRead();
       record = {pointEvent.first, pointEvent.second,
-        cellMaterial.first, cellMaterial.second,
-        point};
+                cellMaterial.first, cellMaterial.second,
+                point};
       return true;
     } else {
       return false;
@@ -261,8 +253,8 @@ int MCNPPTRACASCII::getDataFromLine5Ptrac(const string &line5)
 void MCNPPTRACASCII::checkDataFromLine6Ptrac(const string &line6, int nbData)
 {
   vector<int> data(nbData);
-  const int cellIDPtracCode = 17;
-  const int materialIDPtracCode = 18;
+  constexpr int cellIDPtracCode = 17;
+  constexpr int materialIDPtracCode = 18;
   istringstream iss(line6);
   for (int jj = 0; jj < nbData; jj++) {
     iss >> data[jj];
@@ -270,5 +262,180 @@ void MCNPPTRACASCII::checkDataFromLine6Ptrac(const string &line6, int nbData)
   if ((data[nbData - 2] != cellIDPtracCode) && (data[nbData - 1] != materialIDPtracCode)) {
     std::cerr << "PTRAC file format not suitable. Please see Oracle/data/slapb file for example..." << endl;
     exit(EXIT_FAILURE);
+  }
+}
+
+/*****************************************
+*                                        *
+*  methods of the MCNPPTRACBinary class  *
+*                                        *
+******************************************/
+
+MCNPPTRACBinary::MCNPPTRACBinary(std::string const &ptracPath) : ptracFile(ptracPath, std::ios_base::binary)
+{
+  if (ptracFile.fail()) {
+    std::cerr << "PTRAC file " << ptracPath << " not found." << endl;
+    exit(EXIT_FAILURE);
+  }
+  parseHeader();
+}
+
+bool MCNPPTRACBinary::readNextPtracData(long maxReadPoint)
+{
+  if ((ptracFile && ptracFile.peek() != EOF) && getNbPointsRead() <= maxReadPoint) {
+    parsePTRACRecord();
+    incrementNbPointsRead();
+    return true;
+  }
+  return false;
+}
+
+void MCNPPTRACBinary::parseHeader()
+{
+  skipHeader();
+  skipPtracInputData();
+  parseVariableIDs();
+}
+
+void MCNPPTRACBinary::skipHeader()
+{
+  readRecord(ptracFile); // header
+  readRecord(ptracFile); // code, version, dates
+  readRecord(ptracFile); // calculation title
+}
+
+void MCNPPTRACBinary::skipPtracInputData()
+{
+  std::string buffer = readRecord(ptracFile);
+  std::stringstream bufferStream(buffer);
+  int n_fields_total = (int)readBinary<double>(bufferStream);
+  int n_fields_read = 0;
+  int n_desc = 0;
+
+  while (n_fields_read < n_fields_total) {
+    if (bufferStream.peek() == EOF) {
+      buffer = readRecord(ptracFile);
+      bufferStream.str(buffer);
+      bufferStream.clear();
+    }
+    if (n_desc == 0) {
+      n_desc = (int)readBinary<double>(bufferStream);
+      ++n_fields_read;
+    } else {
+      --n_desc;
+      readBinary<double>(bufferStream); // throw away field descriptor
+    }
+  }
+}
+
+void MCNPPTRACBinary::parseVariableIDs()
+{
+  std::string buffer = readRecord(ptracFile); // line 6
+  auto const fields = reinterpretBuffer<int, long, long>(buffer);
+  const int nbDataNPS = std::get<0>(fields);
+  const long nbDataSrcLong = std::get<1>(fields);
+  const long nbDataSrcDouble = std::get<2>(fields);
+
+  buffer = readRecord(ptracFile); // line 7
+  std::stringstream bufferStream(buffer);
+
+  // Skip over the NPS data line. For some reason these fields are written as
+  // longs.
+  for (int i = 0; i < nbDataNPS; ++i) {
+    reinterpretBuffer<long>(bufferStream);
+  }
+
+  constexpr int eventID = 7;
+  constexpr int cellID = 17;
+  constexpr int matID = 18;
+  int eventIdx = -1;
+  int cellIdx = -1;
+  int matIdx = -1;
+  for (int i = 0; i < nbDataSrcLong; ++i) {
+    const int varID = std::get<0>(reinterpretBuffer<int>(bufferStream));
+    switch (varID) {
+    case eventID:
+      eventIdx = i;
+      break;
+    case cellID:
+      cellIdx = i;
+      break;
+    case matID:
+      matIdx = i;
+      break;
+    }
+  }
+
+  constexpr int pointXID = 20;
+  constexpr int pointYID = 21;
+  constexpr int pointZID = 22;
+  int pointXIdx = -1;
+  int pointYIdx = -1;
+  int pointZIdx = -1;
+  for (int i = 0; i < nbDataSrcDouble; ++i) {
+    const int varID = std::get<0>(reinterpretBuffer<int>(bufferStream));
+    switch (varID) {
+    case pointXID:
+      pointXIdx = i;
+      break;
+    case pointYID:
+      pointYIdx = i;
+      break;
+    case pointZID:
+      pointZIdx = i;
+      break;
+    }
+  }
+
+  indices = PTRACRecordIndices{eventIdx, cellIdx, matIdx, pointXIdx, pointYIdx, pointZIdx, nbDataSrcLong, nbDataSrcDouble};
+}
+
+void MCNPPTRACBinary::parsePTRACRecord()
+{
+  long point = -1;
+  long event = -1, oldEvent = -1;
+  constexpr long lastEvent = 9000;
+  constexpr long sourceEvent = 1000;
+  long cell = -1;
+  long mat = -1;
+  double px = 0.;
+  double py = 0.;
+  double pz = 0.;
+
+  std::string buffer = readRecord(ptracFile); // NPS line
+  std::tie(point, event) = reinterpretBuffer<long, long>(buffer);
+  if(event != sourceEvent) {
+    throw std::logic_error("expected source event at the start of the history");
+  }
+
+  while (event != lastEvent) {
+    buffer = readRecord(ptracFile); // data line (all doubles, even though the
+                                    // first group are actually longs)
+    std::stringstream bufferStream(buffer);
+    for (int i = 0; i < indices.nbDataSrcLong; ++i) {
+      const auto someLong = static_cast<long>(std::get<0>(reinterpretBuffer<double>(bufferStream)));
+      if (i == indices.event) {
+        oldEvent = event;
+        event = someLong;
+      } else if (i == indices.cell) {
+        cell = someLong;
+      } else if (i == indices.mat) {
+        mat = someLong;
+      }
+    }
+    for (int i = 0; i < indices.nbDataSrcDouble; ++i) {
+      const auto someDouble = std::get<0>(reinterpretBuffer<double>(bufferStream));
+      if (i == indices.px) {
+        px = someDouble;
+      } else if (i == indices.py) {
+        py = someDouble;
+      } else if (i == indices.pz) {
+        pz = someDouble;
+      }
+    }
+
+    if(oldEvent == sourceEvent) {
+      record = PTRACRecord{point, oldEvent, cell, mat, {px, py, pz}};
+    }
   }
 }
