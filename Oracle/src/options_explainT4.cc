@@ -19,7 +19,7 @@ void help()
 
   std::cout << "INPUT FILES" << endl;
   edit_help_option("jdd.t4", "A TRIPOLI-4 input file with the geometry to query.");
-  edit_help_option("jdd.inp", "A file of lines of the form <x> <y> <z> <volID>.");
+  edit_help_option("points_file", "A file of lines of the form <x> <y> <z> <volID>.");
 
   std::cout << endl
             << "OPTIONS" << endl;
