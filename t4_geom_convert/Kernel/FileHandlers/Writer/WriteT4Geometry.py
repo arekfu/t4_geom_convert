@@ -29,7 +29,7 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
         mcnp_cell_cache_path = None
 
     if not args.cache:
-        dic_surfaceT4, dic_surfaceMCNP = constructSurfaceT4(mcnpParser)
+        dic_surfaceT4, dic_surfaceMCNP, aux_ids = constructSurfaceT4(mcnpParser)
     else:
         try:
             with t4_surf_cache_path.open('rb') as dicfile:
@@ -38,7 +38,7 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 dic_surfaceT4, dic_surfaceMCNP  = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
-            dic_surfaceT4, dic_surfaceMCNP = constructSurfaceT4(mcnpParser)
+            dic_surfaceT4, dic_surfaceMCNP, aux_ids = constructSurfaceT4(mcnpParser)
             with t4_surf_cache_path.open('wb') as dicfile:
                 print('writing surfaces to file {}...'
                       .format(t4_surf_cache_path.resolve()), end='', flush=True)
@@ -46,7 +46,7 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 print(' done', flush=True)
 
     if not args.cache:
-        dic_volume, surf_used, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP)
+        dic_volume, surf_used, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
     else:
         try:
             with t4_vol_cache_path.open('rb') as dicfile:
@@ -55,7 +55,7 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 dic_volume,surf_used, mcnp_new_dict, dic_surfaceT4 = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
-            dic_volume, surf_used, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP)
+            dic_volume, surf_used, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
             with t4_vol_cache_path.open('wb') as dicfile:
                 print('writing cells to file {}...'
                       .format(t4_vol_cache_path.resolve()), end='', flush=True)

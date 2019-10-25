@@ -30,7 +30,11 @@ def remove_duplicate_surfaces(surfs):
     for i, (key, (_, fixed)) in enumerate(new_surfs.items()):
         print(fmt_string.format(i+1, key), end='', flush=True)
         for i in range(len(fixed)):
-            fixed[i] = renumbering[fixed[i]]
+            surf = fixed[i]
+            if surf > 0:
+                fixed[i] = renumbering[fixed[i]]
+            else:
+                fixed[i] = -renumbering[-fixed[i]]
     print('... done', flush=True)
 
     return new_surfs, renumbering

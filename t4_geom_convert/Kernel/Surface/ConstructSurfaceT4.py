@@ -19,7 +19,6 @@ def constructSurfaceT4(mcnpParser):
     dic_newSurfaceT4 = OrderedDict()
     dic_surfaceT4, dic_surfaceMCNP = conversionSurfaceMCNPToT4(mcnpParser)
     free_id = max(int(k) for k in dic_surfaceT4.keys()) + 1
-    keyS = 100000
     n_surfaces = len(dic_surfaceT4)
     fmt_string = '\rconverting surface {{:{}d}}/{}'.format(len(str(n_surfaces)),
                                                          n_surfaces)
@@ -32,7 +31,8 @@ def constructSurfaceT4(mcnpParser):
             fixed_ids.append(side * free_id)
             free_id += 1
         dic_newSurfaceT4[key] = (surf_coll.main, fixed_ids)
-    dic_newSurfaceT4[keyS + 1] = (CSurfaceT4(T4S.PLANEX, [1], ['aux plane for unions']), [])
-    dic_newSurfaceT4[keyS + 2] = (CSurfaceT4(T4S.PLANEX, [-1], ['aux plane for unions']), [])
+    aux_ids = free_id + 1, free_id + 2
+    dic_newSurfaceT4[aux_ids[0]] = (CSurfaceT4(T4S.PLANEX, [1], ['aux plane for unions']), [])
+    dic_newSurfaceT4[aux_ids[1]] = (CSurfaceT4(T4S.PLANEX, [-1], ['aux plane for unions']), [])
     print('... done', flush=True)
-    return dic_newSurfaceT4, dic_surfaceMCNP
+    return dic_newSurfaceT4, dic_surfaceMCNP, aux_ids

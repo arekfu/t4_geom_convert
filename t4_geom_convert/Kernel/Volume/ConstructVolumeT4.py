@@ -15,7 +15,7 @@ from .ByUniverse import by_universe
 
 
 def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
-                      dic_surfaceMCNP):
+                      dic_surfaceMCNP, aux_ids):
     '''
     :brief: method changing the tuple from CCellConversion in
     instance of the CVolumeT4 Class
@@ -30,7 +30,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
         max(int(k) for k in dic_surface) + 1
         )
     surf_used = set()
-    conv = CCellConversion(free_key, free_surf_key, objT4, dic_surface, dic_surfaceMCNP, mcnp_dict)
+    conv = CCellConversion(free_key, free_surf_key, objT4, dic_surface, dic_surfaceMCNP, mcnp_dict, aux_ids)
 
     # treat TRCL
     trcl_keys = [key for key, value in mcnp_dict.items()

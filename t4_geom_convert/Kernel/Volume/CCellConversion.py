@@ -26,7 +26,8 @@ class CCellConversion:
     :brief: Class which contains methods to convert the Cell of MCNP in T4 Volume
     '''
 
-    def __init__(self, int_cell, int_surf, d_dictClassT4, d_dictSurfaceT4, d_dicSurfaceMCNP, d_dicCellMCNP):
+    def __init__(self, int_cell, int_surf, d_dictClassT4, d_dictSurfaceT4,
+                 d_dicSurfaceMCNP, d_dicCellMCNP, aux_ids):
         '''
         Constructor
         :param: int_i : id of the volume created
@@ -39,6 +40,7 @@ class CCellConversion:
         self.dictSurfaceT4 = d_dictSurfaceT4
         self.dicSurfaceMCNP = d_dicSurfaceMCNP
         self.dicCellMCNP = d_dicCellMCNP
+        self.aux_ids = aux_ids
 
     def conversionEQUA(self, list_surface):
         '''
@@ -66,13 +68,13 @@ class CCellConversion:
         :brief: method analyze the type of conversion needed between a T4 INTERSECTION
         and a T4 UNION and return a tuple with the information of the T4 VOLUME
         '''
-        keyS = 100000
         if op == '*':
             pluses = []
             minuses = []
             ops =[('INTE', ids)]
         elif op == ':':
-            pluses, minuses = self.conversionEQUA([keyS+1, -(keyS+2)])
+            pluses, minuses = self.conversionEQUA([self.aux_ids[0],
+                                                   -self.aux_ids[1]])
             ops = [('UNION', ids)]
         else:
             raise ValueError('Converting cell with unexpected operator: {}'
