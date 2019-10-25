@@ -40,64 +40,44 @@ class CCellConversion:
         self.dicSurfaceMCNP = d_dicSurfaceMCNP
         self.dicCellMCNP = d_dicCellMCNP
 
-    def conversionEQUA(self, list_surface, fictive):
+    def conversionEQUA(self, list_surface):
         '''
         :brief: method converting a list of if of surface and return a tuple with the
         informations of the volume EQUA T4
         '''
 
-        str_equaMinus = ''
-        str_equaPlus = ''
-        i_minus = 0
-        i_plus = 0
+        minus_surfs = []
+        plus_surfs = []
         seen = set()
         for elt in list_surface:
+            assert isinstance(elt, int)
             if elt in seen:
+                # do not emit the same surface twice
                 continue
             seen.add(elt)
-            if '-' in str(elt):
-                i_minus += 1
-                elt = int(elt)
-                elt = abs(elt)
-                str_equaMinus = str_equaMinus + str(elt) + ' '
-            else:
-                i_plus += 1
-                str_equaPlus = str_equaPlus + str(elt) + ' '
-        str_equaPlus = 'PLUS'+ ' ' + str(i_plus) + ' ' + str_equaPlus
-        str_equaMinus = 'MINUS'+ ' ' + str(i_minus) + ' ' + str_equaMinus
-        if i_plus == 0 and i_minus != 0:
-            str_equaPlus = ''
-        if i_minus == 0 and i_plus != 0:
-            str_equaMinus = ''
-        str_equa = str_equaPlus + ' ' + str_equaMinus
-        if fictive == False:
-            s_fictive = ''
-        if fictive == True:
-            s_fictive = 'FICTIVE'
-        params = ['EQUA', str_equa]
-        return params, s_fictive
+            if elt < 0:
+                minus_surfs.append(-elt)
+            elif elt > 0:
+                plus_surfs.append(elt)
+        return plus_surfs, minus_surfs
 
-    def conversionINTUNION(self, op, *ids, fictive):
+    def conversionINTUNION(self, op, *ids):
         '''
         :brief: method analyze the type of conversion needed between a T4 INTERSECTION
         and a T4 UNION and return a tuple with the information of the T4 VOLUME
         '''
-        params = []
         keyS = 100000
         if op == '*':
-            params.extend(('EQUA', 'INTE'))
-        if op == ':':
-            tupleForEqua = self.conversionEQUA([keyS+1, -(keyS+2)], fictive=True)
-            params.extend(tupleForEqua[0])
-            params.append('UNION')
-        params.append(len(ids))
-        params.extend(ids)
-        if fictive == False:
-            s_fictive = ''
-        if fictive == True:
-            s_fictive = 'FICTIVE'
-        tuple_final = params, s_fictive
-        return tuple_final
+            pluses = []
+            minuses = []
+            ops =[('INTE', ids)]
+        elif op == ':':
+            pluses, minuses = self.conversionEQUA([keyS+1, -(keyS+2)])
+            ops = [('UNION', ids)]
+        else:
+            raise ValueError('Converting cell with unexpected operator: {}'
+                             .format(op))
+        return pluses, minuses, ops
 
     def postOrderTraversalFill(self, key, dictUniverse):
 
@@ -200,9 +180,9 @@ class CCellConversion:
         if isLeaf(p_tree):
             self.new_cell_key += 1
             p_id = self.new_cell_key
-            tupEQUA = self.conversionEQUA([p_tree], fictive=True)
-            params, fict = tupEQUA
-            self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
+            pluses, minuses = self.conversionEQUA([p_tree])
+            self.dictClassT4[p_id] = CVolumeT4(pluses=pluses, minuses=minuses,
+                                               idorigin=idorigin)
             return p_id
 
         p_id, op, *args = p_tree
@@ -218,30 +198,34 @@ class CCellConversion:
             # here we know that paramsOPER starts as ['EQUA', 'INTE', ...]
             # because op == '*'
             if surfs:
-                paramsEQUA, fict = self.conversionEQUA(surfs, fictive=True)
-                params = paramsEQUA.copy()
+                pluses, minuses = self.conversionEQUA(surfs)
                 if nodes:
                     arg_ids = [self.postOrderTraversalConversion(node, idorigin)
                             for node in nodes]
-                    paramsOPER, _fict = self.conversionINTUNION(op, *arg_ids, fictive=True)
-                    params.extend(paramsOPER[1:])  # take everything after the EQUA
+                    pluses2, minuses2, ops = self.conversionINTUNION(op,
+                                                                     *arg_ids)
+                    pluses += pluses2
+                    minuses += minuses2
+                else:
+                    ops = None
             else:
                 # we assume that nodes is not empty
                 arg_ids = [self.postOrderTraversalConversion(node, idorigin)
-                        for node in nodes]
-                paramsOPER, fict = self.conversionINTUNION(op, *arg_ids, fictive=True)
-                params = paramsOPER.copy()  # take everything after the EQUA
-            self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
+                           for node in nodes]
+                pluses, minuses, ops = self.conversionINTUNION(op, *arg_ids)
+            self.dictClassT4[p_id] = CVolumeT4(pluses=pluses, minuses=minuses,
+                                               ops=ops, idorigin=idorigin)
             return p_id
 
         # here op == ':'
         if op != ':':
-            raise ValueError('Converting cell with unexpected operator: %s'
-                             % op)
+            raise ValueError('Converting cell with unexpected operator: {}'
+                             .format(op))
         arg_ids = [self.postOrderTraversalConversion(arg, idorigin)
                     for arg in args]
-        params, fict = self.conversionINTUNION(op, *arg_ids, fictive=True)
-        self.dictClassT4[p_id] = CVolumeT4(params, fict, idorigin)
+        pluses, minuses, ops = self.conversionINTUNION(op, *arg_ids)
+        self.dictClassT4[p_id] = CVolumeT4(pluses=pluses, minuses=minuses,
+                                           ops=ops, idorigin=idorigin)
         return p_id
 
 

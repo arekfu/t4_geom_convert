@@ -9,6 +9,7 @@ import pickle
 from pathlib import Path
 
 from ...Surface.ConstructSurfaceT4 import constructSurfaceT4
+from ...Surface.Duplicates import remove_duplicate_surfaces, renumber_surfaces
 from ...Volume.ConstructVolumeT4 import constructVolumeT4
 
 
@@ -61,6 +62,9 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 pickle.dump((dic_volume, surf_used, mcnp_new_dict, dic_surfaceT4), dicfile)
                 print(' done', flush=True)
 
+    dic_surfaceT4, surf_renumbering = remove_duplicate_surfaces(dic_surfaceT4)
+    dic_volume, surf_used = renumber_surfaces(dic_volume, surf_renumbering)
+
     for key in sorted(surf_used):
         surf, _ = dic_surfaceT4[key]
         list_paramSurface = surf.paramSurface
@@ -73,14 +77,8 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                                         s_paramSurface, s_comment))
     ofile.write("\n")
 
-    for k, val in dic_volume.items():
-        s_params = ' '.join(str(param) for param in val.params)
-        s_fictive = val.fictive
-        if val.idorigin:
-            s_comment = ' // ' + '; '.join(map(str, val.idorigin))
-        else:
-            s_comment = ""
-        ofile.write("VOLU %s %s %s ENDV%s\n" % (k, s_params, s_fictive, s_comment))
+    for key, val in dic_volume.items():
+        ofile.write('VOLU {} {} ENDV{}\n'.format(key, val, val.comment()))
     ofile.write("\n")
     ofile.write("ENDG")
     ofile.write("\n")

@@ -20,7 +20,7 @@ def constructGeomCompT4(dicVol, dic_cellMCNP):
     dic_partialGeomComp = OrderedDict()
     obj_T4 = CDictGeomCompT4(dic_geomCompT4)
     for key, val in dicVol.items():
-        if val.fictive != '':
+        if val.fictive:
             continue
         if val.idorigin:
             volID = val.idorigin[0][0]

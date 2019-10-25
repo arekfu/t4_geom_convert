@@ -111,7 +111,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
             continue
         surf_used |= set(_surfacesUsed(opt_tree))
         j = conv.postOrderTraversalConversion(opt_tree, val.idorigin)
-        objT4.volumeT4[j].fictive = ''
+        objT4.volumeT4[j].fictive = False
         if j == key:
             continue
         objT4.set_key(j, key)
