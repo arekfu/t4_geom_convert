@@ -16,6 +16,10 @@ v0.2.0
 * Fix conversion of materials specified by total atomic concentration and
   atomic fractions (fixes issue #14)
 * Support spaces between the # operator and its arguments (fixes issue #10)
+* Handle the conversion of cards with a TRCL keyword (fixes issue #21)
+* Remove duplicated surfaces (fixes issue #19)
+* Do not use fixed IDs for the helper surface used in UNION cells (fixes issue
+  #15).
 * Some linting and refactoring
 
 
