@@ -48,10 +48,11 @@ def renumber_surfaces(volus, renumbering):
                   .format(len(str(n_volus)), n_volus))
     for i, (key, volu) in enumerate(volus.items()):
         print(fmt_string.format(i+1, key), end='', flush=True)
-        for surfs in (volu.pluses, volu.minuses):
-            for i in range(len(surfs)):
-                new_surf = renumbering[surfs[i]]
-                surfs[i] = new_surf
-                surf_used.add(new_surf)
+        new_pluses = set(renumbering[s] for s in volu.pluses)
+        new_minuses = set(renumbering[s] for s in volu.minuses)
+        surf_used |= new_pluses
+        surf_used |= new_minuses
+        volu.pluses = new_pluses
+        volu.minuses = new_minuses
     print('... done', flush=True)
     return volus, surf_used

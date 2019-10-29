@@ -17,8 +17,8 @@ class CVolumeT4(object):
         '''
         Constructor
         '''
-        self.pluses = pluses.copy()
-        self.minuses = minuses.copy()
+        self.pluses = set(pluses)
+        self.minuses = set(minuses)
         self.ops = ops.copy() if ops is not None else []
         self.idorigin = idorigin.copy() if idorigin is not None else []
         self.fictive = fictive
@@ -27,10 +27,10 @@ class CVolumeT4(object):
         str_params = ['EQUA']
         if self.pluses:
             str_params.extend(('PLUS', len(self.pluses)))
-            str_params.extend(self.pluses)
+            str_params.extend(sorted(self.pluses))
         if self.minuses:
             str_params.extend(('MINUS', len(self.minuses)))
-            str_params.extend(self.minuses)
+            str_params.extend(sorted(self.minuses))
         for op, args in self.ops:
             str_params.extend((op, len(args)))
             str_params.extend(args)
