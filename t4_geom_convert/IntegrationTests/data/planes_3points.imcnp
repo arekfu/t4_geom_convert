@@ -19,3 +19,9 @@ c IMPORTANCES
 c
 imp:n   1 1 0
 *TR2 0.0 0.0 0.0 22.5 67.5 90.0 112.5 22.5 90.0 90.0 90.0 0.0
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 1000
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000

@@ -3,19 +3,22 @@
 `pytest`_ configuration file.
 '''
 import pathlib
+import subprocess as sub
+
 import pytest
-import py
+
+# pylint: disable=redefined-outer-name
+
+# pylint: disable=redefined-outer-name
 
 
 def pytest_addoption(parser):
-    '''Add the ``--run-slow`` and ``--mcnp-path`` options to `pytest`.'''
-    parser.addoption('--run-slow', action='store_true',
-                     default=False, help='run slow tests')
-    parser.addoption('--mcnp-path', action='store',
-                     help='path to the MCNP executable', default=None,
-                     type=pathlib.Path)
+    '''Add the ``--oracle-path`` and ``--mcnp-path`` options to `pytest`.'''
     parser.addoption('--oracle-path', action='store',
                      help='path to the oracle executable', default=None,
+                     type=pathlib.Path)
+    parser.addoption('--mcnp-path', action='store',
+                     help='path to the MCNP executable', default=None,
                      type=pathlib.Path)
 
 
@@ -31,12 +34,6 @@ def pytest_collection_modifyitems(config, items):
             if 'oracle' in item.keywords:
                 item.add_marker(skip_or)
 
-    if not config.getoption("--run-slow"):
-        skip_slow = pytest.mark.skip(reason="needs --run-slow option to run")
-        for item in items:
-            if "slow" in item.keywords:
-                item.add_marker(skip_slow)
-
 
 ##############
 #  fixtures  #
@@ -44,7 +41,7 @@ def pytest_collection_modifyitems(config, items):
 
 
 @pytest.fixture
-def datadir(tmpdir, request):
+def datadir(tmp_path, request):
     '''Fixture responsible for searching a folder called 'data' in the same
     directory as the test module and, if available, moving all contents to a
     temporary directory so tests can use them freely.
@@ -53,16 +50,9 @@ def datadir(tmpdir, request):
     test_dir = filename.dirpath('data')
 
     if test_dir.check():
-        test_dir.copy(tmpdir)
+        test_dir.copy(tmp_path)
 
-    return tmpdir
-
-
-@pytest.fixture
-def workdir(tmpdir):
-    '''Fixture that cd's to a temporary working directory.'''
-    with tmpdir.as_cwd():
-        yield tmpdir
+    return tmp_path
 
 
 @pytest.fixture
@@ -117,18 +107,89 @@ def foreach_data(*args, **kwargs):
             raise ValueError('No kwargs allowed with a positional '
                              'argument to @foreach_data')
         fix_name = args[0]
-        fil = None
+        def fil(name):
+            return True
     else:
         if len(kwargs) != 1:
             raise ValueError('Only one kwarg allowed in @foreach_data')
         fix_name, fil = next(iter(kwargs.items()))
 
-    def _decorator(wrapped):
+    def _decorator(wrapped, fil=fil):
         from inspect import getfile
-        module_dir = py.path.local(getfile(wrapped))  # pylint: disable=E1101
-        test_dir = module_dir.dirpath('data')
-        datafiles = [path for path in test_dir.listdir(fil=fil)
-                     if path.isfile()]
-        ids = [str(path.basename) for path in datafiles]
+        module_dir = pathlib.Path(getfile(wrapped))  # pylint: disable=E1101
+        test_dir = module_dir.parent / 'data'
+        datafiles = [path for path in test_dir.iterdir()
+                     if path.is_file() and fil(path)]
+        ids = [str(path.name) for path in datafiles]
         return pytest.mark.parametrize(fix_name, datafiles, ids=ids)(wrapped)
     return _decorator
+
+
+class MCNPRunner:  # pylint: disable=too-few-public-methods
+    '''A helper class to run MCNP on a given input file.'''
+
+    def __init__(self, path, work_path):
+        '''Create an instance of :class:`MCNPRunner`.
+
+        :param path: path to the MCNP executable
+        :type path: str or path-like object
+        :param work_path: path to the working directory
+        :type work_path: str or path-like object
+        '''
+        self.path = path
+        self.work_path = work_path
+
+    def run(self, input_file):
+        '''Run MCNP on the given input file.
+
+        :param str input_file: absolute path to the input file
+        :returns: the path to the generated PTRAC file
+        :rtype: str or path-like object
+        '''
+        run_name = 'run_' + input_file.name
+        cli = [str(self.path),
+               'inp={}'.format(input_file),
+               'name={}'.format(run_name)]
+        sub.check_call(cli, cwd=str(self.work_path))
+        return self.work_path / (run_name + 'p')
+
+
+@pytest.fixture
+def mcnp(mcnp_path, tmp_path):
+    '''Return an instance of the :class:`MCNPRunner` class.'''
+    return MCNPRunner(mcnp_path, tmp_path)
+
+
+class OracleRunner:  # pylint: disable=too-few-public-methods
+    '''A helper class to run the test oracle.'''
+
+    def __init__(self, path, work_path):
+        '''Create an instance of :class:`OracleRunner`.
+
+        :param path: path to the MCNP executable
+        :type path: str or path-like object
+        :param work_path: path to the working directory
+        :type work_path: str or path-like object
+        '''
+        self.path = path
+        self.work_path = work_path
+
+    def run(self, t4_o, mcnp_i, mcnp_ptrac):
+        '''Run the test oracle on the given files.
+
+        :param str t4_o: absolute path to the TRIPOLI-4 file to test
+        :param str mcnp_i: absolute path to the MCNP input file
+        :param str mcnp_ptrac: absolute path to the MCNP PTRAC file
+        :returns: the number of failed points in the comparison
+        '''
+        cli = [str(self.path), str(t4_o), str(mcnp_i), str(mcnp_ptrac)]
+        sub.check_call(cli, cwd=str(self.work_path))
+        failed_path = self.work_path / (t4_o.stem + '.failedpoints.dat')
+        with failed_path.open() as failed_path_file:
+            return len(failed_path_file.readlines())
+
+
+@pytest.fixture
+def oracle(oracle_path, tmp_path):
+    '''Return an instance of the :class:`OracleRunner` class.'''
+    return OracleRunner(oracle_path, tmp_path)

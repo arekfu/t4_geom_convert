@@ -64,3 +64,9 @@ c surfaces
 m1 13027 1.
 m2 13027 1.
 *TR148 -10 2 1 25.34625 64.65375 90 115.34625 25.34625 90 90 90 0
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 30
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000

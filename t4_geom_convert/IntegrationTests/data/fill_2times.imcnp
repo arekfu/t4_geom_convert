@@ -1,0 +1,27 @@
+Test fill universe
+    3 0 -3 U=2
+    33 0 3 U=2
+    2 0 -2 FILL=2 (0 0 -30 1 0 0 0 1 0 0 0 1)
+    1 0 -1 FILL=2 (0 0 30 1 0 0 0 1 0 0 0 1)
+  999 0 -1000 1 2
+ 1000 0 1000
+
+    1000  SO  100
+    3  SO  10
+    2  SZ  -30 20
+    1  SZ  30 20
+
+m1
+              13027        -1.0
+m2
+              13027        -1.0
+m3
+              13027        -1.0
+imp:n 1. 4R 0.
+mode n
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 100
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000
