@@ -71,11 +71,11 @@ class CCellConversion:
         if op == '*':
             pluses = []
             minuses = []
-            ops =[('INTE', ids)]
+            ops =('INTE', ids)
         elif op == ':':
             pluses, minuses = self.conversionEQUA([self.aux_ids[0],
                                                    -self.aux_ids[1]])
-            ops = [('UNION', ids)]
+            ops = ('UNION', ids)
         else:
             raise ValueError('Converting cell with unexpected operator: {}'
                              .format(op))

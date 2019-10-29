@@ -10,7 +10,8 @@ from pathlib import Path
 
 from ...Surface.ConstructSurfaceT4 import constructSurfaceT4
 from ...Surface.Duplicates import remove_duplicate_surfaces, renumber_surfaces
-from ...Volume.ConstructVolumeT4 import constructVolumeT4
+from ...Volume.ConstructVolumeT4 import (constructVolumeT4, remove_empty_cells,
+                                         extract_used_surfaces)
 
 
 def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
@@ -46,24 +47,27 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 print(' done', flush=True)
 
     if not args.cache:
-        dic_volume, surf_used, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
+        dic_volume, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
     else:
         try:
             with t4_vol_cache_path.open('rb') as dicfile:
                 print('reading TRIPOLI-4 volumes from file {}...'
                       .format(t4_vol_cache_path.resolve()), end='', flush=True)
-                dic_volume,surf_used, mcnp_new_dict, dic_surfaceT4 = pickle.load(dicfile)
+                dic_volume, mcnp_new_dict, dic_surfaceT4 = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
-            dic_volume, surf_used, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
+            dic_volume, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
             with t4_vol_cache_path.open('wb') as dicfile:
                 print('writing cells to file {}...'
                       .format(t4_vol_cache_path.resolve()), end='', flush=True)
-                pickle.dump((dic_volume, surf_used, mcnp_new_dict, dic_surfaceT4), dicfile)
+                pickle.dump((dic_volume, mcnp_new_dict, dic_surfaceT4), dicfile)
                 print(' done', flush=True)
 
     dic_surfaceT4, surf_renumbering = remove_duplicate_surfaces(dic_surfaceT4)
-    dic_volume, surf_used = renumber_surfaces(dic_volume, surf_renumbering)
+    dic_volume = renumber_surfaces(dic_volume, surf_renumbering)
+
+    remove_empty_cells(dic_volume)
+    surf_used = extract_used_surfaces(dic_volume.values())
 
     for key in sorted(surf_used):
         surf, _ = dic_surfaceT4[key]

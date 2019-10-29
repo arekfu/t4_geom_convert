@@ -29,7 +29,6 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
         max(int(k) for k in dic_surfaceMCNP) + 1,
         max(int(k) for k in dic_surface) + 1
         )
-    surf_used = set()
     conv = CCellConversion(free_key, free_surf_key, objT4, dic_surface, dic_surfaceMCNP, mcnp_dict, aux_ids)
 
     # treat TRCL
@@ -109,7 +108,6 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
         if opt_tree is None:
             # the cell is empty, do not emit a converted cell
             continue
-        surf_used |= set(_surfacesUsed(opt_tree))
         j = conv.postOrderTraversalConversion(opt_tree, val.idorigin)
         objT4.volumeT4[j].fictive = False
         if j == key:
@@ -119,14 +117,35 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
         del objT4[j]
     print('... done', flush=True)
 
-    surf_used.add(100001)
-    surf_used.add(100002)
-    return dic_cellT4, surf_used, mcnp_dict
+    return dic_cellT4, mcnp_dict
 
 
-def _surfacesUsed(tree):
-    if isLeaf(tree):
-        return [abs(tree)]
-    _id, _op, *args = tree
-    result = [x for leaf in args for x in _surfacesUsed(leaf)]
-    return result
+def remove_empty_cells(dic_volume):
+    '''Remove cells that are patently empty.'''
+    removed = set()
+    to_remove = [key for key, val in dic_volume.items()
+                 if val.empty() and (val.ops is None or val.ops[0] != 'UNION')]
+
+    while to_remove:
+        for key in to_remove:
+            del dic_volume[key]
+        removed |= set(to_remove)
+
+        to_remove = []
+        for key, val in dic_volume.items():
+            if val.ops is None:
+                continue
+            if val.ops[0] == 'INTE' and any(x in removed for x in val.ops[1]):
+                to_remove.append(key)
+            elif val.ops[0] == 'UNION':
+                new_args = tuple(cell for cell in val.ops[1]
+                                 if cell not in removed)
+                if new_args:
+                    val.ops = (val.ops[0], new_args)
+                else:
+                    val.ops = None
+
+
+def extract_used_surfaces(volumes):
+    '''Return the IDs of the surfaces used in the given volumes, as a set.'''
+    return set(surf for volume in volumes for surf in volume.surface_ids())

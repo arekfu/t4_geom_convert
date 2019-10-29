@@ -39,9 +39,9 @@ def remove_duplicate_surfaces(surfs):
 
     return new_surfs, renumbering
 
+
 def renumber_surfaces(volus, renumbering):
     volus = volus.copy()
-    surf_used = set()
 
     n_volus = len(volus)
     fmt_string = ('\rrenumbering surfaces in cell {{:{}d}}/{} (cell {{}})'
@@ -50,9 +50,7 @@ def renumber_surfaces(volus, renumbering):
         print(fmt_string.format(i+1, key), end='', flush=True)
         new_pluses = set(renumbering[s] for s in volu.pluses)
         new_minuses = set(renumbering[s] for s in volu.minuses)
-        surf_used |= new_pluses
-        surf_used |= new_minuses
         volu.pluses = new_pluses
         volu.minuses = new_minuses
     print('... done', flush=True)
-    return volus, surf_used
+    return volus
