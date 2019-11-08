@@ -24,7 +24,7 @@ pipeline {
     timeout(time: 1, unit: 'HOURS')
   }
 
-  agent { label 'T4' }
+  agent { label 'tripoli4' }
 
   environment {
     projectName = 't4_geom_convert'
