@@ -69,7 +69,11 @@ void MCNPGeometry::parseINP()
       if (finishedReading()) {
         break;
       }
-      if (!isLineAComment(currentLine) && isdigit(currentLine[0])) {
+      if(isLineAComment(currentLine)) {
+        continue;
+      }
+      auto const pos = currentLine.find_first_of("0123456789");
+      if(pos != std::string::npos && pos < 5) {
         associateCell2Density();
       }
     }
