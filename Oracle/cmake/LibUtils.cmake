@@ -140,7 +140,9 @@ function(t4_add_library LIBNAME)
     )
   install(DIRECTORY "${T4_SOURCES_PATH}/"
           DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-          FILES_MATCHING PATTERN "*.hh")
+          FILES_MATCHING
+          PATTERN "*.hh"
+          PATTERN "*.h")
 endfunction()
 
 # Helper function to add executables.
@@ -428,10 +430,9 @@ function(import_HDF5_library VAR)
   endif()
   foreach(T4_HDF5_INSTALL_DIR IN LISTS T4_HDF5_INSTALL_DIRS)
     if(T4_HDF5_INSTALL_DIR STREQUAL "")
-      unset(ENV{HDF5_ROOT})
+      unset(ENV{HDF5_DIR})
     else()
-      unset(HDF5_ROOT)
-      set(ENV{HDF5_ROOT} "${T4_HDF5_INSTALL_DIR}")
+      set(ENV{HDF5_DIR} "${T4_HDF5_INSTALL_DIR}")
     endif()
     if(T4_STRICT_DEPENDENCIES)
       find_package(HDF5 ${HDF5_VERSION_REQUIRED} ${REQUIRED_FLAG} EXACT)
