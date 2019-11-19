@@ -8,7 +8,7 @@ import re
 
 re_comment = re.compile('^\s{0,4}[cC](\s|$)')
 re_continuation_spaces = re.compile('^\s{5,}')
-re_continuation_prev = re.compile('[^$]*&$')
+re_continuation_prev = re.compile('[^$]*&\s*$')
 
 
 # Function used at two places below
