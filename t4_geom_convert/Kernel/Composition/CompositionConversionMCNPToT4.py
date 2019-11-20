@@ -7,7 +7,7 @@
 from collections import OrderedDict
 
 from .CDictCompositionMCNP import CDictCompositionMCNP
-from .CIsotopeConversion import CIsotopeConversion
+from .ConvertIsotope import convert_isotope
 from .EIsotopeNameElementT4 import EIsotopeNameElement
 from .Abundances import Abundances
 
@@ -22,7 +22,7 @@ def compositionConversionMCNPToT4(mcnp_parser):
     for key, val in dict_compo_mcnp.items():
         atom_fracs = None
         l_composition_t4 = []
-        for isotope_id, fraction in val.ordDict():
+        for isotope_id, fraction in val.materialCompositionParameters:
             positive_fraction = not fraction.lstrip().startswith('-')
             if atom_fracs is None:
                 atom_fracs = positive_fraction
@@ -32,8 +32,7 @@ def compositionConversionMCNPToT4(mcnp_parser):
                                  'fractions) in M{}'
                                  .format(key))
 
-            atomic_number, mass_number = (CIsotopeConversion(isotope_id)
-                                          .conversionIsotope())
+            atomic_number, mass_number = convert_isotope(isotope_id)
             atomic_number_t4 = EIsotopeNameElement(atomic_number.value)
             if mass_number == '0':
                 mass_number_t4 = '-NAT'

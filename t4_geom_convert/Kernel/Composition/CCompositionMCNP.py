@@ -19,21 +19,17 @@ class CCompositionMCNP(object):
         :param: l_materialCompositionParameters : list of composition of
         material with id of isotope and its abondance
         '''
-        self.materialCompositionParameters = l_materialCompositionParameters
-
-    def ordDict(self):
-        '''
-        :brief: method taking the liste of the parameters of the composition
-        in the MCNP file and return a list reordonate in list of tuple :
-        isotope, fractionOfTheIsotope
-        '''
-        L = []
-        for i in range(0, math.floor(len(self.materialCompositionParameters)/2.0)):
-            isotope = self.materialCompositionParameters[2*i]
+        self.materialCompositionParameters = []
+        i = 0
+        while i < len(l_materialCompositionParameters):
+            isotope = l_materialCompositionParameters[i]
+            if '=' in isotope:
+                # this is a keyword, skip it
+                i += 1
+                continue
             if "." in isotope:
-                l_isotope = isotope.split(".")
-                isotope = l_isotope[0]
-            fractionIsotope = self.materialCompositionParameters[(2*i)+1]
-            L.append((isotope, fractionIsotope))
-        self.materialCompositionParameters = L
-        return self.materialCompositionParameters
+                isotope = isotope.split(".")[0]
+            fractionIsotope = l_materialCompositionParameters[i+1]
+            self.materialCompositionParameters.append((isotope,
+                                                       fractionIsotope))
+            i += 2
