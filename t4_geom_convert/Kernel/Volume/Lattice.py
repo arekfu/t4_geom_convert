@@ -120,9 +120,25 @@ class LatticeBounds:
         '''
         return reduce(lambda x, y: x * (y[1] - y[0] + 1), self.bounds, 1)
 
+    def __getitem__(self, i):
+        '''Return the i-th element in the list of range bounds.
+
+        >>> LatticeBounds([(-1, 1), (-3, 3)])[1]
+        (-3, 3)
+        >>> LatticeBounds([(-1, 1), (-3, 3)])[4]
+        Traceback (most recent call last):
+            ...
+        IndexError: list index out of range
+        '''
+        return self.bounds[i]
+
     def __len__(self):
         '''Return the number of dimensions.'''
         return len(self.bounds)
+
+    def dims(self):
+        '''Return the number of non-trivial dimensions.'''
+        return sum(1 for x in self.bounds if x[0] != x[1])
 
     def __iter__(self):
         yield from self.bounds

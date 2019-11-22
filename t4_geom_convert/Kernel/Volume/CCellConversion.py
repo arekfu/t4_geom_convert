@@ -331,7 +331,22 @@ class CCellConversion:
             mcnp_element_geom = cell.geometry
             list_info_surface = self.listSurfaceForLat(key)
             if len(list_info_surface) != len(domain.bounds):
-                raise ValueError('Problem of domain definition for lattice in cell %s; %d != %d' %(key,len(list_info_surface),len(domain.bounds)))
+                if len(list_info_surface) != domain.bounds.dims():
+                    msg = ('Problem of domain definition for lattice in cell '
+                            '{}; expected {} non-trivial bounds, got {}'
+                            .format(key, len(list_info_surface),
+                                    domain.bounds.dims()))
+                    raise ValueError(msg)
+                n_missing_bounds = len(list_info_surface) - len(domain.bounds)
+                for i in range(n_missing_bounds):
+                    range_ = domain.bounds[-1-i]
+                    if range[0] != range[1]:
+                        msg = ('Problem of domain definition for lattice in '
+                               'cell {}; expected {} non-trivial bounds, but '
+                               'the {}:{} bound is not trivial'
+                                .format(key, len(list_info_surface),
+                                        range[0], range[1]))
+                        raise ValueError(msg)
             lat_base_vectors = latticeReciprocal(list_info_surface)
             for index, universe in domain.items():
                 if universe == 0:
