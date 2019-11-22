@@ -22,6 +22,8 @@ def string_to_enum(p_typeSurface):
     try:
         enumSurface = getattr(ESurfaceTypeMCNP, typeSurf)
     except AttributeError:
+        if typeSurf == 'SPH':
+            return ESurfaceTypeMCNP.S
         raise ValueError('{}: The type of this surface does not exist'
                          .format(p_typeSurface.upper()))
     return enumSurface
