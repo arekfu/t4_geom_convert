@@ -265,6 +265,13 @@ a new feature or contribute to the project in any way.
 The full changelog is [here](CHANGELOG.md).
 
 
+Testing
+-------
+
+The correctness of `t4_geom_convert` is tested using [a specific test
+oracle](Oracle/README.md), which is included in this repository.
+
+
 Reporting bugs
 --------------
 
