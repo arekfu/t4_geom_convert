@@ -219,16 +219,18 @@ may be able to do in the future (in roughly decreasing order of likelihood):
   occurrences of the missing isotopes)
 - [ ] Convert MCNP macrobodies
 - [ ] Convert cell temperatures
-- [ ] In the fully-specified lattice syntax, handle the case where the subcell
-      universe is equal to the universe of the lattice cell.
-- [ ] Convert hexagonal lattices
+- [X] ~~In the fully-specified lattice syntax, handle the case where the
+  subcell universe is equal to the universe of the lattice cell.~~
+
+  **Fixed in issue #16**
+- [ ] Convert hexagonal lattices (tracked in issue #22)
 - [ ] Import comments describing the MCNP cells/surfaces (tracked in issue #9)
 - [ ] Provide a way to specify lattice fill ranges per enclosing cell(s) (this
   needs to be specified in such a way that it works with nested lattices, too)
 - [X] ~~Deduplicate repeated surface definitions, i.e. remove duplicate surface
   definitions in favour of one of the replicas (this is especially an issue for
   lattices, that tend to generate lots of identical surfaces)~~
-      
+
   **Fixed in issue #19**
 - [ ] Deduplicate repeated cell definitions (this is a bit harder than
   deduplicating surfaces)
