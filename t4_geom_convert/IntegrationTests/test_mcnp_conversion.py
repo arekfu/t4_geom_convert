@@ -40,12 +40,24 @@ def test_convert(mcnp_i, tmp_path):
     do_conversion(mcnp_i, tmp_path)
 
 
+def do_test_oracle(mcnp_i, tmp_path, mcnp, oracle):
+    '''Actually perform a conversion test, followed by an oracle test.'''
+    t4_o = do_conversion(mcnp_i, tmp_path)
+    mcnp_ptrac = mcnp.run(mcnp_i)
+    n_failed_points = oracle.run(t4_o, mcnp_i, mcnp_ptrac)
+    assert n_failed_points == 0
+
+
 @pytest.mark.oracle
 @foreach_data(mcnp_i=lambda path: str(path).endswith('.imcnp'))
 def test_oracle(mcnp_i, tmp_path, mcnp, oracle):
     '''Run the conversion and check the oracle for all data files in the
     ``data`` subfolder.'''
-    t4_o = do_conversion(mcnp_i, tmp_path)
-    mcnp_ptrac = mcnp.run(mcnp_i)
-    oracle_response = oracle.run(t4_o, mcnp_i, mcnp_ptrac)
-    assert oracle_response
+    do_test_oracle(mcnp_i, tmp_path, mcnp, oracle)
+
+
+@pytest.mark.oracle
+def test_extra_mcnp(extra_input, tmp_path, mcnp, oracle):
+    '''Test conversion + oracle for any MCNP input files provided via the
+    --extra-mcnp-input CLI option.'''
+    do_test_oracle(extra_input, tmp_path, mcnp, oracle)

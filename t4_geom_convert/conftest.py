@@ -20,6 +20,10 @@ def pytest_addoption(parser):
     parser.addoption('--mcnp-path', action='store',
                      help='path to the MCNP executable', default=None,
                      type=pathlib.Path)
+    parser.addoption('--extra-mcnp-input', action='append',
+                     help='Add an extra MCNP input file to test conversion',
+                     default=[],
+                     type=pathlib.Path)
 
 
 def pytest_collection_modifyitems(config, items):
@@ -33,6 +37,17 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if 'oracle' in item.keywords:
                 item.add_marker(skip_or)
+
+
+def pytest_generate_tests(metafunc):
+    '''Generate tests for the --extra-mcnp-input option'''
+    # This is called for every test. Only get/set command line arguments
+    # if the argument is specified in the list of test "fixturenames".
+    extra_inputs = metafunc.config.option.extra_mcnp_input
+    if 'extra_input' in metafunc.fixturenames:
+        paths = [path.resolve() for path in extra_inputs]
+        ids = [path.name for path in paths]
+        metafunc.parametrize('extra_input', paths, ids=ids)
 
 
 ##############
