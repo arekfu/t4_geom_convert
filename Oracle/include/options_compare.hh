@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include "PTRACFormat.hh"
 
 void help();
@@ -15,7 +16,7 @@ public:
   std::vector<std::string> filenames;
   bool help;
   int verbosity;
-  long npoints;
+  std::unique_ptr<long> npoints;
   double delta;
   bool guessMaterialAssocs;
   PTRACFormat ptracFormat;

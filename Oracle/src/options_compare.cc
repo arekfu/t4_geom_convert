@@ -40,7 +40,6 @@ void help()
 */
 OptionsCompare::OptionsCompare() : help(false),
                                    verbosity(0),
-                                   npoints(2000000),
                                    delta(1.0E-7),
                                    guessMaterialAssocs(false),
                                    ptracFormat(PTRACFormat::BINARY)
@@ -72,10 +71,11 @@ void OptionsCompare::get_opts(int argc, char **argv)
       } else if (opt == "--npts" || opt == "-n") {
         int nv = 1;
         check_argv(argc, i + nv);
-        npoints = int_of_string(argv[i + 1]);
-        if (npoints <= 0) {
-          std::cout << "Warning: npoints<=0. Setting npoints=100." << std::endl;
-          npoints = 100;
+        long const npoints_arg = int_of_string(argv[i + 1]);
+        if(npoints_arg <= 0) {
+          std::cout << "Warning: npoints<=0. Ignored." << std::endl;
+        } else {
+          npoints = std::make_unique<long>(npoints_arg);
         }
         i += nv;
       } else if (opt == "--delta" || opt == "-d") {

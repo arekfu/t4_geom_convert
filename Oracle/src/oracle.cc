@@ -49,7 +49,7 @@ Statistics compare_geoms(const OptionsCompare &options)
   stats.setNbT4Volumes(t4Geom.getVolumes()->get_nb_vol());
 
   mcnpGeom.parseINP();
-  long maxSampledPts = min(options.npoints, mcnpGeom.getNPS());
+  long maxSampledPts = options.npoints ? min(*options.npoints, mcnpGeom.getNPS()) : mcnpGeom.getNPS();
 
   std::cout << "Starting comparison on "
             << maxSampledPts << " points..."

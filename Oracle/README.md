@@ -227,9 +227,8 @@ Useful options for the `oracle` executable include:
 
 * `-V`: increase the verbosity.
 
-* `-n NPOINTS`: limits the test run to `NPOINTS` points. Note that the default
-  value for this option is 2000000 (2×10⁶), so you will need to use this option
-  if your PTRAC file contains more than two million points.
+* `-n NPOINTS`: limits the test run to `NPOINTS` points. There is no limit by
+  default.
 
 * `-d DELTA`: specifies the geometrical tolerance for ignoring mismatched
   materials near surfaces. Points that are within a distance `DELTA` from a
