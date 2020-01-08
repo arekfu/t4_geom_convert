@@ -20,10 +20,10 @@ def pytest_addoption(parser):
     parser.addoption('--mcnp-path', action='store',
                      help='path to the MCNP executable', default=None,
                      type=pathlib.Path)
-    parser.addoption('--extra-mcnp-input', action='append',
-                     help='Add an extra MCNP input file to test conversion',
-                     default=[],
-                     type=pathlib.Path)
+    parser.addoption('--extra-mcnp-inputs', action='store',
+                     help='Path to a file containing a list of additional '
+                     'MCNP input files to test conversion',
+                     default=None, type=pathlib.Path)
 
 
 def pytest_collection_modifyitems(config, items):
@@ -40,12 +40,17 @@ def pytest_collection_modifyitems(config, items):
 
 
 def pytest_generate_tests(metafunc):
-    '''Generate tests for the --extra-mcnp-input option'''
+    '''Generate tests for the --extra-mcnp-inputs option'''
     # This is called for every test. Only get/set command line arguments
     # if the argument is specified in the list of test "fixturenames".
-    extra_inputs = metafunc.config.option.extra_mcnp_input
     if 'extra_input' in metafunc.fixturenames:
-        paths = [path.resolve() for path in extra_inputs]
+        extra_inputs_file = metafunc.config.option.extra_mcnp_inputs
+        if extra_inputs_file is None:
+            extra_inputs = []
+        else:
+            with extra_inputs_file.open() as extra_file:
+                extra_inputs = extra_file.readlines()
+        paths = [pathlib.Path(path.strip()).resolve() for path in extra_inputs]
         ids = [path.name for path in paths]
         metafunc.parametrize('extra_input', paths, ids=ids)
 

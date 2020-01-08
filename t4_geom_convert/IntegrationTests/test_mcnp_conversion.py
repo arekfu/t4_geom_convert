@@ -63,5 +63,5 @@ def test_oracle(mcnp_i, tmp_path, mcnp, oracle):
 @pytest.mark.oracle
 def test_extra_mcnp(extra_input, tmp_path, mcnp, oracle):
     '''Test conversion + oracle for any MCNP input files provided via the
-    --extra-mcnp-input CLI option.'''
+    --extra-mcnp-inputs CLI option.'''
     do_test_oracle(extra_input, tmp_path, mcnp, oracle)
