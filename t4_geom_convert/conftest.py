@@ -189,7 +189,7 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
         self.path = path
         self.work_path = work_path
 
-    def run(self, t4_o, mcnp_i, mcnp_ptrac):
+    def run(self, t4_o, mcnp_i, mcnp_ptrac, oracle_opts=None):
         '''Run the test oracle on the given files.
 
         :param str t4_o: absolute path to the TRIPOLI-4 file to test
@@ -198,6 +198,8 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
         :returns: the number of failed points in the comparison
         '''
         cli = [str(self.path), str(t4_o), str(mcnp_i), str(mcnp_ptrac)]
+        if oracle_opts is not None:
+            cli += oracle_opts
         sub.check_call(cli, cwd=str(self.work_path))
         failed_path = self.work_path / (t4_o.stem + '.failedpoints.dat')
         with failed_path.open() as failed_path_file:
