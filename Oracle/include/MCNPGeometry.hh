@@ -137,8 +137,6 @@ protected:
      *
      */
   void getNextLinePtrac();
-
-  bool finishedReading();
 };
 
 class MCNPPTRACBinary : public MCNPPTRAC

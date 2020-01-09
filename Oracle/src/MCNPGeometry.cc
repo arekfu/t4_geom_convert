@@ -65,8 +65,16 @@ void MCNPGeometry::addCell2Density(unsigned long key, const std::pair<unsigned l
 void MCNPGeometry::parseINP()
 {
   if (inputFile) {
+    int emptyLinesRemaining = 1;
+    getline(inputFile, currentLine);
+    if(currentLine.substr(0, 8) == "message:" || currentLine.substr(0, 8) == "message:") {
+      ++emptyLinesRemaining;
+    }
     while (getline(inputFile, currentLine)) {
-      if (finishedReading()) {
+      if (currentLine.empty()) {
+        --emptyLinesRemaining;
+      }
+      if(emptyLinesRemaining == 0) {
         break;
       }
       if(isLineAComment(currentLine)) {
@@ -89,11 +97,6 @@ void MCNPGeometry::parseINP()
     }
     std::cout << "...read " << cell2Density.size() << " MCNP cells and their densities" << std::endl;
   }
-}
-
-bool MCNPGeometry::finishedReading()
-{
-  return currentLine.empty();
 }
 
 bool MCNPGeometry::isLineAComment(string const &lineContent) const
@@ -151,11 +154,6 @@ void MCNPPTRACASCII::getNextLinePtrac()
   getline(ptracFile, currentLine);
 }
 
-bool MCNPPTRACASCII::finishedReading()
-{
-  return currentLine.empty();
-}
-
 PTRACRecord const &MCNPPTRAC::getPTRACRecord() const
 {
   return record;
@@ -210,7 +208,7 @@ bool MCNPPTRACASCII::readNextPtracData(long maxReadPoint)
 {
   if ((ptracFile && !ptracFile.eof()) && (getNbPointsRead() <= maxReadPoint)) {
     getline(ptracFile, currentLine);
-    if (!finishedReading()) {
+    if (!currentLine.empty()) {
       auto const pointEvent = readPointEvent();
       getline(ptracFile, currentLine);
       auto const cellMaterial = readCellMaterial();
