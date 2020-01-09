@@ -6,7 +6,7 @@ c cells
 
 c surfaces
 c   1  P 0 0 20 1 0 20 0 1 20  $ a complicated way to specify the z=20 plane
- 446 2 p   -44 187 54.5 44 187 54.5 0 76 104
+ 446 2 p   -44 187 54.5 22 -94. 6.6 0 76 104
  1000  SO  1000
 
 m1
