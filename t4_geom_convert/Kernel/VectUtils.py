@@ -60,6 +60,9 @@ def planeParamsFromPoints(pt1, pt2, pt3):
     .. math::
 
         a x + b y + c z - d = 0
+
+    Furthermore, the normal to the plane is oriented in such as way that the
+    origin has negative sense (this is the MCNP convention).
     '''
     d12 = vdiff(pt1, pt2)
     d13 = vdiff(pt1, pt3)
@@ -71,4 +74,6 @@ def planeParamsFromPoints(pt1, pt2, pt3):
                          .format(pt1, pt2, pt3))
     unit_normal = rescale(1./sqrt(normal_len2), normal)
     pos = scal(unit_normal, pt1)
-    return [unit_normal[0], unit_normal[1], unit_normal[2], pos]
+    if pos > 0.:  # make sure the origin lies on the negative side of the plane
+        return [unit_normal[0], unit_normal[1], unit_normal[2], pos]
+    return [-unit_normal[0], -unit_normal[1], -unit_normal[2], -pos]
