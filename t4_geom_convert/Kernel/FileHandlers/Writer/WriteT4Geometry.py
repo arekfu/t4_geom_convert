@@ -30,47 +30,55 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
         mcnp_cell_cache_path = None
 
     if not args.cache:
-        dic_surfaceT4, dic_surfaceMCNP, aux_ids = constructSurfaceT4(mcnpParser)
+        surf_conv = constructSurfaceT4(mcnpParser)
     else:
         try:
             with t4_surf_cache_path.open('rb') as dicfile:
                 print('reading surfaces from file {}...'
                       .format(t4_surf_cache_path.resolve()), end='', flush=True)
-                dic_surfaceT4, dic_surfaceMCNP  = pickle.load(dicfile)
+                surf_conv = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
-            dic_surfaceT4, dic_surfaceMCNP, aux_ids = constructSurfaceT4(mcnpParser)
+            surf_conv = constructSurfaceT4(mcnpParser)
             with t4_surf_cache_path.open('wb') as dicfile:
                 print('writing surfaces to file {}...'
                       .format(t4_surf_cache_path.resolve()), end='', flush=True)
-                pickle.dump((dic_surfaceT4, dic_surfaceMCNP), dicfile)
+                pickle.dump(surf_conv, dicfile)
                 print(' done', flush=True)
+    dic_surface_t4, dic_surfaceMCNP, union_ids = surf_conv
 
     if not args.cache:
-        dic_volume, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
+        vol_conv = constructVolumeT4(mcnpParser, lattice_params,
+                                     mcnp_cell_cache_path,
+                                     dic_surface_t4,
+                                     dic_surfaceMCNP, union_ids)
     else:
         try:
             with t4_vol_cache_path.open('rb') as dicfile:
                 print('reading TRIPOLI-4 volumes from file {}...'
                       .format(t4_vol_cache_path.resolve()), end='', flush=True)
-                dic_volume, mcnp_new_dict, dic_surfaceT4 = pickle.load(dicfile)
+                vol_conv = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
-            dic_volume, mcnp_new_dict = constructVolumeT4(mcnpParser, lattice_params, mcnp_cell_cache_path, dic_surfaceT4, dic_surfaceMCNP, aux_ids)
+            vol_conv = constructVolumeT4(mcnpParser, lattice_params,
+                                         mcnp_cell_cache_path,
+                                         dic_surface_t4,
+                                         dic_surfaceMCNP, union_ids)
             with t4_vol_cache_path.open('wb') as dicfile:
                 print('writing cells to file {}...'
                       .format(t4_vol_cache_path.resolve()), end='', flush=True)
-                pickle.dump((dic_volume, mcnp_new_dict, dic_surfaceT4), dicfile)
+                pickle.dump(vol_conv, dicfile)
                 print(' done', flush=True)
 
-    dic_surfaceT4, surf_renumbering = remove_duplicate_surfaces(dic_surfaceT4)
+    dic_volume, mcnp_new_dict, dic_surface_t4 = vol_conv
+    dic_surface_t4, surf_renumbering = remove_duplicate_surfaces(dic_surface_t4)
     dic_volume = renumber_surfaces(dic_volume, surf_renumbering)
 
     remove_empty_cells(dic_volume)
     surf_used = extract_used_surfaces(dic_volume.values())
 
     for key in sorted(surf_used):
-        surf, _ = dic_surfaceT4[key]
+        surf, _ = dic_surface_t4[key]
         list_paramSurface = surf.paramSurface
         s_paramSurface = ' '.join(str(element) for element in list_paramSurface)
         if surf.idorigin:

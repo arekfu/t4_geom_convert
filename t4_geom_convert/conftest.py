@@ -171,7 +171,9 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
                'inp={}'.format(input_file),
                'name={}'.format(run_name)]
         sub.check_call(cli, cwd=str(self.work_path))
-        return self.work_path / (run_name + 'p')
+        output = self.work_path / (run_name + 'o')
+        ptrac = self.work_path / (run_name + 'p')
+        return output, ptrac
 
 
 @pytest.fixture

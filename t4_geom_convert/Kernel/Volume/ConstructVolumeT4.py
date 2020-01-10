@@ -14,8 +14,8 @@ from .TreeFunctions import isLeaf
 from .ByUniverse import by_universe
 
 
-def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
-                      dic_surfaceMCNP, aux_ids):
+def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
+                      dic_surface_t4, dic_surfaceMCNP, aux_ids):
     '''
     :brief: method changing the tuple from CCellConversion in
     instance of the CVolumeT4 Class
@@ -27,9 +27,10 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
     free_key = max(int(k) for k in mcnp_dict) + 1
     free_surf_key = max(
         max(int(k) for k in dic_surfaceMCNP) + 1,
-        max(int(k) for k in dic_surface) + 1
+        max(int(k) for k in dic_surface_t4) + 1
         )
-    conv = CCellConversion(free_key, free_surf_key, objT4, dic_surface, dic_surfaceMCNP, mcnp_dict, aux_ids)
+    conv = CCellConversion(free_key, free_surf_key, objT4,
+                           dic_surface_t4, dic_surfaceMCNP, mcnp_dict, aux_ids)
 
     # treat TRCL
     trcl_keys = [key for key, value in mcnp_dict.items()
@@ -69,7 +70,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
     conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
     conv.new_surf_key = max(
         max(int(k) for k in dic_surfaceMCNP) + 1,
-        max(int(k) for k in dic_surface) + 1
+        max(int(k) for k in dic_surface_t4) + 1
         )
 
     # treat FILL
@@ -89,7 +90,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
     conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
     conv.new_surf_key = max(
         max(int(k) for k in dic_surfaceMCNP) + 1,
-        max(int(k) for k in dic_surface) + 1
+        max(int(k) for k in dic_surface_t4) + 1
         )
 
     conv_keys = [(key, value) for key, value in mcnp_dict.items()
@@ -117,7 +118,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path, dic_surface,
         del objT4[j]
     print('... done', flush=True)
 
-    return dic_cellT4, mcnp_dict
+    return dic_cellT4, mcnp_dict, dic_surface_t4
 
 
 def remove_empty_cells(dic_volume):

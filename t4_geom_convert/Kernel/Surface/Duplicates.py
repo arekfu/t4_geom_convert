@@ -12,29 +12,29 @@ def remove_duplicate_surfaces(surfs):
     n_surfs = len(surfs)
     fmt_string = ('\rdetecting duplicate surfaces {{:{}d}}/{} (surface {{}})'
                   .format(len(str(n_surfs)), n_surfs))
-    for i, (key, (surf, fixed)) in enumerate(sorted(surfs.items())):
+    for i, (key, (surf, aux)) in enumerate(sorted(surfs.items())):
         print(fmt_string.format(i+1, key), end='', flush=True)
         tuple_surf = (surf.typeSurface, tuple(surf.paramSurface))
         if tuple_surf in tuple_surf_to_id:
             renumbering[key] = tuple_surf_to_id[tuple_surf]
         else:
-            new_surfs[key] = (surf, fixed)
+            new_surfs[key] = (surf, aux)
             renumbering[key] = key
             tuple_surf_to_id[tuple_surf] = key
     print('... done', flush=True)
 
-    # renumbering fixed surfaces
+    # renumbering aux surfaces
     n_surfs = len(new_surfs)
-    fmt_string = ('\rrenumbering fixed surfaces {{:{}d}}/{} (surface {{}})'
+    fmt_string = ('\rrenumbering aux surfaces {{:{}d}}/{} (surface {{}})'
                   .format(len(str(n_surfs)), n_surfs))
-    for i, (key, (_, fixed)) in enumerate(new_surfs.items()):
+    for i, (key, (_, aux)) in enumerate(new_surfs.items()):
         print(fmt_string.format(i+1, key), end='', flush=True)
-        for i in range(len(fixed)):
-            surf = fixed[i]
+        for i in range(len(aux)):
+            surf = aux[i]
             if surf > 0:
-                fixed[i] = renumbering[fixed[i]]
+                aux[i] = renumbering[aux[i]]
             else:
-                fixed[i] = -renumbering[-fixed[i]]
+                aux[i] = -renumbering[-aux[i]]
     print('... done', flush=True)
 
     return new_surfs, renumbering

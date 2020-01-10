@@ -59,4 +59,4 @@ def transformationQuad(l_paramSurface, l_paramTransformation):
         l_transfParamSurface[9] = Atransf.item(3,3)
         return l_transfParamSurface
     else:
-        raise ValueError('error of rotation,R%s, Q%s,  RQ %s, A %s' %(iM, A))
+        raise ValueError('degenerate transformation matrix: M={}'.format(M))

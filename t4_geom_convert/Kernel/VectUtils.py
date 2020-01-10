@@ -6,6 +6,7 @@
 
 from math import sqrt
 
+
 def scal(v1, v2):
     '''Yields the scalar product of `v1` and `v2`.'''
     a1, b1, c1 = v1
@@ -13,12 +14,14 @@ def scal(v1, v2):
     result = a1*a2 + b1*b2 + c1*c2
     return float(result)
 
+
 def vect(v1, v2):
     '''Yields the vector product of `v1` and `v2`.'''
     x1, y1, z1 = v1
     x2, y2, z2 = v2
     result = (y1*z2-z1*y2,x2*z1-x1*z2,x1*y2-y1*x2)
     return result
+
 
 def mixed(v1, v2, v3):
     '''Yields the mixed product of `v1`, `v2` and `v3`.
@@ -29,10 +32,12 @@ def mixed(v1, v2, v3):
     '''
     return scal(v1, vect(v2, v3))
 
+
 def rescale(a, v1):
     '''Return `v1` multiplied by a scalar `a`, as a new vector.'''
     x1, y1, z1 = v1
     return (a*x1, a*y1, a*z1)
+
 
 def vsum(*args):
     '''Return the vector sum of its arguments.'''
@@ -45,11 +50,28 @@ def vsum(*args):
         zsum += vec[2]
     return xsum, ysum, zsum
 
+
 def vdiff(v1, v2):
     '''Return the vector difference of `v1` and `v2` (`v1-v2`).'''
     x1, y1, z1 = v1
     x2, y2, z2 = v2
     return (x1-x2, y1-y2, z1-z2)
+
+
+def renorm(vec, norm=1.):
+    '''Return a new vector parallel to `vec` whose norm is equal to `norm`.'''
+    return rescale(norm/mag(vec), vec)
+
+
+def mag2(vec):
+    '''Return the square of the magnitude of `vec`.'''
+    return scal(vec, vec)
+
+
+def mag(vec):
+    '''Return the magnitude of `vec`.'''
+    return sqrt(mag2(vec))
+
 
 def planeParamsFromPoints(pt1, pt2, pt3):
     '''Compute the parameters `(a ,b, c, d)` of the plane passing through the
@@ -67,13 +89,20 @@ def planeParamsFromPoints(pt1, pt2, pt3):
     d12 = vdiff(pt1, pt2)
     d13 = vdiff(pt1, pt3)
     normal = vect(d12, d13)
-    normal_len2 = scal(normal, normal)
+    normal_len2 = mag2(normal)
     if normal_len2 <= 1e-10:
         raise ValueError('Cannot convert plane from three points because the '
                          'points are collinear or almost so: {}, {}, {}'
                          .format(pt1, pt2, pt3))
-    unit_normal = rescale(1./sqrt(normal_len2), normal)
+    unit_normal = renorm(normal)
     pos = scal(unit_normal, pt1)
     if pos > 0.:  # make sure the origin lies on the negative side of the plane
         return [unit_normal[0], unit_normal[1], unit_normal[2], pos]
     return [-unit_normal[0], -unit_normal[1], -unit_normal[2], -pos]
+
+
+def planeParamsFromNormalAndPoint(normal, point):
+    '''Return the MCNP-style parameters of the plane having the given normal
+    and passing through the given points.'''
+    intercept = scal(normal, point)
+    return [normal[0], normal[1], normal[2], intercept]

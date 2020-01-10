@@ -12,7 +12,7 @@ from .DTypeConversion import dict_conversionSurfaceType
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 from .CSurfaceT4 import CSurfaceT4
-from .CSurfaceCollection import CSurfaceCollection
+from .SurfaceCollection import SurfaceCollection
 from ..VectUtils import planeParamsFromPoints
 
 
@@ -25,13 +25,15 @@ def conversionSurfaceMCNPToT4(mcnpParser):
     obj_T4 = CDictSurfaceT4(dic_SurfaceT4)
     dic_surface_mcnp = CDictSurfaceMCNP(mcnpParser).d_surfaceMCNP
     for key, val in dic_surface_mcnp.items():
-        try:
-            surfacesT4 = conversionSurfaceParams(key, val)
-            # surfacesT4 = _surfaceParametresConversion(key, val)
-        except:
-            print(key, 'Parameters of this surface do not comply')
-            raise
-        obj_T4[key] = surfacesT4
+        surf_colls = []
+        for surf, side in val:
+            try:
+                surf_coll = conversionSurfaceParams(key, surf)
+            except:
+                print(key, 'Parameters of this surface do not comply')
+                raise
+            surf_colls.append((surf_coll, side))
+        obj_T4[key] = SurfaceCollection.join(surf_colls)
     return dic_SurfaceT4, dic_surface_mcnp
 
 
@@ -99,28 +101,25 @@ def conversionSurfaceParams(key, val):
 
         nappe = val.complParam[2] if len(val.complParam) == 3 else None
         if nappe is None or nappe == 0:
-            return CSurfaceCollection(cone)
+            return SurfaceCollection([(cone, 1)])
         pos = -(ux*x + uy*y + uz*z)
 
         if ux == 0 and uy == 0:
             type_surface = T4S.PLANEZ
             param = [-pos/uz]
-            side = int(nappe) if uz > 0. else -int(nappe)
         elif uy == 0 and uz == 0:
             type_surface = T4S.PLANEX
             param = [-pos/ux]
-            side = int(nappe) if ux > 0. else -int(nappe)
         elif uz == 0 and ux == 0:
             type_surface = T4S.PLANEY
             param = [-pos/uy]
-            side = int(nappe) if uy > 0. else -int(nappe)
         else:
             typePlane = T4S.PLANE
             paramPlane = [ux, uy, uz, pos]
-            side = int(nappe)
+        side = -int(nappe)
         plane = CSurfaceT4(type_surface, param,
                            ['aux plane for cone {}'.format(key)])
-        return CSurfaceCollection(cone, fixed=[(plane, side)])
+        return SurfaceCollection([(cone, 1), (plane, side)])
     elif val.typeSurface == MS.GQ:
         type_surface = T4S.QUAD
         param = val.complParam
@@ -142,4 +141,4 @@ def conversionSurfaceParams(key, val):
 
 
     surf = CSurfaceT4(type_surface, param)
-    return CSurfaceCollection(surf)
+    return SurfaceCollection([(surf, 1)])

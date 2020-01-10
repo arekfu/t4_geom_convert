@@ -327,6 +327,13 @@ def c_x(p):
     return _cylinder(0, p[0], p[1], p[2], 1, 0, 0)
 
 
+def cylinder(p):
+    """
+    Cylinder defined by `c` surface. (Not implemented in MCNP)
+    """
+    return _cylinder(*p)
+
+
 def kz(p):
     """
     Cone defined by `kz` surface.
@@ -373,6 +380,13 @@ def k_z(p):
     """
     nappe = p[-1] if len(p) == 5 else None
     return _cone(p[0], p[1], p[2], p[3]**0.5, 0, 0, 1, nappe)
+
+
+def cone(p):
+    """
+    Cone defined by `k` surface. (Not implemented in MCNP)
+    """
+    return _cone(*p)
 
 
 def tx(p):
@@ -507,12 +521,14 @@ mcnp2cad['cz'] = cz
 mcnp2cad['c/x'] = c_x
 mcnp2cad['c/y'] = c_y
 mcnp2cad['c/z'] = c_z
+mcnp2cad['c'] = cylinder
 mcnp2cad['kx'] = kx
 mcnp2cad['ky'] = ky
 mcnp2cad['kz'] = kz
 mcnp2cad['k/x'] = k_x
 mcnp2cad['k/y'] = k_y
 mcnp2cad['k/z'] = k_z
+mcnp2cad['k'] = cone
 mcnp2cad['tx'] = tx
 mcnp2cad['ty'] = ty
 mcnp2cad['tz'] = tz

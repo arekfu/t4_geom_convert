@@ -27,9 +27,13 @@ class CConversionBoundaryCondition(object):
         material as a key and the instance of CBoundCondT4 as a value
         '''
         d_boundCond = OrderedDict()
-        for k, v in list(self.dic_surf_mcnp.items()):
-            if v.boundaryCond != '':
-                p_typeOfBC = v.boundaryCond
+        for k, v in self.dic_surf_mcnp.items():
+            if v[0][0].boundaryCond != '':
+                if len(v) > 1:
+                    msg = ('Boundary conditions on macrobodies are not '
+                           'supported yet.')
+                    raise NotImplementedError(msg)
+                p_typeOfBC = v[0][0].boundaryCond
                 d_boundCond[k] = CBoundCond(p_typeOfBC)
         return d_boundCond
 

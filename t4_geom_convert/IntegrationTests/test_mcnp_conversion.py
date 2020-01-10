@@ -47,9 +47,12 @@ def do_test_oracle(mcnp_i, tmp_path, mcnp, oracle):
     '''Actually perform a conversion test, followed by an oracle test.'''
     conv_opts, oracle_opts = get_options(mcnp_i)
     t4_o = do_conversion(mcnp_i, tmp_path, conv_opts)
-    mcnp_ptrac = mcnp.run(mcnp_i)
-    n_failed_points = oracle.run(t4_o, mcnp_i, mcnp_ptrac, oracle_opts)
-    assert n_failed_points == 0
+    mcnp_output, mcnp_ptrac = mcnp.run(mcnp_i)
+    mcnp_output_txt = mcnp_output.read_text()
+    assert 'trouble' not in mcnp_output_txt
+    assert 'fatal error' not in mcnp_output_txt
+    n_failed = oracle.run(t4_o, mcnp_i, mcnp_ptrac, oracle_opts)
+    assert n_failed == 0
 
 
 @pytest.mark.oracle

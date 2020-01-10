@@ -1,0 +1,20 @@
+Test for macrobodies
+   10 1 -1. -1 imp:n=1
+   20 2 -2. -1000 1 imp:n=1
+ 1000 0 1000 imp:n=0
+
+c surfaces
+   1 REC -5 0 0  10 0 0  0 12 0   0 0 7
+ 1000  SO  100
+
+m1
+              13027        -1.0
+m2
+              13027        -1.0
+mode n
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 100
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000

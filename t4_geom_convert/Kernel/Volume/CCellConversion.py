@@ -18,6 +18,7 @@ from ..Transformation.Transformation import transformation
 from ..Surface.ConversionSurfaceMCNPToT4 import conversionSurfaceParams
 from ..Surface.CSurfaceT4 import CSurfaceT4
 from ..Surface.ESurfaceTypeMCNP import mcnp_to_mip
+from ..Surface.SurfaceCollection import SurfaceCollection
 from ..VectUtils import rescale, scal
 from math import fabs, sqrt
 
@@ -27,7 +28,7 @@ class CCellConversion:
     '''
 
     def __init__(self, int_cell, int_surf, d_dictClassT4, d_dictSurfaceT4,
-                 d_dicSurfaceMCNP, d_dicCellMCNP, aux_ids):
+                 d_dicSurfaceMCNP, d_dicCellMCNP, union_ids):
         '''
         Constructor
         :param: int_i : id of the volume created
@@ -40,7 +41,7 @@ class CCellConversion:
         self.dictSurfaceT4 = d_dictSurfaceT4
         self.dicSurfaceMCNP = d_dicSurfaceMCNP
         self.dicCellMCNP = d_dicCellMCNP
-        self.aux_ids = aux_ids
+        self.union_ids = union_ids
 
     def conversionEQUA(self, list_surface):
         '''
@@ -73,8 +74,8 @@ class CCellConversion:
             minuses = []
             ops =('INTE', ids)
         elif op == ':':
-            pluses, minuses = self.conversionEQUA([self.aux_ids[0],
-                                                   -self.aux_ids[1]])
+            pluses, minuses = self.conversionEQUA([self.union_ids[0],
+                                                   -self.union_ids[1]])
             ops = ('UNION', ids)
         else:
             raise ValueError('Converting cell with unexpected operator: {}'
@@ -139,40 +140,43 @@ class CCellConversion:
         if not p_transf:
             return p_tree
 
-        if isLeaf(p_tree):
-            surfaceObject = self.dicSurfaceMCNP[abs(p_tree)]
-            p_boundCond = surfaceObject.boundaryCond
-            p_typeSurface = surfaceObject.typeSurface
-            frame = surfaceObject.paramSurface
-            compl_param = surfaceObject.complParam
-            idorigin = surfaceObject.idorigin + ['via tr']
-            surfaceObject = transformation(p_transf, p_typeSurface, frame,
-                                           compl_param, p_boundCond, idorigin)
-            surf_coll = conversionSurfaceParams(p_tree, surfaceObject)
-            idorigin = surfaceObject.idorigin.copy()
-
-            fixed_surfs = surf_coll.fixed
-            fixed_ids = []
-            for surf, side in fixed_surfs:
-                self.new_surf_key += 1
-                new_key = self.new_surf_key
-                surf.idorigin.append('aux fixed surf')
-                self.dictSurfaceT4[new_key] = (surf, [])
-                fixed_ids.append(side * new_key)
-
-            surf = surf_coll.main
-            self.new_surf_key += 1
-            new_key = self.new_surf_key
-            self.dictSurfaceT4[new_key] = (surf, fixed_ids)
-            self.dicSurfaceMCNP[new_key] = surfaceObject
-
-            return Surface(new_key) if p_tree >= 0 else Surface(-new_key)
-        else:
+        if not isLeaf(p_tree):
             op, *args = p_tree
             new_args = [self.postOrderTraversalTransform(node, p_transf) for node in args]
             new_tree = [op]
             new_tree.extend(new_args)
             return new_tree
+
+        surfs = self.dicSurfaceMCNP[abs(p_tree)]
+        surf_colls = []
+        mcnp_surfs = []
+        for surfaceObject, side in surfs:
+            p_boundCond = surfaceObject.boundaryCond
+            p_typeSurface = surfaceObject.typeSurface
+            frame = surfaceObject.paramSurface
+            compl_param = surfaceObject.complParam
+            idorigin = surfaceObject.idorigin + ['via tr']
+            new_mcnp_surf = transformation(p_transf, p_typeSurface, frame,
+                                           compl_param, p_boundCond, idorigin)
+            mcnp_surfs.append((new_mcnp_surf, side))
+            surf_coll = conversionSurfaceParams(p_tree, new_mcnp_surf)
+            surf_colls.append((surf_coll, side))
+
+        surf_coll = SurfaceCollection.join(surf_colls)
+        aux_ids = []
+        for surf, side in surf_coll.surfs[1:]:
+            self.new_surf_key += 1
+            new_key = self.new_surf_key
+            surf.idorigin.append('aux surf')
+            self.dictSurfaceT4[new_key] = (surf, [])
+            aux_ids.append(side * new_key)
+
+        self.new_surf_key += 1
+        new_key = self.new_surf_key
+        self.dictSurfaceT4[new_key] = (surf_coll.surfs[0][0], aux_ids)
+        self.dicSurfaceMCNP[new_key] = mcnp_surfs
+
+        return Surface(new_key) if p_tree >= 0 else Surface(-new_key)
 
     def postOrderTraversalConversion(self, p_tree, idorigin):
         '''
@@ -265,6 +269,10 @@ class CCellConversion:
         return new_node
 
     def postOrderTraversalReplace(self, p_tree):
+        '''Replace collections of surfaces with ASTs representing the
+        intersection/union of the collection. Necessary for one-nappe cones and
+        macrobodies.
+        '''
         if not isLeaf(p_tree):
             p_id, op, *args = p_tree
             new_tree = [p_id, op]
@@ -282,10 +290,10 @@ class CCellConversion:
         self.new_cell_key += 1
         if p_tree < 0:
             new_node = [self.new_cell_key, '*', p_tree]
-            new_node.extend(Surface(surf) for surf in surfT4[1])
+            new_node.extend(Surface(-surf) for surf in surfT4[1])
         else:
             new_node = [self.new_cell_key, ':', p_tree]
-            new_node.extend(Surface(-surf) for surf in surfT4[1])
+            new_node.extend(Surface(surf) for surf in surfT4[1])
         return GeomExpression(new_node)
 
     def postOrderTraversalCompl(self, tree):
@@ -312,9 +320,17 @@ class CCellConversion:
         while list_surface:
             surf_id_1, surf_id_2 = list_surface[0:2]
             surf_1 = self.dicSurfaceMCNP[abs(surf_id_1)]
-            point, normal = surf_1.paramSurface
+            if len(surf_1) != 1:
+                msg = ('A macrobody ({}) appears in a lattice, but only '
+                       'planes are allowed'.format(surf_id_1))
+                raise ValueError(msg)
+            point, normal = surf_1[0][0].paramSurface
             surf_2 = self.dicSurfaceMCNP[abs(surf_id_2)]
-            point2, _normal2 = surf_2.paramSurface
+            if len(surf_2) != 1:
+                msg = ('A macrobody ({}) appears in a lattice, but only '
+                       'planes are allowed'.format(surf_id_2))
+                raise ValueError(msg)
+            point2, _normal2 = surf_2[0][0].paramSurface
             point_diff = (float(point[0])-float(point2[0]),
                           float(point[1])-float(point2[1]),
                           float(point[2])-float(point2[2]))

@@ -8,7 +8,9 @@ from enum import Enum
 
 ESurfaceTypeMCNP = Enum('ESurfaceTypeMCNP', 'PX PY PZ P SO S SX SY SZ C_X '
                         'C_Y C_Z CX CY CZ C K_X K_Y K_Z KX KY KZ K GQ '
-                        'T TX TY TZ X Y Z')
+                        'T TX TY TZ X Y Z '
+                        # macrobody surface types
+                        'BOX RPP SPH RCC HEX RHP REC TRC ELL WED ARB')
 
 def mcnp_to_mip(en):
     if isinstance(en, str):
@@ -22,8 +24,6 @@ def string_to_enum(p_typeSurface):
     try:
         enumSurface = getattr(ESurfaceTypeMCNP, typeSurf)
     except AttributeError:
-        if typeSurf == 'SPH':
-            return ESurfaceTypeMCNP.S
         raise ValueError('{}: The type of this surface does not exist'
                          .format(p_typeSurface.upper()))
     return enumSurface

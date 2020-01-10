@@ -1,0 +1,25 @@
+Test for double-sheet cones with -1 as sheet param
+c cells
+    1 1 -1.0 1 -1000
+    2 2 -1.0 -1 -1000
+ 1000 0 1000
+
+c surfaces
+   1  KX 0 0.00765427 -1
+ 1000  SO  10
+
+m1
+              13027        -1.0
+m2
+              13027        -1.0
+mode n
+c
+c IMPORTANCES
+c
+imp:n   1 1 0
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 10
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000

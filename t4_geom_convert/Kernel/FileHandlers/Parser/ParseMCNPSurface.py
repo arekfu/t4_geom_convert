@@ -11,10 +11,11 @@ from MIP.geom.forcad import mcnp2cad
 from MIP.geom.surfaces import get_surfaces
 from MIP.geom.transforms import get_transforms
 from ...Surface.CSurfaceMCNP import CSurfaceMCNP
-from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP
+from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from ...Surface.ESurfaceTypeMCNP import string_to_enum, mcnp_to_mip
 from ...Transformation.Transformation import transformation
 from ...VectUtils import planeParamsFromPoints
+from ...Surface import MacroBodies as MB
 
 
 def parseMCNPSurface(mcnp_parser):
@@ -32,7 +33,7 @@ def parseMCNPSurface(mcnp_parser):
                                                              n_surf)
     for i, (key, surface) in enumerate(surface_parsed.items()):
         print(fmt_string.format(i+1), end='', flush=True)
-        dict_surface[key] = to_surface_mcnp(key, surface, transform_parsed)
+        dict_surface[key] = to_surfaces_mcnp(key, surface, transform_parsed)
     print('... done', flush=True)
 
     return dict_surface
@@ -42,7 +43,7 @@ def normalizeSurface(typ, params):
     '''Put the surface parametrization in a canonical form. For instance,
     planes defined by three points are transformed into the equivalent
     (A,B,C,D) representation.'''
-    if typ == ESurfaceTypeMCNP.P:
+    if typ == MS.P:
         if len(params) == 9:
             params = planeParamsFromPoints(params[0:3],
                                            params[3:6],
@@ -53,11 +54,9 @@ def normalizeSurface(typ, params):
     return typ, params
 
 
-def to_surface_mcnp(key, parsed_surface, transform_parsed):
-    '''Convert the surface described by the given type parameters to a
-    :class:`CSurfaceMCNP`.'''
-    bound_cond, transform_id, type_surface, params = parsed_surface
-    enum_surface = string_to_enum(type_surface)
+def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
+                    transform_id, enum_surface, params, transform_parsed):
+    '''Convert the parsed surface into a :class:`CSurfaceMCNP`.'''
     enum_surface, params = normalizeSurface(enum_surface, params)
     mip_transf = mcnp2cad[mcnp_to_mip(enum_surface)]
     typ, params, compl_params, _ = mip_transf(params)
@@ -73,3 +72,54 @@ def to_surface_mcnp(key, parsed_surface, transform_parsed):
         surf = CSurfaceMCNP(bound_cond, enum_surface, params,
                             compl_params, idorigin)
     return surf
+
+
+def to_surfaces_macro(key, bound_cond,  # pylint: disable=too-many-arguments
+                      transform_id, enum_surface, params, transform_parsed):
+    '''Convert the parsed macro body into a collection of
+    :class:`CSurfaceMCNP`.'''
+    if enum_surface == MS.BOX:
+        parts = MB.box(params)
+    elif enum_surface == MS.RPP:
+        parts = MB.rpp(params)
+    elif enum_surface == MS.SPH:
+        parts = MB.sph(params)
+    elif enum_surface == MS.RCC:
+        parts = MB.rcc(params)
+    elif enum_surface == MS.RHP or enum_surface == MS.HEX:
+        parts = MB.rhp(params)
+    elif enum_surface == MS.REC:
+        parts = MB.rec(params)
+    elif enum_surface == MS.TRC:
+        parts = MB.trc(params)
+    elif enum_surface == MS.ELL:
+        parts = MB.ell(params)
+    elif enum_surface == MS.WED:
+        parts = MB.wed(params)
+    elif enum_surface == MS.ARB:
+        parts = MB.arb(params)
+    else:
+        raise NotImplementedError('Macrobody {} is not implemented yet'
+                                  .format(enum_surface))
+    mcnp_surfs = [(to_surface_mcnp(key, bound_cond, transform_id, type_,
+                                   params, transform_parsed), side)
+                  for type_, params, side in parts]
+    return mcnp_surfs
+
+
+def to_surfaces_mcnp(key, parsed_surface, transform_parsed):
+    '''Convert the parsed surface into a collection of
+    :class:`CSurfaceMCNP`.
+
+    This function returns a list of ``(int, CSurfaceMCNP)`` pairs. The integers
+    represent the side of the surface that should be considered as positive
+    (±1).'''
+    bound_cond, transform_id, type_surface, params = parsed_surface
+    enum_surface = string_to_enum(type_surface)
+    if enum_surface in (MS.BOX, MS.RPP, MS.SPH, MS.RCC, MS.HEX, MS.RHP, MS.REC,
+                        MS.TRC, MS.ELL, MS.WED, MS.ARB):
+        return to_surfaces_macro(key, bound_cond, transform_id, enum_surface,
+                                 params, transform_parsed)
+    surf = to_surface_mcnp(key, bound_cond, transform_id, enum_surface, params,
+                           transform_parsed)
+    return [(surf, 1)]
