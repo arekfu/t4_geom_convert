@@ -217,7 +217,9 @@ may be able to do in the future (in roughly decreasing order of likelihood):
 - [ ] Warn about isotopes that are missing from the TRIPOLI-4 dictionary
   (currently you need to edit the converted file by hand and remove the
   occurrences of the missing isotopes)
-- [X] ~~Convert MCNP macrobodies (tracked in issue #25)~~
+- [X] ~~Convert MCNP macrobodies~~
+
+  **Fixed in issue #25**
 - [ ] Convert cell temperatures
 - [X] ~~In the fully-specified lattice syntax, handle the case where the
   subcell universe is equal to the universe of the lattice cell.~~

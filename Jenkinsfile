@@ -5,7 +5,7 @@ def notifyTuleap(boolean success) {
   }
   REPO_ID=1076  // repository ID
   withCredentials([string(credentialsId: "ci-token-${REPO_ID}", variable: 'token')]) {
-    sh """
+    sh """#!/bin/bash
        cd ${SRC}
        rev="\$(git rev-parse HEAD)"
        curl -k "https://codev-tuleap.intra.cea.fr/api/git/${REPO_ID}/statuses/\$rev" \
@@ -25,6 +25,10 @@ pipeline {
   }
 
   agent { label 'tripoli4' }
+
+  parameters {
+    booleanParam(name: 'WITH_ORACLE', defaultValue: false, description: 'If true, compile and run the test oracle')
+  }
 
   environment {
     projectName = 't4_geom_convert'
@@ -48,10 +52,13 @@ pipeline {
       }
     }
     stage('Configure Oracle') {
+      when {
+        equals expected: true, actual: params.WITH_ORACLE
+      }
       steps {
         echo "Starting cmake for ${env.BUILD_ID} on ${env.JENKINS_URL}..."
         dir("${ORACLE_BUILD}") {
-          sh """
+          sh """#!/bin/bash
           . /home/tri4dev/developers/prerequisites/install/lin-x86-64-cen7/root_v6.12.06/bin/thisroot.sh
           cmake3 ${SRC}/Oracle -DT4_DIR=/data/tmpdm2s/dm232107/product/t4/t4.11/cen7/share/cmake -DHDF5_DIR=/home/tri4dev/developers/prerequisites/install/lin-x86-64-cen7/hdf5-1.8.14
           """
@@ -59,20 +66,23 @@ pipeline {
       }
     }
     stage('Build Oracle') {
+      when {
+        equals expected: true, actual: params.WITH_ORACLE
+      }
       steps {
         echo "Starting cmake for ${env.BUILD_ID} on ${env.JENKINS_URL}..."
         dir("${ORACLE_BUILD}") {
-          sh """
+          sh """#!/bin/bash
           make
           """
         }       
       }
     }
-    stage('Install Converter') {
+    stage('Install t4_geom_convert') {
       steps {
-        sh """
+        sh """#!/bin/bash
         python3 -m venv "${VENV}"
-        source "${VENV}/bin/activate"
+        . "${VENV}/bin/activate"
         python3 -m pip install --upgrade pip setuptools
         python3 -m pip install ${SRC}[dev]
         """
@@ -82,8 +92,8 @@ pipeline {
       steps {
         echo 'Linting...'
         dir("${SRC}") {
-          sh """
-              source "${VENV}/bin/activate"
+          sh """#!/bin/bash
+              . "${VENV}/bin/activate"
               pylint -f parseable t4_geom_convert/ | tee pylint.out || true
               # flake8 returns 1 in case of warnings and that would stop the
               # build
@@ -94,18 +104,26 @@ pipeline {
         }
       }
     }
-    stage('Run unit tests') {
+    stage('Run oracle unit tests') {
+      when {
+        equals expected: true, actual: params.WITH_ORACLE
+      }
       steps {
         echo 'Running unit tests...'
         dir("${ORACLE_BUILD}") {
-          sh """
+          sh """#!/bin/bash
              cp ${DATA}/* ${ORACLE_BUILD}
              ./tests --gtest_output=xml:gtestresults.xml
              """
         }
+      }
+    }
+    stage('Run t4_geom_convert unit tests') {
+      steps {
+        echo 'Running unit tests...'
         dir("${SRC}") {
-          sh """
-             source "${VENV}/bin/activate"
+          sh """#!/bin/bash
+             . "${VENV}/bin/activate"
              pytest --cov-report term-missing --cov-config .coveragerc --cov-report=xml --cov=t4_geom_convert --junit-xml=pytest.xml --timeout=30 | tee pytest.out || true
              """
           step([$class: 'CoberturaPublisher',
@@ -130,8 +148,10 @@ pipeline {
         notifyTuleap(false)
     }
     always {
-      recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: pep8(pattern: '**/flake8.out', reportEncoding: 'UTF-8')
-      recordIssues referenceJobName: 'valjean/reference/master', enabledForFailure: true, tool: pyLint(pattern: '**/pylint.out', reportEncoding: 'UTF-8')
+      dir("${SRC}") {
+        recordIssues enabledForFailure: true, tool: pep8(pattern: '**/flake8.out', reportEncoding: 'UTF-8')
+        recordIssues enabledForFailure: true, tool: pyLint(pattern: '**/pylint.out', reportEncoding: 'UTF-8')
+      }
       archiveArtifacts artifacts: "**/flake8.out", fingerprint: true
       archiveArtifacts artifacts: "**/pylint.out", fingerprint: true
       archiveArtifacts artifacts: "**/pytest.out", fingerprint: true
