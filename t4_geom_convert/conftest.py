@@ -46,11 +46,18 @@ def pytest_generate_tests(metafunc):
     if 'extra_input' in metafunc.fixturenames:
         extra_inputs_file = metafunc.config.option.extra_mcnp_inputs
         if extra_inputs_file is None:
-            extra_inputs = []
+            paths = []
         else:
             with extra_inputs_file.open() as extra_file:
                 extra_inputs = extra_file.readlines()
-        paths = [pathlib.Path(path.strip()).resolve() for path in extra_inputs]
+            extra_inputs_path = extra_inputs_file.parent
+            paths = []
+            for name in extra_inputs:
+                path = pathlib.Path(name.strip())
+                if path.is_absolute():
+                    paths.append(path)
+                else:
+                    paths.append(extra_inputs_path / path)
         ids = [path.name for path in paths]
         metafunc.parametrize('extra_input', paths, ids=ids)
 
