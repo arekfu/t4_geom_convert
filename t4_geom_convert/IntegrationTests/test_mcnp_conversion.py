@@ -16,8 +16,10 @@ def get_options(mcnp_path, n_lines=50):
     '''
     with mcnp_path.open() as mcnp_file:
         lines = [mcnp_file.readline() for _ in range(n_lines)]
-    conv_str, oracle_str = 'converter-flags:', 'oracle-flags:'
+    conv_str, oracle_str, tol_str = ('converter-flags:', 'oracle-flags:',
+                                     'oracle-tolerance:')
     conv_opts, oracle_opts = [], []
+    tol = 0
     for line in lines:
         pos = line.find(conv_str)
         if pos != -1:
@@ -25,7 +27,10 @@ def get_options(mcnp_path, n_lines=50):
         pos = line.find(oracle_str)
         if pos != -1:
             oracle_opts = shlex.split(line[pos + len(oracle_str):])
-    return conv_opts, oracle_opts
+        pos = line.find(tol_str)
+        if pos != -1:
+            tol = int(line[pos + len(tol_str):])
+    return conv_opts, oracle_opts, tol
 
 
 def do_conversion(mcnp_i, output_dir, conv_opts):
@@ -39,20 +44,20 @@ def do_conversion(mcnp_i, output_dir, conv_opts):
 @foreach_data(mcnp_i=lambda path: str(path).endswith('.imcnp'))
 def test_convert(mcnp_i, tmp_path):
     '''Test conversion for all data files in the ``data`` subfolder.'''
-    conv_opts, _ = get_options(mcnp_i)
+    conv_opts, _, _ = get_options(mcnp_i)
     do_conversion(mcnp_i, tmp_path, conv_opts)
 
 
 def do_test_oracle(mcnp_i, tmp_path, mcnp, oracle):
     '''Actually perform a conversion test, followed by an oracle test.'''
-    conv_opts, oracle_opts = get_options(mcnp_i)
+    conv_opts, oracle_opts, tolerance = get_options(mcnp_i)
     t4_o = do_conversion(mcnp_i, tmp_path, conv_opts)
     mcnp_output, mcnp_ptrac = mcnp.run(mcnp_i)
     mcnp_output_txt = mcnp_output.read_text()
     assert 'trouble' not in mcnp_output_txt
     assert 'fatal error' not in mcnp_output_txt
     n_failed = oracle.run(t4_o, mcnp_i, mcnp_ptrac, oracle_opts)
-    assert n_failed == 0
+    assert n_failed <= tolerance
 
 
 @pytest.mark.oracle
