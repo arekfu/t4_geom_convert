@@ -209,8 +209,14 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
             cli += oracle_opts
         sub.check_call(cli, cwd=str(self.work_path))
         failed_path = self.work_path / (t4_o.stem + '.failedpoints.dat')
+        n_points, dist = 0, 0
         with failed_path.open() as failed_path_file:
-            return len(failed_path_file.readlines())
+            for line in failed_path_file:
+                n_points += 1
+                fields = line.strip().split()
+                assert len(fields) == 8
+                dist = max(dist, fields[6])
+        return n_points, dist
 
 
 @pytest.fixture

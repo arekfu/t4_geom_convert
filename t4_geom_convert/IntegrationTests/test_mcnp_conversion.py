@@ -56,8 +56,9 @@ def do_test_oracle(mcnp_i, tmp_path, mcnp, oracle):
     mcnp_output_txt = mcnp_output.read_text()
     assert 'trouble' not in mcnp_output_txt
     assert 'fatal error' not in mcnp_output_txt
-    n_failed = oracle.run(t4_o, mcnp_i, mcnp_ptrac, oracle_opts)
-    assert n_failed <= tolerance
+    n_failed, distance = oracle.run(t4_o, mcnp_i, mcnp_ptrac, oracle_opts)
+    msg = '{} failed points, max distance = {}'.format(n_failed, distance)
+    assert n_failed <= tolerance, msg
 
 
 @pytest.mark.oracle
