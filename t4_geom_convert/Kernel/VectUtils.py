@@ -4,7 +4,7 @@
 :date: 2019-09-19
 '''
 
-from math import sqrt
+from math import sqrt, cos, sin
 
 
 def scal(v1, v2):
@@ -71,6 +71,42 @@ def mag2(vec):
 def mag(vec):
     '''Return the magnitude of `vec`.'''
     return sqrt(mag2(vec))
+
+
+def rotate(vec, axis, angle):
+    r'''Rotate vector `vec` around the axis `axis` by angle `angle`, according
+    to the right-hand rule.
+
+    This function uses Rodrigues' rotation formula. If we denote `vec` as `v`,
+    the angle as `θ` and the axis as `k`, the formula reads:
+
+    .. math::
+
+        v' = v \cos(\theta) + (k ^ v) \sin(\theta)
+             + k (k\cdot v) (1 - \cos(\theta))
+
+    Examples:
+
+        >>> from math import pi
+        >>> vec = (1, 1, 0)
+        >>> axis = (0, 0, 1)
+        >>> rot_vec = rotate(vec, axis, 0.5*pi)
+        >>> print('({:.5f}, {:.5f}, {:.5f})'.format(*rot_vec))
+        (-1.00000, 1.00000, 0.00000)
+        >>> rot_vec = rotate(vec, axis, 0.25*pi)
+        >>> print('({:.5f}, {:.5f}, {:.5f})'.format(*rot_vec))
+        (0.00000, 1.41421, 0.00000)
+
+    :param vec: the vector to rotate
+    :param axis: the rotation axis (must be a unit vector)
+    :param angle: the rotation angle, in radians
+    '''
+    cangle = cos(angle)
+    sangle = sin(angle)
+    term1 = rescale(cangle, vec)
+    term2 = rescale(sangle, vect(axis, vec))
+    term3 = rescale((1 - cangle)*scal(axis, vec), axis)
+    return vsum(term1, term2, term3)
 
 
 def planeParamsFromPoints(pt1, pt2, pt3):

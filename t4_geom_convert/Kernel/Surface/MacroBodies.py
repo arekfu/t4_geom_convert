@@ -9,7 +9,7 @@ import math
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from ..Transformation.TransformationQuad import transformationQuad
 from ..VectUtils import (vect, vsum, vdiff, scal, rescale, renorm, mag, mag2,
-                         mixed, planeParamsFromPoints,
+                         mixed, rotate, planeParamsFromPoints,
                          planeParamsFromNormalAndPoint)
 
 
@@ -123,12 +123,16 @@ def rhp(params):
     :returns: see :func:`box`
     :rtype: list((ESurfaceTypeMCNP, list(float), int))
     '''
-    check_params_length('RHP', 15, params)
+    check_params_length('RHP', (9, 15), params)
     base_bottom = params[0:3]
     height = params[3:6]
     vec_a = params[6:9]
-    vec_b = params[9:12]
-    vec_c = params[12:]
+    if len(params) == 15:
+        vec_b = params[9:12]
+        vec_c = params[12:]
+    else:
+        vec_b = rotate(vec_a, renorm(height), math.pi/3.)
+        vec_c = rotate(vec_a, renorm(height), 2.*math.pi/3.)
     base_top = vsum(base_bottom, height)
     pt_a = vsum(base_bottom, vec_a)
     pt_b = vsum(base_bottom, vec_b)
@@ -136,14 +140,14 @@ def rhp(params):
     pt_a_op = vdiff(base_bottom, vec_a)
     pt_b_op = vdiff(base_bottom, vec_b)
     pt_c_op = vdiff(base_bottom, vec_c)
-    return [(MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_a, pt_a), 1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_b), 1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c), 1),
+    return [(MS.P, planeParamsFromNormalAndPoint(vec_a, pt_a), 1),
             (MS.P, planeParamsFromNormalAndPoint(vec_a, pt_a_op), -1),
+            (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_b), 1),
             (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_b_op), -1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c_op), -1)]
+            (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c), 1),
+            (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c_op), -1),
+            (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
+            (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1)]
 
 
 def rec(params):
