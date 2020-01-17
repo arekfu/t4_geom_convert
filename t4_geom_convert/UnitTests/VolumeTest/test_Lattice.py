@@ -20,8 +20,8 @@ def vectors(draw):
 
 @composite
 def lattices(draw):
-    '''Generate base vectors for a 1D, 2D or 3D lattice. Make sure that they
-    are not collinear.'''
+    '''Generate base vectors for a 1D, 2D or 3D square lattice. Make sure that
+    they are not collinear.'''
     vecs = draw(lists(vectors(), min_size=1, max_size=3))
     for i, vec in enumerate(vecs):
         for j, other in enumerate(vecs[i+1:]):

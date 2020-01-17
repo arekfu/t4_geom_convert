@@ -222,7 +222,7 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
                 n_points += 1
                 fields = line.strip().split()
                 assert len(fields) == 8
-                dist = max(dist, fields[6])
+                dist = max(dist, float(fields[6]))
         return n_points, dist
 
 

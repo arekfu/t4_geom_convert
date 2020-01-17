@@ -97,7 +97,7 @@ class CParseMCNPCell:
             listeparamfill = []
             listeparamtrcl = []
             importance = None
-            lattice = False
+            lattice = 0
             universe = 0
             material, geometry, option = v
             option_liste = option.lower().replace('(',' ').replace(')',' ').replace('=', ' ').split()
@@ -152,7 +152,18 @@ class CParseMCNPCell:
                         listeparamfill[3:] = list(map(to_cos,
                                                       listeparamfill[3:]))
                 elif 'lat' in elt:
-                    lattice = True
+                    lat_opt = option_liste.pop(0)
+                    try:
+                        lattice = int(lat_opt)
+                    except ValueError:
+                        msg = ('expected an integer in lattice '
+                               'specifications, found {} in cell {}'
+                               .format(lat_opt, key))
+                        raise ValueError(msg) from None
+                    if lattice not in (1, 2):
+                        raise ValueError('Invalid value for LAT option '
+                                         '(LAT={}) in cell {}'
+                                         .format(key, lattice))
                 elif 'trcl' in elt:
                     if '*' in elt:
                         costrcl = True
@@ -187,7 +198,7 @@ class CParseMCNPCell:
                 # case of no FILL, no LAT
                 fillid = None
             elif lattice:
-                # case of FILL=n and LAT=1
+                # case of FILL=n and LAT=1 or 2
                 if isinstance(fillid_universes, int):
                     try:
                         fillid_bounds = self.lattice_params[key]

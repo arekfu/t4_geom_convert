@@ -42,7 +42,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
         for i, key in enumerate(trcl_keys):
             print(fmt_string.format(i+1, key), end='', flush=True)
             cell = mcnp_dict[key]
-            cell.geometry = conv.applyTRCL(cell.trcl, cell.geometry)
+            cell.geometry = conv.apply_trcl(cell.trcl, cell.geometry)
             mcnp_dict[key] = cell
         print('... done', flush=True)
 

@@ -4,7 +4,7 @@
 :date: 2019-09-19
 '''
 
-from math import sqrt, cos, sin
+from math import sqrt, cos, sin, isclose
 
 
 def scal(v1, v2):
@@ -19,7 +19,7 @@ def vect(v1, v2):
     '''Yields the vector product of `v1` and `v2`.'''
     x1, y1, z1 = v1
     x2, y2, z2 = v2
-    result = (y1*z2-z1*y2,x2*z1-x1*z2,x1*y2-y1*x2)
+    result = (y1*z2-z1*y2, x2*z1-x1*z2, x1*y2-y1*x2)
     return result
 
 
@@ -142,3 +142,105 @@ def planeParamsFromNormalAndPoint(normal, point):
     and passing through the given points.'''
     intercept = scal(normal, point)
     return [normal[0], normal[1], normal[2], intercept]
+
+
+def pointInPlaneIntersection(plane1, plane2):
+    '''Construct a point in the intersection of two planes. The planes must be
+    given as a `(point, normal)` pair.
+
+    >>> from math import isclose
+    >>> def is_in_plane(point, plane):
+    ...     pt, norm = plane
+    ...     return isclose(scal(vdiff(point, pt), norm), 0., abs_tol=1e-10)
+
+    >>> plane1 = ((0, 0, 0), (1, 0, 0))
+    >>> plane2 = ((0, 0, 0), (0, 1, 0))
+    >>> pointInPlaneIntersection(plane1, plane2)
+    ((0.0, 0.0, 0.0), (0.0, 0.0, 1.0))
+
+    >>> plane1 = ((0, 0, 0), (1, 0, 0))
+    >>> plane2 = ((0, 5, 0), (0, 1, 0))
+    >>> int_p, line_vec = pointInPlaneIntersection(plane1, plane2)
+    >>> is_in_plane(int_p, plane1) and is_in_plane(int_p, plane2)
+    True
+    >>> isclose(scal(line_vec, (1, 0, 0)), 0., abs_tol=1e-10)
+    True
+    >>> isclose(scal(line_vec, (0, 1, 0)), 0., abs_tol=1e-10)
+    True
+    '''
+    point1, normal1 = plane1
+    point2, normal2 = plane2
+    # line_vec is the vector of the line where the two planes intersect
+    line_vec = vect(normal1, normal2)
+    vec1 = vect(normal1, line_vec)
+    vec2 = vect(normal2, line_vec)
+    dist = vdiff(point1, point2)
+    a = - mixed(dist, vec2, line_vec) / mixed(vec1, vec2, line_vec)
+    int_point = vsum(point1, rescale(a, vec1))
+    return int_point, renorm(line_vec)
+
+
+def planeSide(point, plane):
+    '''Returns 1 if point lies on the positive side of the plane, -1 if it lies
+    on the negative side and 0 if it lies on the plane (no numerical
+    tolerance).'''
+    point_pl, normal = plane
+    dist = scal(vdiff(point, point_pl), normal)
+    if dist > 0:
+        return 1
+    if dist < 0:
+        return -1
+    return 0
+
+
+def projectPointOnPlane(point, plane, direction):
+    '''Project a point on a plane along the given direction.
+
+    >>> from math import isclose, sqrt
+    >>> point = (0, 0, 3)
+    >>> plane = ((0, 0, 0), (0, 0, 1))
+    >>> direction = (1, 0, 1)
+    >>> proj = projectPointOnPlane(point, plane, direction)
+    >>> expected = (-3, 0, 0)
+    >>> all(isclose(p, e, abs_tol=1e-10) for p, e in zip(proj, expected))
+    True
+
+    >>> point = (0, 0, 3)
+    >>> plane = ((0, 0, 1), (0, 0, 1))
+    >>> direction = (2, 0, 1)
+    >>> proj = projectPointOnPlane(point, plane, direction)
+    >>> expected = (-4, 0, 1)
+    >>> all(isclose(p, e, abs_tol=1e-10) for p, e in zip(proj, expected))
+    True
+    '''
+    pl_pt, normal = plane
+    dist = scal(vdiff(pl_pt, point), normal)/scal(direction, normal)
+    return vsum(point, rescale(dist, direction))
+
+
+def isPointOnPlane(point, plane, *, tol=1e-10):
+    '''Returns `True` if the point lies on the plane within the specified
+    tolerance.
+
+    >>> point = (1.0, 1.0, 1.0)
+    >>> plane = ((3.0, 0.0, 0.0), (1.0, 1.0, 1.0))
+    >>> isPointOnPlane(point, plane)
+    True
+    '''
+    return isVectorParallelToPlane(vdiff(point, plane[0]), plane, tol=tol)
+
+
+def isVectorParallelToPlane(vector, plane, *, tol=1e-10):
+    '''Returns `True` if the vector is parallel to the plane within the
+    specified tolerance.
+
+    >>> vector = (1.0, 1.0, -2.0)
+    >>> plane = ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0))
+    >>> isVectorParallelToPlane(vector, plane)
+    True
+    >>> isVectorParallelToPlane(rescale(2.0, vector), plane)
+    True
+    >>> isVectorParallelToPlane(plane[1], plane)
+    False
+    '''
+    return isclose(scal(plane[1], vector), 0.0, abs_tol=tol)

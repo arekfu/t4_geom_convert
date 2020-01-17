@@ -19,8 +19,7 @@ at least partially supported and converted by `t4_geom_convert`:
 * Boundary conditions (reflection, white surfaces)
 * Isotopic compositions and cell densities
 * Universes and fills, even nested, possibly with affine transformations
-* [Lattices](#lattice-conversion) (see the [Current
-  limitations](#current-limitations) section though)
+* [Lattices](#lattice-conversion)
 
 
 Installation
@@ -77,17 +76,18 @@ Use the `-h` option for a list of all available options.
 ### Lattice conversion
 
 `t4_geom_convert` is capable of handling the conversion of repeated structures
-(lattices). Only hexaedral lattices (`LAT=1`) are supported for the moment.
+(lattices). Hexahedral lattices (`LAT=1`) and hexagonal (`LAT=2`) are
+supported.
 
-A hexaedral cell declared as `LAT=1` represents the unit cell of the lattice,
-which is assumed to repeat in all directions up to the boundaries of the
-enclosing cell. Due to limitations of the TRIPOLI-4 representation of lattices,
-we have chosen to represent lattices using a purely surface-based approach.
-This means that `t4_geom_convert` will actually emit separate cell definitions
-for each cell of the lattice that is visible through the enclosing cell. The
-ranges of cell definitions to be emitted must be specified by the user via the
-`--lattice` command-line option. For instance, consider the following MCNP
-input:
+The cell declared as `LAT=1` or `LAT=2` represents the unit cell of the
+lattice, which is assumed to repeat in all directions up to the boundaries of
+the enclosing cell. Due to limitations of the TRIPOLI-4 representation of
+lattices, we have chosen to represent lattices using a purely surface-based
+approach.  This means that `t4_geom_convert` will actually emit separate cell
+definitions for each cell of the lattice that is visible through the enclosing
+cell. The ranges of cell definitions to be emitted must be specified by the
+user via the `--lattice` command-line option. For instance, consider the
+following MCNP input:
 
 ```
 A lattice example
@@ -146,6 +146,12 @@ surface appearing in the definition of the unit cell is surface `2`; therefore,
 surface `2` separates the unit cell (0, 0) from cell (1, 0); the next surface
 (`1`) separates the unit cell from cell (-1, 0); the following surfaces, `4`
 and `3`, separate the unit cell from cells (0, 1) and (0, -1), respectively.
+
+For hexagonal lattices, `t4_geom_convert` follows the convention described in
+the MCNP manual. The lattice axes are defined by the first and the third plane
+appearing in the definition of the base cell. The positive direction of the
+third axis (if present) is defined by the normal to the seventh plane appearing
+in the definition.
 
 A lattice unit cell may appear as a fill pattern in several enclosing cells. It
 is currently not possible to specify different fill ranges for each of them.
@@ -225,7 +231,9 @@ may be able to do in the future (in roughly decreasing order of likelihood):
   subcell universe is equal to the universe of the lattice cell.~~
 
   **Fixed in issue #16**
-- [ ] Convert hexagonal lattices (tracked in issue #22)
+- [X] ~~Convert hexagonal lattices~~
+
+  **Fixed in issue #22**
 - [ ] Import comments describing the MCNP cells/surfaces (tracked in issue #9)
 - [ ] Provide a way to specify lattice fill ranges per enclosing cell(s) (this
   needs to be specified in such a way that it works with nested lattices, too)

@@ -8,24 +8,19 @@ Created on 5 févr. 2019
 '''
 
 from MIP.geom.semantics import GeomExpression, Surface
-from MIP.geom.forcad import mcnp2cad
 from MIP.geom.main import extract_surfaces_list
 
 from .TreeFunctions import isLeaf, isIntersection, isUnion
 from .CVolumeT4 import CVolumeT4
-from .Lattice import latticeReciprocal, LatticeSpec, latticeVector
+from .Lattice import (LatticeSpec, latticeVector, LatticeError,
+                      squareLatticeBaseVectors, hexLatticeBaseVectors)
 from ..Transformation.Transformation import transformation
 from ..Surface.ConversionSurfaceMCNPToT4 import conversionSurfaceParams
-from ..Surface.CSurfaceT4 import CSurfaceT4
-from ..Surface.ESurfaceTypeMCNP import mcnp_to_mip
 from ..Surface.SurfaceCollection import SurfaceCollection
-from ..VectUtils import rescale, scal
-from math import fabs, sqrt
+
 
 class CCellConversion:
-    '''
-    :brief: Class which contains methods to convert the Cell of MCNP in T4 Volume
-    '''
+    '''Class which contains methods to convert the Cell of MCNP in T4 Volume'''
 
     def __init__(self, int_cell, int_surf, d_dictClassT4, d_dictSurfaceT4,
                  d_dicSurfaceMCNP, d_dicCellMCNP, union_ids):
@@ -44,10 +39,8 @@ class CCellConversion:
         self.union_ids = union_ids
 
     def conversionEQUA(self, list_surface):
-        '''
-        :brief: method converting a list of if of surface and return a tuple with the
-        informations of the volume EQUA T4
-        '''
+        '''Method converting a list of if of surface and return a tuple with
+        the informations of the volume EQUA T4'''
 
         minus_surfs = []
         plus_surfs = []
@@ -65,14 +58,12 @@ class CCellConversion:
         return plus_surfs, minus_surfs
 
     def conversionINTUNION(self, op, *ids):
-        '''
-        :brief: method analyze the type of conversion needed between a T4 INTERSECTION
-        and a T4 UNION and return a tuple with the information of the T4 VOLUME
-        '''
+        '''Analyze the type of conversion needed between a T4 INTERSECTION and
+        a T4 UNION and return a tuple with the information of the T4 VOLUME'''
         if op == '*':
             pluses = []
             minuses = []
-            ops =('INTE', ids)
+            ops = ('INTE', ids)
         elif op == ':':
             pluses, minuses = self.conversionEQUA([self.union_ids[0],
                                                    -self.union_ids[1]])
@@ -87,13 +78,14 @@ class CCellConversion:
         cell = self.dicCellMCNP[key]
         if cell.fillid is not None:
             new_cells = []
-            cells_to_process = []
+            to_process = []
             mcnp_key_geom = cell.geometry
             mcnp_key_filltr = cell.filltr
             universe = int(cell.fillid)
             for element in dictUniverse[universe]:
-                cells_to_process.extend(self.postOrderTraversalFill(element, dictUniverse))
-            for element in cells_to_process:
+                to_process.extend(self.postOrderTraversalFill(element,
+                                                              dictUniverse))
+            for element in to_process:
                 element_cell = self.dicCellMCNP[element]
                 mcnp_element_geom = element_cell.geometry
                 self.new_cell_key += 1
@@ -112,7 +104,7 @@ class CCellConversion:
                 tree = self.postOrderTraversalTransform(mcnp_element_geom,
                                                         mcnp_key_filltr)
                 if cell.trcl:
-                    tree = self.applyTRCL(cell.trcl, tree)
+                    tree = self.apply_trcl(cell.trcl, tree)
                 self.dicCellMCNP[new_key].geometry = ['*', mcnp_key_geom, tree]
                 new_cells.append(new_key)
             return new_cells
@@ -276,7 +268,8 @@ class CCellConversion:
         if not isLeaf(p_tree):
             p_id, op, *args = p_tree
             new_tree = [p_id, op]
-            new_tree.extend(self.postOrderTraversalReplace(node) for node in args)
+            new_tree.extend(self.postOrderTraversalReplace(node)
+                            for node in args)
             return new_tree
 
         abs_id = abs(p_tree)
@@ -309,90 +302,83 @@ class CCellConversion:
         result = GeomExpression(new_tree)
         return result
 
-    def listSurfaceForLat(self, cell):
-
-        list_surface = extract_surfaces_list(self.dicCellMCNP[cell].geometry)
-        if len(list_surface) not in (2, 4, 6):
-            raise ValueError('Lattice base cell {} has {} surfaces; 2, 4 or 6 '
-                             'were expected'.format(cell, len(list_surface)))
-
-        base_vecs = []
-        while list_surface:
-            surf_id_1, surf_id_2 = list_surface[0:2]
-            surf_1 = self.dicSurfaceMCNP[abs(surf_id_1)]
-            if len(surf_1) != 1:
-                msg = ('A macrobody ({}) appears in a lattice, but only '
-                       'planes are allowed'.format(surf_id_1))
-                raise ValueError(msg)
-            point, normal = surf_1[0][0].paramSurface
-            surf_2 = self.dicSurfaceMCNP[abs(surf_id_2)]
-            if len(surf_2) != 1:
-                msg = ('A macrobody ({}) appears in a lattice, but only '
-                       'planes are allowed'.format(surf_id_2))
-                raise ValueError(msg)
-            point2, _normal2 = surf_2[0][0].paramSurface
-            point_diff = (float(point[0])-float(point2[0]),
-                          float(point[1])-float(point2[1]),
-                          float(point[2])-float(point2[2]))
-            distance = scal(point_diff, normal)
-            base_vecs.append(rescale(1./distance, normal))
-            list_surface = list_surface[2:]
-        return base_vecs
+    def extract_surfaces(self, cell):
+        surf_ids = extract_surfaces_list(cell.geometry)
+        return [(surf.paramSurface, side if surf_id > 0 else -side)
+                for surf_id in surf_ids
+                for surf, side in self.dicSurfaceMCNP[abs(surf_id)]]
 
     def developLattice(self, key):
         cell = self.dicCellMCNP[key]
-        if cell.lattice:
-            assert isinstance(cell.fillid, LatticeSpec)
-            domain = cell.fillid
-            mcnp_element_geom = cell.geometry
-            list_info_surface = self.listSurfaceForLat(key)
-            if len(list_info_surface) != len(domain.bounds):
-                if len(list_info_surface) != domain.bounds.dims():
-                    msg = ('Problem of domain definition for lattice in cell '
-                            '{}; expected {} non-trivial bounds, got {}'
-                            .format(key, len(list_info_surface),
-                                    domain.bounds.dims()))
-                    raise ValueError(msg)
-                n_missing_bounds = len(list_info_surface) - len(domain.bounds)
-                for i in range(n_missing_bounds):
-                    range_ = domain.bounds[-1-i]
-                    if range[0] != range[1]:
-                        msg = ('Problem of domain definition for lattice in '
-                               'cell {}; expected {} non-trivial bounds, but '
-                               'the {}:{} bound is not trivial'
-                                .format(key, len(list_info_surface),
-                                        range[0], range[1]))
-                        raise ValueError(msg)
-            lat_base_vectors = latticeReciprocal(list_info_surface)
-            for index, universe in domain.items():
-                if universe == 0:
-                    continue
-                transl = latticeVector(lat_base_vectors, index)
-                tr = list(transl) + [1., 0., 0., 0., 1., 0., 0., 0., 1.]
+        if cell.lattice is None:
+            return
+        assert isinstance(cell.fillid, LatticeSpec)
+        assert cell.lattice in (1, 2)
+        mcnp_element_geom = cell.geometry
+        surfaces = self.extract_surfaces(cell)
+        try:
+            if cell.lattice == 1:
+                lat_base_vectors = squareLatticeBaseVectors(surfaces)
+            elif cell.lattice == 2:
+                lat_base_vectors = hexLatticeBaseVectors(surfaces)
+        except LatticeError as err:
+            raise LatticeError('{} (in cell {})'.format(err, key)) from None
 
-                new_cell = cell.copy()
-                tree = self.postOrderTraversalTransform(mcnp_element_geom, tr)
-                new_cell.geometry = tree
-                if universe == cell.universe:
-                    new_cell.fillid = None
-                    new_cell.materialID = cell.materialID
-                else:
-                    new_cell.fillid = universe
-                filltr = new_cell.filltr
-                if filltr:
-                    new_filltr = tuple(x if i>2 else x+tr[i]
-                                       for i, x in enumerate(filltr))
-                else:
-                    filltr = [0.,0.,0.,1.,0.,0.,0.,1.,0.,0.,0.,1.]
-                    new_filltr = tuple(x if i>2 else x+tr[i]
-                                       for i, x in enumerate(filltr))
-                new_cell.filltr = new_filltr
-                new_cell.lattice = False
-                self.new_cell_key += 1
-                self.dicCellMCNP[self.new_cell_key] = new_cell
-            del self.dicCellMCNP[key]
+        # compute the base vectors of the lattice
+        domain = cell.fillid
+        if len(lat_base_vectors) != len(domain.bounds):
+            if len(lat_base_vectors) != domain.bounds.dims():
+                msg = ('Problem of domain definition for lattice; expected {} '
+                       'non-trivial bounds, got {}'
+                       .format(len(lat_base_vectors), domain.bounds.dims()))
+                raise LatticeError(msg)
+            n_missing_bounds = len(lat_base_vectors) - len(domain.bounds)
+            for i in range(n_missing_bounds):
+                range_ = domain.bounds[-1-i]
+                if range_[0] != range_[1]:
+                    msg = ('Problem of domain definition for lattice; '
+                           'expected {} non-trivial bounds, but the {}:{} '
+                           'bound is not trivial'
+                           .format(len(lat_base_vectors), range_[0],
+                                   range_[1]))
+                    raise LatticeError(msg)
 
-    def applyTRCL(self, trcls, geometry):
+        for index, universe in domain.items():
+            if universe == 0:
+                continue
+            transl = latticeVector(lat_base_vectors, index)
+            trnsf = list(transl) + [1., 0., 0., 0., 1., 0., 0., 0., 1.]
+            new_cell = cell.copy()
+            tree = self.postOrderTraversalTransform(mcnp_element_geom, trnsf)
+            new_cell.geometry = tree
+            if universe == cell.universe:
+                new_cell.fillid = None
+                new_cell.materialID = cell.materialID
+            else:
+                new_cell.fillid = universe
+            filltr = new_cell.filltr
+            if filltr:
+                new_filltr = tuple(x if i > 2 else x + trnsf[i]
+                                   for i, x in enumerate(filltr))
+            else:
+                filltr = [0.0, 0.0, 0.0,
+                          1.0, 0.0, 0.0,
+                          0.0, 1.0, 0.0,
+                          0.0, 0.0, 1.0]
+                new_filltr = tuple(x if i > 2 else x + trnsf[i]
+                                   for i, x in enumerate(filltr))
+            new_cell.filltr = new_filltr
+            new_cell.lattice = False
+            self.new_cell_key += 1
+            self.dicCellMCNP[self.new_cell_key] = new_cell
+        del self.dicCellMCNP[key]
+
+    def apply_trcl(self, trcls, geometry):
+        '''Apply the given coordinate transformation to the given cell AST
+        (`geometry`).
+
+        :returns: the transformed AST
+        '''
         if not trcls:
             return geometry
         for trcl in trcls:
