@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
 from setuptools import setup, find_packages
 
 
@@ -13,8 +14,10 @@ test_deps = ['pytest', 'pytest-cov', 'pytest-xdist', 'pytest-timeout',
              'hypothesis']
 dev_deps = test_deps  + ['flake8', 'pylint', 'sphinx', 'sphinx_rtd_theme']
 
-with open('README.md') as readme:
-    long_description = readme.read()
+# read the contents of your README file
+readme_path = Path(__file__).resolve().with_name('README.md')
+with readme_path.open(encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(name=name,
       author=author,
