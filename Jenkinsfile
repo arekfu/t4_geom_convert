@@ -124,12 +124,12 @@ pipeline {
         dir("${SRC}") {
           sh """#!/bin/bash
              . "${VENV}/bin/activate"
-             pytest --cov-report term-missing --cov-config .coveragerc --cov-report=xml --cov=t4_geom_convert --junit-xml=pytest.xml --timeout=30 | tee pytest.out || true
+             pytest --cov-report term-missing --cov-config .coveragerc --cov-report=xml --cov=t4_geom_convert --junit-xml=pytest.xml | tee pytest.out || true
              """
           step([$class: 'CoberturaPublisher',
                 autoUpdateHealth: false,
                 autoUpdateStability: false,
-                coberturaReportFile: 'UnitTests/coverage.xml',
+                coberturaReportFile: 'coverage.xml',
                 failUnhealthy: false,
                 failUnstable: false,
                 maxNumberOfBuilds: 0,

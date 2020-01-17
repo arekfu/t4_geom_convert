@@ -1,11 +1,12 @@
 [run]
 omit =
-        tests/*
+        t4_geom_convert/UnitTests/*
+        t4_geom_convert/IntegrationTests/*
         */MIP/*
 branch = True
 
 [html]
-directory = UnitTests/htmlcov
+directory = htmlcov
 
 [xml]
-output = UnitTests/coverage.xml
+output = coverage.xml
