@@ -34,7 +34,7 @@ class Isect(Operation):
         return
 
 
-class Semantics(object):
+class Semantics:
     def surface(self, ast):
         return Surface(ast)
 

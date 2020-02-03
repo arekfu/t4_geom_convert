@@ -29,7 +29,7 @@ the part starts with.
 """
 
 
-class BIDClass(object):
+class BIDClass:
     """
     BLock ID.
 

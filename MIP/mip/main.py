@@ -24,7 +24,7 @@ def card_debugger(meth):
     return wrapper
 
 
-class Card(object):
+class Card:
     """
     Representation of a card in the MCNP input file.
 
@@ -92,7 +92,7 @@ class Card(object):
             raise NotImplementedError
 
 
-class MIP(object):
+class MIP:
     """
     Class to read general structure of an MCNP input file.
 
