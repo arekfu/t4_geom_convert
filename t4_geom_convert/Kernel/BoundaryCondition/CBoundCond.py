@@ -7,7 +7,7 @@ Created on 6 févr. 2019
 :file : CBoundCond..py
 '''
 
-class CBoundCond(object):
+class CBoundCond:
     '''
     classdocs
     '''

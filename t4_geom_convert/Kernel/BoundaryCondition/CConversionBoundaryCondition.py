@@ -10,7 +10,7 @@ from .CBoundCond import CBoundCond
 from collections import OrderedDict
 
 
-class CConversionBoundaryCondition(object):
+class CConversionBoundaryCondition:
     '''
     '''
 

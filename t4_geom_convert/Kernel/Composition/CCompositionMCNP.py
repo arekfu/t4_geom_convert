@@ -7,7 +7,7 @@ Created on 7 févr. 2019
 :file : CCompositionMCNP.py
 '''
 import math
-class CCompositionMCNP(object):
+class CCompositionMCNP:
     '''
     :brief: Class which permit to access precisely to the information
     of the part material of the block DATA

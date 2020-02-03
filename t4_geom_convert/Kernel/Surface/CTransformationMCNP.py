@@ -7,7 +7,7 @@ Created on 6 févr. 2019
 :file : CTransformMCNP.py
 '''
 
-class CTransformationMCNP(object):
+class CTransformationMCNP:
     '''
      :brief: Class which permit to access precisely to the information of
      the transformation part of the block DATA

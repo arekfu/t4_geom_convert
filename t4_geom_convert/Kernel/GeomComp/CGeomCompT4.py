@@ -7,7 +7,7 @@ Created on 7 févr. 2019
 :file : CGeomCompT4.py
 '''
 
-class CGeomCompT4(object):
+class CGeomCompT4:
     '''
     :brief: Class of the object permitting to obtain information of the GeomComp
     of the T4 file

@@ -8,7 +8,7 @@ Created on 5 févr. 2019
 '''
 
 
-class CVolumeT4(object):
+class CVolumeT4:
     '''
     :brief: class which permits to access precisely of the value of a volume T4
     '''

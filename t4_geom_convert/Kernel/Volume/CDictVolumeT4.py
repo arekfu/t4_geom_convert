@@ -7,7 +7,7 @@ Created on 5 févr. 2019
 :file : CDictVolumeT4.py
 '''
 
-class CDictVolumeT4(object):
+class CDictVolumeT4:
     '''
     :brief: Class inheriting of abstract class MutableMapping and
     listing volume for T4
