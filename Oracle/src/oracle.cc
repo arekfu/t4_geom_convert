@@ -108,7 +108,7 @@ Statistics compare_geoms(const OptionsCompare &options)
       stats.recordCoveredRank(rank);
 
       unsigned long cID = record.cellID;
-      string materialDensityKey = mcnpGeom.getCellDensity(cID);
+      std::string materialDensityKey = mcnpGeom.getCellDensity(cID);
       if (!t4Geom.materialInMap(materialDensityKey) && options.guessMaterialAssocs) {
         if (options.verbosity > 0) {
           cout << "at point: (" << point[0] << ", " << point[1] << ", " << point[2]

@@ -161,7 +161,7 @@
         <UML:Attribute visibility="private" isSpecification="false" xmi.id="kJdAgtL9k1Y3" type="w44PFefeBvhH" name="dict(int->CCellT4)"/>
        </UML:Classifier.feature>
       </UML:Class>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="ZrSwIlBYNPmh" name="CCellMCNP">
+      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="ZrSwIlBYNPmh" name="CellMCNP">
        <UML:Classifier.feature>
         <UML:Attribute visibility="private" isSpecification="false" xmi.id="ewKqi9h0kdT2" type="CbHLz8nhC2Wr" name="materialID"/>
         <UML:Attribute visibility="private" isSpecification="false" xmi.id="LOtWetP3xsZV" type="RjGblkTr0Mgb" name="density"/>

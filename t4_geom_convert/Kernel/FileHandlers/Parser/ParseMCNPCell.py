@@ -13,7 +13,7 @@ from MIP.geom.cells import get_cells
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.composition import get_materialImportance
 from MIP.geom.transforms import get_transforms, to_cos
-from ...Volume.CCellMCNP import CCellMCNP
+from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
 
 
@@ -29,6 +29,8 @@ class ParseMCNPCell:
     '''
     :brief: Class which parse the block CELLS.
     '''
+
+    LIKE_RE = re.compile(r'like\s+(\d+)\s+but')
 
     def __init__(self, mcnp_parser, cell_cache_path, lattice_params):
         '''
@@ -70,7 +72,7 @@ class ParseMCNPCell:
         :brief method which permit to recover the information of each line of
         the block CELLS
         :return: dictionary which contains the ID of the cells as a key
-        and as a value, a object from the class CCellMCNP
+        and as a value, a object from the :class:`~.CellMCNP` class.
         '''
         if self.cell_cache_path is None:
             dict_cell = self.parse_worker()
@@ -95,13 +97,23 @@ class ParseMCNPCell:
         dict_cell = OrderedDict()
         cell_parser = get_cells(self.mcnp_parser, lim=None)
         lencell = len(cell_parser)
-        fmt_string = ('\rparsing MCNP cell {{:{}d}}/{}'
-                      .format(len(str(lencell)), lencell))
-        for rank, (key, value) in enumerate(cell_parser.items()):
-            print(fmt_string.format(rank+1), end='', flush=True)
+        fmt_string = ('\rparsing MCNP cell {{:{}d}} ({{:{}d}}/{})'
+                      .format(len(str(max(cell_parser))),
+                              len(str(lencell)), lencell))
+        for rank, (key, parsed_cell) in enumerate(cell_parser.items()):
+            print(fmt_string.format(key, rank+1), end='', flush=True)
             lat_opt = self.lattice_params.get(key, None)
+
+            # handle LIKE n BUT syntax
+            match_like = self.LIKE_RE.search(parsed_cell[1].lower())
+            while match_like:
+                like_id = int(float(match_like.group(1)))
+                like_cell = cell_parser[like_id]
+                parsed_cell = self.apply_but(like_cell, parsed_cell[2])
+                match_like = self.LIKE_RE.search(parsed_cell[1].lower())
+
             try:
-                cell = self.parse_one_cell(rank, lat_opt, value)
+                cell = self.parse_one_cell(rank, lat_opt, parsed_cell)
             except ParseMCNPCellError as err:
                 msg = '{} (in cell {})'.format(err, key)
                 raise ParseMCNPCellError(msg) from None
@@ -113,15 +125,11 @@ class ParseMCNPCell:
         print('... done', flush=True)
         return dict_cell
 
-    def parse_one_cell(self, rank, lat_opt, value):
-        '''Parse one cell, update `dict_cell`.'''
-        material, geometry, option = value
+    def parse_one_cell(self, rank, lat_opt, parsed_cell):
+        '''Parse one cell, return new :class:`~.CellMCNP` object.'''
+        material, geometry, option = parsed_cell
 
-        material_id = material.split()[0]
-        if int(material_id) == 0:
-            density = None
-        else:
-            density = material.split()[1]
+        material_id, density = self.parse_material(material)
 
         ast_mcnp = get_ast(geometry)
 
@@ -136,12 +144,31 @@ class ParseMCNPCell:
             kws['importance'] = self.importance_card[rank]
         if kws['u'] is None:
             kws['u'] = 0
+        if kws['material'] is not None:
+            material_id = kws['material']
+        if kws['density'] is not None:
+            density = kws['density']
         fillid = self.to_fillid(kws, lat_opt)
         kws['trcl'] = [] if not kws['trcl'] else [kws['trcl']]
 
-        return CCellMCNP(material_id, density, ast_mcnp, kws['importance'],
-                         kws['u'], fillid, kws['f_params'], kws['lattice'],
-                         kws['trcl'])
+        return CellMCNP(material_id, density, ast_mcnp, kws['importance'],
+                        kws['u'], fillid, kws['f_params'], kws['lattice'],
+                        kws['trcl'])
+
+    @staticmethod
+    def parse_material(material):
+        '''Parse the material/density pair.'''
+        material_id = material.split()[0]
+        if int(material_id) == 0:
+            density = None
+        else:
+            density = material.split()[1]
+        return material_id, density
+
+    def apply_but(self, parsed_cell, but_options):
+        '''Extend the list of cell options with the BUT options.'''
+        material, geometry, options = parsed_cell
+        return material, geometry, (options + ' ' + but_options)
 
     @staticmethod
     def to_fillid(kws, lat_opt):
@@ -188,6 +215,12 @@ class ParseMCNPCell:
                 keywords['trcl'] = self.parse_trcl_kw(elt, kw_list)
             elif 'u' in elt:
                 keywords['u'] = int(float(kw_list.pop(0)))
+            elif 'rho' in elt:
+                # only relevant for LIKE n BUT cells
+                keywords['density'] = kw_list.pop(0)
+            elif 'mat' in elt:
+                # only relevant for LIKE n BUT cells
+                keywords['material'] = kw_list.pop(0)
         return keywords
 
     def parse_fill_kw(self, elt, kw_list):

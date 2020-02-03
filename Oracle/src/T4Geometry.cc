@@ -79,7 +79,8 @@ void T4Geometry::addEquivalence(const string &matDens, const string &compo)
 bool T4Geometry::weakEquivalence(const string &matDens, const string &compo)
 {
   if (!materialInMap(matDens)) {
-    cerr << "ERROR : Testing weak equivalence on non-registered material" << endl;
+    cerr << "ERROR: Testing weak equivalence on non-registered material: "
+      << matDens << endl;
     return false;
   }
   return (equivalenceMap[matDens] == compo);

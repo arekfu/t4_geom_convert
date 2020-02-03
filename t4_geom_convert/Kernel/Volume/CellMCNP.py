@@ -4,10 +4,10 @@ Created on 5 févr. 2019
 
 :author: Sogeti
 :data : 05 february 2019
-:file : CCellMCNP.py
+:file : CellMCNP.py
 '''
 
-class CCellMCNP:
+class CellMCNP:
     '''
     :brief: Class which permit to access precisely to the
     information of the block CELLS
@@ -51,11 +51,11 @@ class CCellMCNP:
 
     def copy(self):
         if hasattr(self.geometry , 'copy'):
-            return CCellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
-        return CCellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
+            return CellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
+        return CellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
 
     def __repr__(self):
-        return ('CCellMCNP({!r}, {!r}, {!r},\n'
+        return ('CellMCNP({!r}, {!r}, {!r},\n'
                 '    {!r}, {!r}, {!r},\n'
                 '    {!r}, {!r}, {!r},\n'
                 '    {!r})'

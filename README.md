@@ -14,6 +14,7 @@ at least partially supported and converted by `t4_geom_convert`:
 
 * All surface types (except SQ)
 * Boolean cell operators
+* `LIKE n BUT` syntax
 * Affine transformations on surfaces and on cells (see the [Current
   limitations](#current-limitations) section though)
 * Boundary conditions (reflection, white surfaces)

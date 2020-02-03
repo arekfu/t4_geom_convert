@@ -10,12 +10,12 @@
 
 #include "MCNPGeometry.hh"
 #include "help.hh"
+#include <algorithm>
 #include <cassert>
+#include <cctype>
 #include <unistd.h>
 
-using namespace std;
-
-MCNPGeometry::MCNPGeometry(const string &inputPath) : nps(-1),
+MCNPGeometry::MCNPGeometry(const std::string &inputPath) : nps(-1),
                                                       inputPath(inputPath),
                                                       inputFile(inputPath)
 {
@@ -27,17 +27,30 @@ MCNPGeometry::MCNPGeometry(const string &inputPath) : nps(-1),
 
 void MCNPGeometry::associateCell2Density()
 {
-  istringstream iss(currentLine);
+  std::string lineLower;
+  std::transform(std::begin(currentLine), std::end(currentLine),
+                 std::back_inserter(lineLower),
+                 [](char c) { return std::tolower(c); });
+  std::string::size_type const pos = lineLower.find("like");
+
+  std::istringstream iss(currentLine);
   unsigned long cellNum;
-  string density;
-  if (iss >> cellNum) {
+  iss >> cellNum;
+
+  if(pos != std::string::npos) {
+    handleLikeNBut(cellNum, pos);
+    return;
+  }
+
+  std::string density;
+  if (iss) {
     unsigned long matNum;
     iss >> matNum;
     if (matNum == 0) {
       addCell2Density(cellNum, {0, "void"});
     } else {
       iss >> density;
-      istringstream istest(density);
+      std::istringstream istest(density);
       double fdensity;
       istest >> fdensity;
       if (istest.fail()) {
@@ -51,11 +64,37 @@ void MCNPGeometry::associateCell2Density()
   }
 }
 
+void MCNPGeometry::handleLikeNBut(unsigned long cellNum, std::string::size_type pos)
+{
+  std::istringstream iss(currentLine.substr(pos+4));
+  unsigned long likeNum;
+  iss >> likeNum;
+  std::string but_str;
+  iss >> but_str;
+  decltype(cell2Density)::mapped_type newValue = cell2Density.at(likeNum);
+  while(iss) {
+    std::string token;
+    iss >> token;
+    std::string tokenLower;
+    std::transform(std::begin(token), std::end(token),
+                   std::back_inserter(tokenLower),
+                   [](char c) { return std::tolower(c); });
+    if(tokenLower.substr(0, 4) == "rho=") {
+      newValue.second = token.substr(4);
+    } else if(tokenLower.substr(0, 4) == "mat=") {
+      std::istringstream issMatNum(token.substr(4));
+      unsigned long matNum;
+      issMatNum >> matNum;
+      newValue.first = matNum;
+    }
+  }
+  addCell2Density(cellNum, newValue);
+}
+
 void MCNPGeometry::addCell2Density(unsigned long key, const std::pair<unsigned long, std::string> &value)
 {
   if (cell2Density.find(key) == cell2Density.end()) {
-    std::string value_str = std::to_string(value.first) + "_" + value.second;
-    cell2Density[key] = value_str;
+    cell2Density[key] = value;
   } else {
     std::cerr << "This cellID " << key << " already appeared in the MCNP input file." << endl;
     std::cerr << "Check MCNP input file for errors..." << endl;
@@ -86,9 +125,9 @@ void MCNPGeometry::parseINP()
       }
     }
     while (getline(inputFile, currentLine)) {
-      if (currentLine.find("NPS") != string::npos || currentLine.find("nps") != string::npos) {
-        istringstream iss(currentLine);
-        string dummy;
+      if (currentLine.find("NPS") != std::string::npos || currentLine.find("nps") != std::string::npos) {
+        std::istringstream iss(currentLine);
+        std::string dummy;
         double nps;
         iss >> dummy >> nps;
         this->nps = long(nps);
@@ -99,22 +138,24 @@ void MCNPGeometry::parseINP()
   }
 }
 
-bool MCNPGeometry::isLineAComment(string const &lineContent) const
+bool MCNPGeometry::isLineAComment(std::string const &lineContent) const
 {
   return lineContent[0] == 'c' || lineContent[0] == 'C';
 }
 
-bool MCNPGeometry::isLineAMaterial(string const &lineContent) const
+bool MCNPGeometry::isLineAMaterial(std::string const &lineContent) const
 {
   return lineContent[0] == 'm' || lineContent[0] == 'M';
 }
 
-string const &MCNPGeometry::getCellDensity(unsigned long cellID) const
+std::string MCNPGeometry::getCellDensity(unsigned long cellID) const
 {
-  return cell2Density.at(cellID);
+  auto const &value = cell2Density.at(cellID);
+  std::string value_str = std::to_string(value.first) + "_" + value.second;
+  return value_str;
 }
 
-const string &MCNPGeometry::getInputPath()
+const std::string &MCNPGeometry::getInputPath()
 {
   return inputPath;
 }
@@ -124,7 +165,7 @@ long MCNPGeometry::getNPS()
   return nps;
 }
 
-map<unsigned long, string> &MCNPGeometry::getCell2Density()
+std::map<unsigned long, std::pair<unsigned long, std::string>> &MCNPGeometry::getCell2Density()
 {
   return cell2Density;
 }
@@ -177,17 +218,17 @@ MCNPPTRACASCII::MCNPPTRACASCII(std::string const &ptracPath) : MCNPPTRAC(),
   goThroughHeaderPTRAC(8);
 }
 
-pair<int, int> MCNPPTRACASCII::readPointEvent()
+std::pair<int, int> MCNPPTRACASCII::readPointEvent()
 {
-  istringstream iss(currentLine);
+  std::istringstream iss(currentLine);
   int pointID, eventID;
   iss >> pointID >> eventID;
   return {pointID, eventID};
 }
 
-pair<int, int> MCNPPTRACASCII::readCellMaterial()
+std::pair<int, int> MCNPPTRACASCII::readCellMaterial()
 {
-  istringstream iss(currentLine);
+  std::istringstream iss(currentLine);
   int dummy, volumeID, materialID;
   for (int ii = 1; ii <= nbDataCellMaterialLine - 2; ii++) {
     iss >> dummy;
@@ -198,7 +239,7 @@ pair<int, int> MCNPPTRACASCII::readCellMaterial()
 
 std::vector<double> MCNPPTRACASCII::readPoint()
 {
-  istringstream iss(currentLine);
+  std::istringstream iss(currentLine);
   double pointX, pointY, pointZ;
   iss >> pointX >> pointY >> pointZ;
   return {pointX, pointY, pointZ};
@@ -229,7 +270,7 @@ bool MCNPPTRACASCII::readNextPtracData(long maxReadPoint)
 
 void MCNPPTRACASCII::goThroughHeaderPTRAC(int nHeaderLines)
 {
-  string line5, line6;
+  std::string line5, line6;
   for (int ii = 0; ii < nHeaderLines; ii++) {
     getline(ptracFile, currentLine);
     if (ii == 5) {
@@ -243,21 +284,21 @@ void MCNPPTRACASCII::goThroughHeaderPTRAC(int nHeaderLines)
   checkDataFromLine6Ptrac(line6, nbData);
 }
 
-int MCNPPTRACASCII::getDataFromLine5Ptrac(const string &line5)
+int MCNPPTRACASCII::getDataFromLine5Ptrac(const std::string &line5)
 {
   int nbDataPointEventLine;
-  istringstream iss(line5);
+  std::istringstream iss(line5);
   iss >> nbDataPointEventLine >> nbDataCellMaterialLine;
   int nbData = nbDataPointEventLine + nbDataCellMaterialLine;
   return nbData;
 }
 
-void MCNPPTRACASCII::checkDataFromLine6Ptrac(const string &line6, int nbData)
+void MCNPPTRACASCII::checkDataFromLine6Ptrac(const std::string &line6, int nbData)
 {
   vector<int> data(nbData);
   constexpr int cellIDPtracCode = 17;
   constexpr int materialIDPtracCode = 18;
-  istringstream iss(line6);
+  std::istringstream iss(line6);
   for (int jj = 0; jj < nbData; jj++) {
     iss >> data[jj];
   }

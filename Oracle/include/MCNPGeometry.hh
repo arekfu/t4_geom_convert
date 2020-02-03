@@ -183,7 +183,7 @@ protected:
  */
 class MCNPGeometry
 {
-  std::map<unsigned long, std::string> cell2Density;
+  std::map<unsigned long, std::pair<unsigned long, std::string>> cell2Density;
 
   std::vector<int> volumeList;
   long nps;
@@ -207,6 +207,11 @@ public:
   void associateCell2Density();
 
   /**
+   * Handle the LIKE n BUT syntax
+   */
+  void handleLikeNBut(unsigned long cellNum, std::string::size_type pos);
+
+  /**
    * Parses the INP file, looking for the material densities.
    *
    *
@@ -226,7 +231,7 @@ public:
    * @param[in] cellID the cell ID
    * @return the association as a string: materialID-density.
    */
-  std::string const &getCellDensity(unsigned long cellID) const;
+  std::string getCellDensity(unsigned long cellID) const;
 
   /**
    * Determines whether we have read the whole block data in the input file.
@@ -256,7 +261,7 @@ public:
   long getNPS();
   const std::vector<int> &getVolumeList();
   void setVolumeList(const std::vector<int> &volumeList);
-  std::map<unsigned long, std::string> &getCell2Density();
+  std::map<unsigned long, std::pair<unsigned long, std::string>> &getCell2Density();
 };
 
 /*******************************************************

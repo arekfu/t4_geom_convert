@@ -244,3 +244,11 @@ Useful options for the `oracle` executable include:
   side, it is assumed that the material seen on the TRIPOLI-4 side is the
   corresponding one. Subsequent occurrences of the same MCNP materials will be
   checked against the TRIPOLI-4 material seen on the first point.
+
+
+Known bugs and limitations
+--------------------------
+
+The oracle needs to do some rudimentary parsing of the MCNP input file. The
+parser is not very robust and may choke on unusual spacing, line continuations,
+etc.
