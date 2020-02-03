@@ -22,7 +22,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
     '''
     dic_cellT4 = OrderedDict()
     objT4 = CDictVolumeT4(dic_cellT4)
-    mcnp_dict = CDictCellMCNP(mcnpParser, cell_cache_path, lattice_params).d_cellMCNP
+    mcnp_dict = CDictCellMCNP(mcnpParser, cell_cache_path, lattice_params).d_cell_mcnp
 
     free_key = max(int(k) for k in mcnp_dict) + 1
     free_surf_key = max(

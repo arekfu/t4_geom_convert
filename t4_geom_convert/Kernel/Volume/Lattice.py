@@ -236,10 +236,10 @@ class LatticeSpec:
     def __init__(self, bounds, spec):
         if not isinstance(bounds, LatticeBounds):
             raise TypeError('Expected a LatticeBounds object for the `bounds` '
-                            'argument')
+                            'argument, got a {}'.format(type(bounds)))
         if not isinstance(spec, (list, tuple)):
             raise TypeError('Expected a list or a tuple for the `spec` '
-                            'argument')
+                            'argument, got a {}'.format(type(spec)))
         if bounds.size() != len(spec):
             raise ValueError('The `spec` argument must have exactly {} '
                              'elements'.format(bounds.size()))
