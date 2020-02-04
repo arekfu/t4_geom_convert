@@ -15,6 +15,7 @@ from MIP.geom.composition import get_materialImportance
 from MIP.geom.transforms import get_transforms, to_cos
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
+from ...MCNPDataCards import expand_data_card
 
 
 class ParseMCNPCellError(Exception):
@@ -238,23 +239,15 @@ class ParseMCNPCell:
             while kw_list and ':' in kw_list[0]:
                 str_bounds.append(kw_list.pop(0))
             bounds = parse_ranges(str_bounds)
-            fill_universes = []
-            for _ in range(bounds.size()):
-                if not kw_list:
-                    msg = ('expected {} universe specifications after FILL '
-                           'keyword, found {}'
-                           .format(bounds.size(), len(fill_universes)))
-                    raise ValueError(msg)
-                elt = kw_list.pop(0)
-                try:
-                    fill_universe = int(elt)
-                except ValueError:
-                    msg = ('expected an integer in universe specifications, '
-                           'found {}'.format(elt))
-                    raise ValueError(msg) from None
-                fill_universes.append(fill_universe)
+            try:
+                fill_universes = [kw_list.pop(0) for _ in range(bounds.size())]
+            except IndexError:
+                msg = ('expected {} universe specifications after FILL '
+                       'keyword, found {}'
+                       .format(bounds.size(), len(fill_universes)))
+                raise ParseMCNPCellError(msg) from None
             fillid_bounds = bounds
-            fillid_universes = fill_universes
+            fillid_universes = expand_data_card(fill_universes, dtype='int')
         else:
             fillid_universes = int(float(first_arg))
         while kw_list and kw_list[0][0] in '0123456789.+-':
