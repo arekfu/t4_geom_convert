@@ -137,8 +137,8 @@ class ParseMCNPCell:
 
         ast_mcnp = get_ast(geometry)
 
-        kw_list = (option.lower().replace('(', ' ').replace(')', ' ')
-                   .replace('=', ' ').split())
+        kw_list = list(reversed(option.lower().replace('(', ' ')
+                                .replace(')', ' ').replace('=', ' ').split()))
         kws = self.parse_keywords(kw_list)
         if kws is None:
             return None
@@ -202,9 +202,9 @@ class ParseMCNPCell:
         '''Parse the list of keywords following the cell definition.'''
         keywords = defaultdict(lambda: None)
         while kw_list:
-            elt = kw_list.pop(0)
+            elt = kw_list.pop()
             if 'imp:n' in elt:
-                importance = float(kw_list.pop(0))
+                importance = float(kw_list.pop())
                 if importance == 0:
                     # do not parse cells with zero importance
                     return None
@@ -219,13 +219,13 @@ class ParseMCNPCell:
             elif 'trcl' in elt:
                 keywords['trcl'] = self.parse_trcl_kw(elt, kw_list)
             elif 'u' in elt:
-                keywords['u'] = int(float(kw_list.pop(0)))
+                keywords['u'] = int(float(kw_list.pop()))
             elif 'rho' in elt:
                 # only relevant for LIKE n BUT cells
-                keywords['density'] = kw_list.pop(0)
+                keywords['density'] = kw_list.pop()
             elif 'mat' in elt:
                 # only relevant for LIKE n BUT cells
-                keywords['material'] = kw_list.pop(0)
+                keywords['material'] = kw_list.pop()
         return keywords
 
     def parse_fill_kw(self, elt, kw_list):
@@ -233,14 +233,14 @@ class ParseMCNPCell:
         fillid_bounds = None
         fillid_universes = None
         fill_params = []
-        first_arg = kw_list.pop(0)
+        first_arg = kw_list.pop()
         if ':' in first_arg:
             str_bounds = [first_arg]
-            while kw_list and ':' in kw_list[0]:
-                str_bounds.append(kw_list.pop(0))
+            while kw_list and ':' in kw_list[-1]:
+                str_bounds.append(kw_list.pop())
             bounds = parse_ranges(str_bounds)
             try:
-                fill_universes = [kw_list.pop(0) for _ in range(bounds.size())]
+                fill_universes = [kw_list.pop() for _ in range(bounds.size())]
             except IndexError:
                 msg = ('expected {} universe specifications after FILL '
                        'keyword, found {}'
@@ -250,8 +250,8 @@ class ParseMCNPCell:
             fillid_universes = expand_data_card(fill_universes, dtype='int')
         else:
             fillid_universes = int(float(first_arg))
-        while kw_list and kw_list[0][0] in '0123456789.+-':
-            fill_params.append(float(kw_list.pop(0)))
+        while kw_list and kw_list[-1][0] in '0123456789.+-':
+            fill_params.append(float(kw_list.pop()))
         # now handle the case where the number of the
         # transformation was given instead of the transformation
         # parameters
@@ -271,7 +271,7 @@ class ParseMCNPCell:
     @staticmethod
     def parse_lat_kw(kw_list):
         '''Parse the argument of the LAT keyword.'''
-        lat_opt = kw_list.pop(0)
+        lat_opt = kw_list.pop()
         try:
             lattice = int(lat_opt)
         except ValueError:
@@ -286,8 +286,8 @@ class ParseMCNPCell:
     def parse_trcl_kw(self, elt, kw_list):
         '''Parse the arguments of the TRCL/*TRCL keywords.'''
         trcl_params = []
-        while kw_list and kw_list[0][0] in '0123456789.+-':
-            trcl_params.append(float(kw_list.pop(0)))
+        while kw_list and kw_list[-1][0] in '0123456789.+-':
+            trcl_params.append(float(kw_list.pop()))
         # now handle the case where the number of the
         # transformation was given instead of the transformation
         # parameters
