@@ -1,0 +1,18 @@
+Test without materials
+    10 0 -1000 *fill=2 imp:n=1
+    1 0 -1 U=2 imp:n=1
+    2 0 1 U=2 imp:n=1
+ 1000 0 1000 imp:n=0
+
+c surfaces
+   1  SO 50
+   10 PX 0
+ 1000  SO  100
+
+mode n
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 100
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000

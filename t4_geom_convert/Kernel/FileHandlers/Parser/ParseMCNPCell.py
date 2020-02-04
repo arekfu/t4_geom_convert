@@ -97,11 +97,11 @@ class ParseMCNPCell:
         dict_cell = OrderedDict()
         cell_parser = get_cells(self.mcnp_parser, lim=None)
         lencell = len(cell_parser)
-        fmt_string = ('\rparsing MCNP cell {{:{}d}} ({{:{}d}}/{})'
-                      .format(len(str(max(cell_parser))),
-                              len(str(lencell)), lencell))
+        fmt_string = ('\rparsing MCNP cell {{:{}d}} ({{:3d}}%)'
+                      .format(len(str(max(cell_parser)))))
         for rank, (key, parsed_cell) in enumerate(cell_parser.items()):
-            print(fmt_string.format(key, rank+1), end='', flush=True)
+            percent = int(100.0*rank/(lencell-1)) if lencell > 1 else 100
+            print(fmt_string.format(key, percent), end='', flush=True)
             lat_opt = self.lattice_params.get(key, None)
 
             # handle LIKE n BUT syntax

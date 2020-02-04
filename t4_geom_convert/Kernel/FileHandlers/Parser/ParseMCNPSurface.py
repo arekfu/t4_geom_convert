@@ -29,10 +29,11 @@ def parseMCNPSurface(mcnp_parser):
     transform_parsed = get_transforms(mcnp_parser, lim=None)
     dict_surface = OrderedDict()
     n_surf = len(surface_parsed)
-    fmt_string = '\rparsing MCNP surface {{:{}d}}/{}'.format(len(str(n_surf)),
-                                                             n_surf)
+    fmt_string = ('\rparsing MCNP surface {{:{}d}} ({{:3d}}%)'
+                  .format(len(str(max(surface_parsed)))))
     for i, (key, surface) in enumerate(surface_parsed.items()):
-        print(fmt_string.format(i+1), end='', flush=True)
+        percent = int(100.0*i/(n_surf-1)) if n_surf > 1 else 100
+        print(fmt_string.format(key, percent), end='', flush=True)
         dict_surface[key] = to_surfaces_mcnp(key, surface, transform_parsed)
     print('... done', flush=True)
 
