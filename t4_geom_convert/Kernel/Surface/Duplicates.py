@@ -15,7 +15,7 @@ def remove_duplicate_surfaces(surfs):
     for i, (key, (surf, aux)) in enumerate(sorted(surfs.items())):
         percent = int(100.0*i/(n_surfs-1)) if n_surfs > 1 else 100
         print(fmt_string.format(key, percent), end='', flush=True)
-        tuple_surf = (surf.typeSurface, tuple(surf.paramSurface))
+        tuple_surf = (surf.type_surface, tuple(surf.param_surface))
         if tuple_surf in tuple_surf_to_id:
             renumbering[key] = tuple_surf_to_id[tuple_surf]
         else:

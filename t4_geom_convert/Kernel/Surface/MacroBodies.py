@@ -7,7 +7,7 @@
 import math
 
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
-from ..Transformation.TransformationQuad import transformationQuad
+from ..Transformation.TransformationQuad import transformation_quad
 from ..VectUtils import (vect, vsum, vdiff, scal, rescale, renorm, mag, mag2,
                          mixed, rotate, planeParamsFromPoints,
                          planeParamsFromNormalAndPoint)
@@ -178,7 +178,7 @@ def rec(params):
     u_min = renorm(vec_min)
     u_height = renorm(height)
     transform = tuple(base_bottom) + u_maj + u_min + u_height
-    cyl_params = transformationQuad(ellipse_params, transform)
+    cyl_params = transformation_quad(ellipse_params, transform)
 
     base_top = vsum(base_bottom, height)
 
@@ -266,7 +266,7 @@ def ell(params):
     u_c = vect(u_a, u_b)
     quad_params = [1./mag2(vec_a), 1./min_axis2, 1/min_axis2] + [0]*6 + [-1.]
     transform = center + u_a + u_b + u_c
-    ell_params = transformationQuad(quad_params, transform)
+    ell_params = transformation_quad(quad_params, transform)
 
     return [(MS.GQ, ell_params, 1)]
 

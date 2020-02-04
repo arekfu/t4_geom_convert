@@ -12,6 +12,7 @@ ESurfaceTypeMCNP = Enum('ESurfaceTypeMCNP', 'PX PY PZ P SO S SX SY SZ C_X '
                         # macrobody surface types
                         'BOX RPP SPH RCC HEX RHP REC TRC ELL WED ARB')
 
+
 def mcnp_to_mip(en):
     if isinstance(en, str):
         s = en
@@ -19,11 +20,12 @@ def mcnp_to_mip(en):
         s = en.name
     return s.lower().replace('_', '/')
 
-def string_to_enum(p_typeSurface):
-    typeSurf = p_typeSurface.upper().replace('/','_')
+
+def string_to_enum(type_surface):
+    type_surf = type_surface.upper().replace('/', '_')
     try:
-        enumSurface = getattr(ESurfaceTypeMCNP, typeSurf)
+        enumSurface = getattr(ESurfaceTypeMCNP, type_surf)
     except AttributeError:
         raise ValueError('{}: The type of this surface does not exist'
-                         .format(p_typeSurface.upper()))
+                         .format(type_surface.upper()))
     return enumSurface

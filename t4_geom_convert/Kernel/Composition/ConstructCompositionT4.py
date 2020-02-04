@@ -15,7 +15,7 @@ from .CompositionConversionMCNPToT4 import compositionConversionMCNPToT4
 def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
     '''
     :brief: method changing the tuple from compositionConversionMCNPToT4
-    in instance of the CVolumeT4 Class
+    in instance of the VolumeT4 Class
     '''
     dic_new_composition = OrderedDict()
     for key, val in compositionConversionMCNPToT4(mcnp_parser).items():

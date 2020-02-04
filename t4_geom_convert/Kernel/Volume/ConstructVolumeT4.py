@@ -6,31 +6,26 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 '''
 
-from collections import OrderedDict
-from .CDictVolumeT4 import CDictVolumeT4
-from .CDictCellMCNP import CDictCellMCNP
-from .CCellConversion import CCellConversion
-from .TreeFunctions import isLeaf
+from ..FileHandlers.Parser.ParseMCNPCell import ParseMCNPCell
+from .DictVolumeT4 import DictVolumeT4
+from .CellConversion import CellConversion
 from .ByUniverse import by_universe
 
 
-def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
-                      dic_surface_t4, dic_surfaceMCNP, aux_ids):
-    '''
-    :brief: method changing the tuple from CCellConversion in
-    instance of the CVolumeT4 Class
-    '''
-    dic_cellT4 = OrderedDict()
-    objT4 = CDictVolumeT4(dic_cellT4)
-    mcnp_dict = CDictCellMCNP(mcnpParser, cell_cache_path, lattice_params).d_cell_mcnp
+def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
+                      dic_surface_t4, dic_surface_mcnp, aux_ids):
+    '''A function that orchestrates the conversion steps for TRIPOLI-4
+    volumes.'''
+    dic_vol_t4 = DictVolumeT4()
+    mcnp_dict = ParseMCNPCell(mcnp_parser, cell_cache_path,
+                              lattice_params).parse()
 
     free_key = max(int(k) for k in mcnp_dict) + 1
-    free_surf_key = max(
-        max(int(k) for k in dic_surfaceMCNP) + 1,
-        max(int(k) for k in dic_surface_t4) + 1
-        )
-    conv = CCellConversion(free_key, free_surf_key, objT4,
-                           dic_surface_t4, dic_surfaceMCNP, mcnp_dict, aux_ids)
+    free_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
+                        max(int(k) for k in dic_surface_t4) + 1)
+    conv = CellConversion(free_key, free_surf_key, dic_vol_t4,
+                          dic_surface_t4, dic_surface_mcnp, mcnp_dict,
+                          aux_ids)
 
     # treat TRCL
     trcl_keys = [key for key, value in mcnp_dict.items()
@@ -53,7 +48,7 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
     for i, key in enumerate(mcnp_dict):
         percent = int(100.0*i/(n_compl-1)) if n_compl > 1 else 100
         print(fmt_string.format(key, percent), end='', flush=True)
-        new_geom = conv.postOrderTraversalCompl(mcnp_dict[key].geometry)
+        new_geom = conv.pot_complement(mcnp_dict[key].geometry)
         mcnp_dict[key].geometry = new_geom
     print('... done', flush=True)
 
@@ -66,15 +61,13 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
         for i, key in enumerate(lat_cells):
             percent = int(100.0*i/(n_lat_cells-1)) if n_lat_cells > 1 else 100
             print(fmt_string.format(key, percent), end='', flush=True)
-            conv.developLattice(key)
+            conv.develop_lattice(key)
         print('... done', flush=True)
 
     # update volume and surface free keys
     conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
-    conv.new_surf_key = max(
-        max(int(k) for k in dic_surfaceMCNP) + 1,
-        max(int(k) for k in dic_surface_t4) + 1
-        )
+    conv.new_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
+                            max(int(k) for k in dic_surface_t4) + 1)
 
     # treat FILL
     dict_universe = by_universe(mcnp_dict)
@@ -87,15 +80,13 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
         for i, key in enumerate(fill_keys):
             percent = int(100.0*i/(n_fill_keys-1)) if n_fill_keys > 1 else 100
             print(fmt_string.format(key, percent), end='', flush=True)
-            conv.postOrderTraversalFill(key, dict_universe)
+            conv.pot_fill(key, dict_universe)
         print('... done', flush=True)
 
     # update volume and surface free keys
     conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
-    conv.new_surf_key = max(
-        max(int(k) for k in dic_surfaceMCNP) + 1,
-        max(int(k) for k in dic_surface_t4) + 1
-        )
+    conv.new_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
+                            max(int(k) for k in dic_surface_t4) + 1)
 
     conv_keys = [(key, value) for key, value in mcnp_dict.items()
                  if value.importance != 0 and value.universe == 0
@@ -107,23 +98,20 @@ def constructVolumeT4(mcnpParser, lattice_params, cell_cache_path,
         percent = int(100.0*i/(n_conv_keys-1)) if n_conv_keys > 1 else 100
         print(fmt_string.format(key, percent), end='', flush=True)
         root = val.geometry
-        treeMaster = root
-        tup = conv.postOrderTraversalFlag(treeMaster)
-        replace = conv.postOrderTraversalReplace(tup)
-        opt_tree = conv.postOrderTraversalOptimisation(replace)
+        tup = conv.pot_flag(root)
+        replace = conv.pot_replace(tup)
+        opt_tree = conv.pot_optimise(replace)
         if opt_tree is None:
             # the cell is empty, do not emit a converted cell
             continue
-        j = conv.postOrderTraversalConversion(opt_tree, val.idorigin)
-        objT4.volumeT4[j].fictive = False
+        j = conv.pot_conversion(opt_tree, val.idorigin)
+        dic_vol_t4[j].fictive = False
         if j == key:
             continue
-        objT4.set_key(j, key)
-        objT4[key] = objT4[j]
-        del objT4[j]
+        dic_vol_t4.replace_key(j, key)
     print('... done', flush=True)
 
-    return dic_cellT4, mcnp_dict, dic_surface_t4
+    return dic_vol_t4, mcnp_dict, dic_surface_t4
 
 
 def remove_empty_cells(dic_volume):

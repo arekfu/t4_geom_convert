@@ -3,142 +3,176 @@
 :author: Sogeti
 :data : 06 February 2019
 '''
-from math import atan, pi, sqrt, fabs
+from math import pi, fabs
 from collections import OrderedDict
 
-from .CDictSurfaceMCNP import CDictSurfaceMCNP
-from .CDictSurfaceT4 import CDictSurfaceT4
-from .DTypeConversion import dict_conversionSurfaceType
+from ..FileHandlers.Parser.ParseMCNPSurface import parseMCNPSurface
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
-from .CSurfaceT4 import CSurfaceT4
+from .SurfaceT4 import SurfaceT4
 from .SurfaceCollection import SurfaceCollection
-from ..VectUtils import planeParamsFromPoints
 
 
-def conversionSurfaceMCNPToT4(mcnpParser):
+class SurfaceConversionError(Exception):
+    '''An error in surface conversion.'''
+
+
+def conversionSurfaceMCNPToT4(mcnp_parser):
     '''
     :brief: method which convert MCNP surface and constructing the
     dictionary of Surface T4
     '''
-    dic_SurfaceT4 = OrderedDict()
-    obj_T4 = CDictSurfaceT4(dic_SurfaceT4)
-    dic_surface_mcnp = CDictSurfaceMCNP(mcnpParser).d_surfaceMCNP
+    dic_surface_t4 = OrderedDict()
+    dic_surface_mcnp = parseMCNPSurface(mcnp_parser)
     for key, val in dic_surface_mcnp.items():
         surf_colls = []
         for surf, side in val:
             try:
-                surf_coll = conversionSurfaceParams(key, surf)
-            except:
-                print(key, 'Parameters of this surface do not comply')
-                raise
+                surf_coll = conversion_surface_params(key, surf)
+            except SurfaceConversionError as err:
+                msg = '{} (while converting surface {})'.format(err, key)
+                raise SurfaceConversionError(msg) from None
             surf_colls.append((surf_coll, side))
-        obj_T4[key] = SurfaceCollection.join(surf_colls)
-    return dic_SurfaceT4, dic_surface_mcnp
+        dic_surface_t4[key] = SurfaceCollection.join(surf_colls)
+    return dic_surface_t4, dic_surface_mcnp
 
 
-def conversionSurfaceParams(key, val):
-    if val.typeSurface in (MS.P, MS.PX, MS.PY, MS.PZ):
-        tuple_param = val.paramSurface
-        x, y, z = tuple_param[0]
-        ux, uy, uz = tuple_param[1]
-        pos = -(ux*x + uy*y + uz*z)
-        if ux == 0. and uy == 0. and uz > 0.:
-            type_surface = T4S.PLANEZ
-            param = [-pos/uz]
-        elif uy == 0. and uz == 0. and ux > 0.:
-            type_surface = T4S.PLANEX
-            param = [-pos/ux]
-        elif uz == 0. and ux == 0. and uy > 0.:
-            type_surface = T4S.PLANEY
-            param = [-pos/uy]
-        else:
-            type_surface = T4S.PLANE
-            param = [ux, uy, uz, pos]
-    elif val.typeSurface in (MS.C_X, MS.C_Y, MS.C_Z, MS.CX, MS.CY, MS.CZ,
-                             MS.C):
-        tuple_param = val.paramSurface
-        x, y, z = tuple_param[0]
-        ux, uy, uz = tuple_param[1]
-        r = val.complParam[0]
-        if ux == 0 and uy == 0:
-            type_surface = T4S.CYLZ
-            param = [x, y, r]
-        elif uy == 0 and uz == 0:
-            type_surface = T4S.CYLX
-            param = [y, z, r]
-        elif uz == 0 and ux == 0:
-            type_surface = T4S.CYLY
-            param = [x, z, r]
-        else:
-            param = [x, y, z, r, ux, uy, uz]
-            type_surface = T4S.CYL
-    elif val.typeSurface in (MS.SO, MS.S, MS.SX, MS.SY, MS.SZ):
-        tuple_param = val.paramSurface
-        x, y, z = tuple_param[0]
-        r = val.complParam[0]
-        type_surface = T4S.SPHERE
-        param = [x, y, z, r]
-    elif val.typeSurface in (MS.K_X, MS.K_Y, MS.K_Z, MS.KX, MS.KY, MS.KZ,
-                             MS.K):
-        tuple_param = val.paramSurface
-        x, y, z = tuple_param[0]
-        ux, uy, uz = tuple_param[1]
-        teta = 180.*val.complParam[1]/pi
-        if ux == 0. and uy == 0.:
-            type_surface = T4S.CONEZ
-            param = [x, y, z, teta]
-        elif uy == 0. and uz == 0.:
-            type_surface = T4S.CONEX
-            param = [x, y, z, teta]
-        elif uz == 0. and ux == 0.:
-            type_surface = T4S.CONEY
-            param = [x, y, z, teta]
-        else:
-            type_surface = T4S.CONE
-            param = [x, y, z, teta, ux, uy, uz]
-        cone = CSurfaceT4(type_surface, param)
+def conversion_surface_params(key, val):
+    '''Convert the MCNP surface described by `val` into a TRIPOLI-4 surface.'''
+    if val.type_surface in (MS.K_X, MS.K_Y, MS.K_Z, MS.KX, MS.KY, MS.KZ, MS.K):
+        return convert_cone(key, val)
 
-        nappe = val.complParam[2] if len(val.complParam) == 3 else None
-        if nappe is None or nappe == 0:
-            return SurfaceCollection([(cone, 1)])
-        pos = -(ux*x + uy*y + uz*z)
-
-        if ux == 0 and uy == 0:
-            type_surface = T4S.PLANEZ
-            param = [-pos/uz]
-        elif uy == 0 and uz == 0:
-            type_surface = T4S.PLANEX
-            param = [-pos/ux]
-        elif uz == 0 and ux == 0:
-            type_surface = T4S.PLANEY
-            param = [-pos/uy]
-        else:
-            typePlane = T4S.PLANE
-            paramPlane = [ux, uy, uz, pos]
-        side = -int(nappe)
-        plane = CSurfaceT4(type_surface, param,
-                           ['aux plane for cone {}'.format(key)])
-        return SurfaceCollection([(cone, 1), (plane, side)])
-    elif val.typeSurface == MS.GQ:
-        type_surface = T4S.QUAD
-        param = val.complParam
-    elif val.typeSurface in (MS.TX, MS.TY, MS.TZ, MS.T):
-        tuple_param = val.paramSurface
-        x, y, z = tuple_param[0]
-        ux, uy, uz = tuple_param[1]
-        if fabs(ux)> 0.99:
-            type_surface = T4S.TORUSX
-        elif fabs(uy)> 0.99:
-            type_surface = T4S.TORUSY
-        elif fabs(uz)> 0.99:
-            type_surface = T4S.TORUSZ
-        else:
-            raise ValueError('Cannot convert TORUS with generic axis: %s'%unitary_vector)
-        param = [x, y, z] + list(val.complParam)
+    if val.type_surface in (MS.P, MS.PX, MS.PY, MS.PZ):
+        type_surface, param = convert_plane(val)
+    elif val.type_surface in (MS.C_X, MS.C_Y, MS.C_Z, MS.CX, MS.CY, MS.CZ,
+                              MS.C):
+        type_surface, param = convert_cylinder(val)
+    elif val.type_surface in (MS.SO, MS.S, MS.SX, MS.SY, MS.SZ):
+        type_surface, param = convert_sphere(val)
+    elif val.type_surface == MS.GQ:
+        type_surface, param = convert_quadric(val)
+    elif val.type_surface in (MS.TX, MS.TY, MS.TZ, MS.T):
+        type_surface, param = convert_torus(val)
     else:
-        raise ValueError('Unrecognized surface type: {}'.format(val.typeSurface))
+        msg = 'Unrecognized surface type: {}'.format(val.type_surface)
+        raise SurfaceConversionError(msg)
 
-
-    surf = CSurfaceT4(type_surface, param)
+    surf = SurfaceT4(type_surface, param)
     return SurfaceCollection([(surf, 1)])
+
+
+def convert_plane(val):
+    '''Convert the parameters for planes.'''
+    tuple_param = val.param_surface
+    p_x, p_y, p_z = tuple_param[0]
+    u_x, u_y, u_z = tuple_param[1]
+    pos = -(u_x*p_x + u_y*p_y + u_z*p_z)
+    if u_x == 0. and u_y == 0. and u_z > 0.:
+        type_surface = T4S.PLANEZ
+        param = [-pos/u_z]
+    elif u_y == 0. and u_z == 0. and u_x > 0.:
+        type_surface = T4S.PLANEX
+        param = [-pos/u_x]
+    elif u_z == 0. and u_x == 0. and u_y > 0.:
+        type_surface = T4S.PLANEY
+        param = [-pos/u_y]
+    else:
+        type_surface = T4S.PLANE
+        param = [u_x, u_y, u_z, pos]
+    return type_surface, param
+
+
+def convert_cylinder(val):
+    '''Convert the parameters for cylinders.'''
+    tuple_param = val.param_surface
+    p_x, p_y, p_z = tuple_param[0]
+    u_x, u_y, u_z = tuple_param[1]
+    radius = val.compl_param[0]
+    if u_x == 0 and u_y == 0:
+        type_surface = T4S.CYLZ
+        param = [p_x, p_y, radius]
+    elif u_y == 0 and u_z == 0:
+        type_surface = T4S.CYLX
+        param = [p_y, p_z, radius]
+    elif u_z == 0 and u_x == 0:
+        type_surface = T4S.CYLY
+        param = [p_x, p_z, radius]
+    else:
+        param = [p_x, p_y, p_z, radius, u_x, u_y, u_z]
+        type_surface = T4S.CYL
+    return type_surface, param
+
+
+def convert_sphere(val):
+    '''Convert the parameters for spheres.'''
+    tuple_param = val.param_surface
+    p_x, p_y, p_z = tuple_param[0]
+    radius = val.compl_param[0]
+    type_surface = T4S.SPHERE
+    param = [p_x, p_y, p_z, radius]
+    return type_surface, param
+
+
+def convert_quadric(val):
+    '''Convert the parameters for a quadric.'''
+    return T4S.QUAD, val.compl_param
+
+
+def convert_torus(val):
+    '''Convert the parameters for tori.'''
+    tuple_param = val.param_surface
+    p_x, p_y, p_z = tuple_param[0]
+    u_x, u_y, u_z = tuple_param[1]
+    if fabs(u_x) > 0.99:
+        type_surface = T4S.TORUSX
+    elif fabs(u_y) > 0.99:
+        type_surface = T4S.TORUSY
+    elif fabs(u_z) > 0.99:
+        type_surface = T4S.TORUSZ
+    else:
+        msg = ('Cannot convert TORUS with generic axis: ({}, {}, {})'
+               .format(u_x, u_y, u_z))
+        raise SurfaceConversionError(msg)
+    param = [p_x, p_y, p_z] + list(val.compl_param)
+    return type_surface, param
+
+
+def convert_cone(key, val):
+    '''Convert the parameters for cones.'''
+    p_x, p_y, p_z = val.param_surface[0]
+    u_x, u_y, u_z = val.param_surface[1]
+    theta = 180.*val.compl_param[1]/pi
+    if u_x == 0. and u_y == 0.:
+        type_surface = T4S.CONEZ
+        param = [p_x, p_y, p_z, theta]
+    elif u_y == 0. and u_z == 0.:
+        type_surface = T4S.CONEX
+        param = [p_x, p_y, p_z, theta]
+    elif u_z == 0. and u_x == 0.:
+        type_surface = T4S.CONEY
+        param = [p_x, p_y, p_z, theta]
+    else:
+        type_surface = T4S.CONE
+        param = [p_x, p_y, p_z, theta, u_x, u_y, u_z]
+    cone = SurfaceT4(type_surface, param)
+
+    nappe = val.compl_param[2] if len(val.compl_param) == 3 else None
+    if nappe is None or nappe == 0:
+        return SurfaceCollection([(cone, 1)])
+
+    pos = -(u_x*p_x + u_y*p_y + u_z*p_z)
+    if u_x == 0 and u_y == 0:
+        type_surface = T4S.PLANEZ
+        param = [-pos/u_z]
+    elif u_y == 0 and u_z == 0:
+        type_surface = T4S.PLANEX
+        param = [-pos/u_x]
+    elif u_z == 0 and u_x == 0:
+        type_surface = T4S.PLANEY
+        param = [-pos/u_y]
+    else:
+        type_surface = T4S.PLANE
+        param = [u_x, u_y, u_z, pos]
+    plane = SurfaceT4(type_surface, param,
+                      ['aux plane for cone {}'.format(key)])
+    return SurfaceCollection([(cone, 1), (plane, -int(nappe))])

@@ -75,7 +75,7 @@ class ParseMCNPCell:
         and as a value, a object from the :class:`~.CellMCNP` class.
         '''
         if self.cell_cache_path is None:
-            dict_cell = self.parse_worker()
+            dict_cell = self.parse_all_cells()
         else:
             try:
                 with self.cell_cache_path.open('rb') as dicfile:
@@ -84,7 +84,7 @@ class ParseMCNPCell:
                     dict_cell = pickle.load(dicfile)
                     print(' done')
             except IOError:
-                dict_cell = self.parse_worker()
+                dict_cell = self.parse_all_cells()
                 with self.cell_cache_path.open('wb') as dicfile:
                     print('writing MCNP cells to file {}...'
                           .format(self.cell_cache_path.resolve()), end='')
@@ -92,28 +92,20 @@ class ParseMCNPCell:
                     print(' done')
         return dict_cell
 
-    def parse_worker(self):
+    def parse_all_cells(self):
         '''Actually parse the cells.'''
         dict_cell = OrderedDict()
-        cell_parser = get_cells(self.mcnp_parser, lim=None)
-        lencell = len(cell_parser)
+        parsed_cells = get_cells(self.mcnp_parser, lim=None)
+        lencell = len(parsed_cells)
         fmt_string = ('\rparsing MCNP cell {{:{}d}} ({{:3d}}%)'
-                      .format(len(str(max(cell_parser)))))
-        for rank, (key, parsed_cell) in enumerate(cell_parser.items()):
+                      .format(len(str(max(parsed_cells)))))
+        for rank, (key, parsed_cell) in enumerate(parsed_cells.items()):
             percent = int(100.0*rank/(lencell-1)) if lencell > 1 else 100
             print(fmt_string.format(key, percent), end='', flush=True)
             lat_opt = self.lattice_params.get(key, None)
-
-            # handle LIKE n BUT syntax
-            match_like = self.LIKE_RE.search(parsed_cell[1].lower())
-            while match_like:
-                like_id = int(float(match_like.group(1)))
-                like_cell = cell_parser[like_id]
-                parsed_cell = self.apply_but(like_cell, parsed_cell[2])
-                match_like = self.LIKE_RE.search(parsed_cell[1].lower())
-
             try:
-                cell = self.parse_one_cell(rank, lat_opt, parsed_cell)
+                cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
+                                           parsed_cell)
             except ParseMCNPCellError as err:
                 msg = '{} (in cell {})'.format(err, key)
                 raise ParseMCNPCellError(msg) from None
@@ -125,7 +117,18 @@ class ParseMCNPCell:
         print('... done', flush=True)
         return dict_cell
 
-    def parse_one_cell(self, rank, lat_opt, parsed_cell):
+    def parse_one_cell(self, parsed_cells, rank, lat_opt, parsed_cell):
+        '''Handle the ``LIKE n BUT`` syntax, delegate the real parsing to
+        :meth:`parse_one_cell_worker`.'''
+        match_like = self.LIKE_RE.search(parsed_cell[1].lower())
+        while match_like:
+            like_id = int(float(match_like.group(1)))
+            like_cell = parsed_cells[like_id]
+            parsed_cell = self.apply_but(like_cell, parsed_cell[2])
+            match_like = self.LIKE_RE.search(parsed_cell[1].lower())
+        return self.parse_one_cell_worker(rank, lat_opt, parsed_cell)
+
+    def parse_one_cell_worker(self, rank, lat_opt, parsed_cell):
         '''Parse one cell, return new :class:`~.CellMCNP` object.'''
         material, geometry, option = parsed_cell
 
@@ -165,7 +168,8 @@ class ParseMCNPCell:
             density = material.split()[1]
         return material_id, density
 
-    def apply_but(self, parsed_cell, but_options):
+    @staticmethod
+    def apply_but(parsed_cell, but_options):
         '''Extend the list of cell options with the BUT options.'''
         material, geometry, options = parsed_cell
         return material, geometry, (options + ' ' + but_options)

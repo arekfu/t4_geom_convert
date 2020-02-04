@@ -6,7 +6,7 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 '''
 from .ConversionSurfaceMCNPToT4 import conversionSurfaceMCNPToT4
-from .CSurfaceT4 import CSurfaceT4
+from .SurfaceT4 import SurfaceT4
 from .SurfaceCollection import SurfaceCollection
 from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 from collections import OrderedDict
@@ -15,7 +15,7 @@ from collections import OrderedDict
 def constructSurfaceT4(mcnpParser):
     '''
     :brief: method constructing a dictionary with the id
-    of the surface as a key and the instance of CSurfaceT4 as a value
+    of the surface as a key and the instance of SurfaceT4 as a value
     '''
     dic_surface_t4_new = OrderedDict()
     dic_surface_t4, dic_surfaceMCNP = conversionSurfaceMCNPToT4(mcnpParser)
@@ -34,8 +34,8 @@ def constructSurfaceT4(mcnpParser):
         dic_surface_t4_new[key] = (surf_coll.surfs[0][0], aux_ids)
 
     union_ids = free_id + 1, free_id + 2
-    dic_surface_t4_new[union_ids[0]] = (CSurfaceT4(T4S.PLANEX, [1], ['aux plane for unions']), [])
-    dic_surface_t4_new[union_ids[1]] = (CSurfaceT4(T4S.PLANEX, [-1], ['aux plane for unions']), [])
+    dic_surface_t4_new[union_ids[0]] = (SurfaceT4(T4S.PLANEX, [1], ['aux plane for unions']), [])
+    dic_surface_t4_new[union_ids[1]] = (SurfaceT4(T4S.PLANEX, [-1], ['aux plane for unions']), [])
     print('... done', flush=True)
 
     return dic_surface_t4_new, dic_surfaceMCNP, union_ids

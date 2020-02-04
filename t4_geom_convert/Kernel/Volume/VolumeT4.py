@@ -4,11 +4,11 @@ Created on 5 févr. 2019
 
 :author: Sogeti
 :data : 05 february 2019
-:file : CVolumeT4.py
+:file : VolumeT4.py
 '''
 
 
-class CVolumeT4:
+class VolumeT4:
     '''
     :brief: class which permits to access precisely of the value of a volume T4
     '''
@@ -39,7 +39,7 @@ class CVolumeT4:
         return ' '.join(str(param) for param in str_params)
 
     def __repr__(self):
-        return ('CVolumeT4(pluses={}, minuses={}, ops={}, idorigin={}, '
+        return ('VolumeT4(pluses={}, minuses={}, ops={}, idorigin={}, '
                 'fictive={})'.format(self.pluses, self.minuses, self.ops,
                                      self.idorigin, self.fictive))
 
