@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 name = 't4_geom_convert'
 author = u'Davide Mancusi, Martin Maurey'
 author_email = u'davide.mancusi@cea.fr'
-pkg_copyright = u'2019, ' + author
+pkg_copyright = u'2019-2020, ' + author
 
 test_deps = ['pytest', 'pytest-cov', 'pytest-xdist', 'pytest-timeout',
              'hypothesis']
@@ -34,13 +34,13 @@ setup(name=name,
       setup_requires=['pytest-runner', 'setuptools-scm'],
       classifiers=[
           "Programming Language :: Python :: 3",
-          "Development Status :: 3 - Alpha",
+          "Development Status :: 4 - Beta",
           "Environment :: Console",
           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
           "Operating System :: POSIX :: Linux",
           "Topic :: Scientific/Engineering :: Physics",
           ],
-      install_requires=['TatSu==4.3.0', 'numpy'],
+      install_requires=['TatSu==4.3.0', 'numpy==1.18.1'],
       tests_require=test_deps,
       extras_require={'dev': dev_deps},
       command_options={
