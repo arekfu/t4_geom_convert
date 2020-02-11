@@ -18,7 +18,7 @@ def normalize_transform(name, dtype, params):
         dtype = dtype.replace('*', '')
         pl = pl + [1, 0, 0, 0, 1, 0, 0, 0, 1]
     if dtype[0] == '*':
-        pl[3:] = list(map(to_cos, pl[3:]))
+        pl[3:12] = map(to_cos, pl[3:12])
     return name, pl
 
 

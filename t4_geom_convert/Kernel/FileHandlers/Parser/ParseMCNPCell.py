@@ -42,6 +42,10 @@ class ParseMCNPCell:
         self.lattice_params = lattice_params.copy()
         self.importances = self.parse_importance_cards()
         self.transforms = get_transforms(self.mcnp_parser)
+        for transform in self.transforms.values():
+            if len(transform) == 13 and int(transform[-1]) != 1:
+                raise NotImplementedError('affine transformations with m!=1 '
+                                          'are not supported yet')
 
     def parse_importance_cards(self):
         '''Parse any importance cards and return the minimum importance value
@@ -261,14 +265,15 @@ class ParseMCNPCell:
         # parameters
         if len(fill_params) == 1:
             trid = int(fill_params[0])
-            fill_params = self.transforms[trid]
+            fill_params = self.transforms[trid][:12]
             # no need to apply to_cos, MIP takes care of it
         elif len(fill_params) == 3:
+            fill_params = [float(param) for param in fill_params[:12]]
             fill_params += [1., 0., 0.,
                             0., 1., 0.,
                             0., 0., 1.]
         elif '*' in elt:
-            fill_params[3:] = list(map(to_cos, fill_params[3:]))
+            fill_params[3:] = list(map(to_cos, fill_params[3:12]))
 
         return fillid_bounds, fillid_universes, tuple(fill_params)
 
@@ -291,18 +296,19 @@ class ParseMCNPCell:
         '''Parse the arguments of the TRCL/*TRCL keywords.'''
         trcl_params = []
         while kw_list and kw_list[-1][0] in '0123456789.+-':
-            trcl_params.append(float(kw_list.pop()))
+            trcl_params.append(kw_list.pop())
         # now handle the case where the number of the
         # transformation was given instead of the transformation
         # parameters
         if len(trcl_params) == 1:
             trid = int(trcl_params[0])
-            trcl_params = self.transforms[trid]
+            trcl_params = self.transforms[trid][:12]
             # no need to apply to_cos, MIP takes care of it
         elif len(trcl_params) == 3:
+            trcl_params = [float(param) for param in trcl_params[:12]]
             trcl_params += [1., 0., 0.,
                             0., 1., 0.,
                             0., 0., 1.]
         elif '*' in elt:
-            trcl_params[3:] = list(map(to_cos, trcl_params[3:]))
+            trcl_params[3:] = list(map(to_cos, trcl_params[3:12]))
         return tuple(trcl_params)
