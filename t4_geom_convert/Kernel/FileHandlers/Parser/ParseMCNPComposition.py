@@ -6,9 +6,9 @@ Created on 7 févr. 2019
 :data : 07 february 2019
 '''
 
-from MIP.geom.grammars.composition import get_materialComposition
-from ...Composition.CCompositionMCNP import CCompositionMCNP
 from collections import OrderedDict
+from MIP.geom.composition import get_material_composition
+from ...Composition.CCompositionMCNP import CCompositionMCNP
 
 
 def parseMCNPComposition(mcnpParser):
@@ -18,7 +18,7 @@ def parseMCNPComposition(mcnpParser):
     :return: dictionary which contains the ID of the materials as a key
     and as a value, a object from the class CCompositionMCNP
     '''
-    compositionParser = get_materialComposition(mcnpParser, lim=None)
+    compositionParser = get_material_composition(mcnpParser)
     dictComposition = OrderedDict()
     for k, v in list(compositionParser.items()):
         l_materialCompositionParameters = v

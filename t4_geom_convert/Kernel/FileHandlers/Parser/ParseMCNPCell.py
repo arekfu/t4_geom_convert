@@ -9,9 +9,8 @@ import re
 import pickle
 from collections import OrderedDict, defaultdict
 
-from MIP.geom.cells import get_cells
+from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
-from MIP.geom.composition import get_materialImportance
 from MIP.geom.transforms import get_transforms, to_cos
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
@@ -41,32 +40,33 @@ class ParseMCNPCell:
         self.mcnp_parser = mcnp_parser
         self.cell_cache_path = cell_cache_path
         self.lattice_params = lattice_params.copy()
-        self.importance_card = self.parse_importance_card()
+        self.importances = self.parse_importance_cards()
         self.transforms = get_transforms(self.mcnp_parser)
 
-    def parse_importance_card(self):
+    def parse_importance_cards(self):
+        '''Parse any importance cards and return the minimum importance value
+        for each cell.
+
+        :returns: the minimum importances.
+        :rtype: list(float)
         '''
-        :brief method which permit to recover the information of each line
-        of the block SURFACE
-        :return: dictionary which contains the ID of the materials as a key
-        and as a value, a object from the values of the importance of the cells
-        '''
-        importance_parser = get_materialImportance(self.mcnp_parser, lim=None)
-        list_cell_imp = []
-        i = 0
-        for value in importance_parser.values():
-            list_imp = value
-            for element in list_imp:
-                if 'R' in element.upper():
-                    index = i
-                    value_imp = list_imp[index-1]
-                    list_find_int = re.findall(r'\d+', element)
-                    num_of_rep = int(list_find_int[0])
-                    list_cell_imp.extend([float(value_imp)]*num_of_rep)
-                else:
-                    list_cell_imp.append(float(element))
-                i += 1
-        return list_cell_imp
+        importance_cards = get_cell_importances(self.mcnp_parser)
+        if not importance_cards:
+            return []
+        # here all the lists, dicts, etc. have at least one element
+        importances = [expand_data_card(card)
+                       for card in importance_cards.values()]
+        lens = [len(importance) for importance in importances]
+        if any(len_ != lens[0] for len_ in lens):
+            diagn = ('\n'.join('{}: {}'.format(card, len_)
+                               for card, len_ in zip(importance_cards, lens)))
+            msg = ('All the importance cards (`IMP:*\') must have the same '
+                   'number of elements.\n{}'.format(diagn))
+            raise ParseMCNPCellError(msg)
+        if len(lens) == 1:
+            return importances[0]
+        min_importances = [min(*values) for values in zip(*importances)]
+        return min_importances
 
     def parse(self):
         '''
@@ -140,12 +140,15 @@ class ParseMCNPCell:
         kw_list = list(reversed(option.lower().replace('(', ' ')
                                 .replace(')', ' ').replace('=', ' ').split()))
         kws = self.parse_keywords(kw_list)
-        if kws is None:
-            return None
 
         # replace some missing values with the defaults
         if kws['importance'] is None:
-            kws['importance'] = self.importance_card[rank]
+            try:
+                kws['importance'] = self.importances[rank]
+            except IndexError:
+                raise ParseMCNPCellError('Cannot find importance') from None
+        if kws['importance'] == 0.0:
+            return None
         if kws['u'] is None:
             kws['u'] = 0
         if kws['material'] is not None:
@@ -203,12 +206,13 @@ class ParseMCNPCell:
         keywords = defaultdict(lambda: None)
         while kw_list:
             elt = kw_list.pop()
-            if 'imp:n' in elt:
+            if elt.startswith('imp'):
                 importance = float(kw_list.pop())
-                if importance == 0:
-                    # do not parse cells with zero importance
-                    return None
-                keywords['importance'] = importance
+                if 'importance' in keywords:
+                    keywords['importance'] = min(importance,
+                                                 keywords['importance'])
+                else:
+                    keywords['importance'] = importance
             elif 'fill' in elt:
                 f_bounds, f_univs, f_params = self.parse_fill_kw(elt, kw_list)
                 keywords['f_bounds'] = f_bounds

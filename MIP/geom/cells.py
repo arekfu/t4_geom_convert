@@ -28,6 +28,22 @@ def parse_mat(s):
         return (mat, den)
 
 
+def get_cell_importances(parser):
+    """Collect information about cell importances
+
+    :param mip.MIP parser: the MIP parser.
+    :returns: a dictionary associating the name of the available importance
+        cards to their contents.
+    """
+    imp_dict = OrderedDict()
+    for card in parser.cards(blocks='d', skipcomments=True):
+        type_, name, params = card.parts()
+        if name.lower().strip().startswith('imp:'):
+            params = (type_ + params).split()
+            imp_dict[name.lower()] = params
+    return imp_dict
+
+
 if __name__ == '__main__':
     from sys import argv
     from mcrp_splitters import InputSplitter
