@@ -77,6 +77,9 @@ def get_block_positions(text, firstblock=None):
         # match.start() returns index of the 1-st character of the found match,
         # in case of bld this is the next char after the 1-st \n.
         m = bld.search(text, ps)
+        if m is None:
+            bi.append((ps, len(text)))
+            break
         pe = m.start()
         bi.append((ps, pe))
         ps = m.end() + 1
