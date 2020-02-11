@@ -102,10 +102,10 @@ class MIP:
     file.  Methods of the class help to access separate blocks and cards of the
     input file.
     """
-    def __init__(self, fname, firstblock=None):
+    def __init__(self, fname, firstblock=None, encoding=None):
 
         # Text from the input file
-        self.text = open(fname, 'r').read()
+        self.text = open(fname, 'r', encoding=encoding).read()
 
         # Dictioary of indices describing position of blocks
         self.bi = get_block_positions(self.text, firstblock=firstblock)

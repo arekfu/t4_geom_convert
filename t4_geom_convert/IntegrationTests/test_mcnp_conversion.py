@@ -14,7 +14,11 @@ def get_options(mcnp_path, n_lines=50):
     :type mcnp_path: :class:`py.path.LocalPath`
     :returns: the parsed options, as a list.
     '''
-    with mcnp_path.open() as mcnp_file:
+    if 'latin1' in str(mcnp_path):
+        encoding = 'latin1'
+    else:
+        encoding = None
+    with mcnp_path.open(encoding=encoding) as mcnp_file:
         lines = [mcnp_file.readline() for _ in range(n_lines)]
     conv_str, oracle_str, tol_str = ('converter-flags:', 'oracle-flags:',
                                      'oracle-tolerance:')

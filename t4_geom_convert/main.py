@@ -105,7 +105,14 @@ def conversion(args):
     else:
         t4_output_filename = Path(args.input).with_suffix('.t4')
 
-    mcnp_parser = mip.MIP(args.input)
+    try:
+        mcnp_parser = mip.MIP(args.input, encoding=args.encoding)
+    except UnicodeError as err:
+        msg = ("Could not decode input file using encoding {!r}. Probably you "
+               "need to specify the encoding with the `-e' option."
+               .format(args.encoding))
+        raise UnicodeError(msg)
+
     lattice_params = parse_lattice(args.lattice)
     with t4_output_filename.open('w') as ofile:
         dic_surf_mcnp, dic_vol, mcnp_new_dict = writeT4Geometry(mcnp_parser,
@@ -136,6 +143,8 @@ def parse_args(argv):
 
     # general arguments
     g_general = parser.add_argument_group('general arguments')
+    g_general.add_argument('input', metavar='MCNP_INPUT_FILE',
+                           help='MCNP input file to convert')
     g_general.add_argument('-v', '--verbose', help='increase verbosity',
                            action='count', default=0)
     g_general.add_argument('-V', '--version',
@@ -143,8 +152,8 @@ def parse_args(argv):
     g_general.add_argument('-o', '--output', metavar='T4_OUTPUT_FILE',
                            help='name of the TRIPOLI-4® file to generate',
                            default=None)
-    g_general.add_argument('input', metavar='MCNP_INPUT_FILE',
-                           help='MCNP input file to convert')
+    g_general.add_argument('-e', '--encoding',
+                           help='encoding of the input file', default='utf-8')
     g_general.add_argument('--skip-compositions', action='store_true',
                            help='skip conversion of the compositions')
     g_general.add_argument('--skip-geomcomp', action='store_true',
