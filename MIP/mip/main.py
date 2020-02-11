@@ -1,4 +1,5 @@
 import re
+from functools import wraps
 
 from .blocks import get_block_positions
 from .cards import get_cards
@@ -12,6 +13,7 @@ re_spaces = re.compile('\s+')
 
 
 def card_debugger(meth):
+    @wraps(meth)
     def wrapper(*a, **kwa):
         try:
             return meth(*a, **kwa)
