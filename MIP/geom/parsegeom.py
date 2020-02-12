@@ -25,26 +25,28 @@ re_compl_surf = re.compile('#\s*\(')
 
 
 def normalize(geom):
-    """
-    Replace spaces denoting intersection with `*`.
+    """Replace spaces denoting intersection with ``'*'``.
 
-    Also replace '#' denoting complement with '_' .
+    Also replace ``'#'`` denoting surface complement with ``'_'`` and ``'#'``
+    denoting cell complement with ``'^'``.
     """
     g = geom.strip()
 
     # remove spaces around ':' operator
     g = re_union.sub(':', g)
+
+    # Remove spaces inside complement operators. Represent complement of
+    # surfaces with _() and complement of cells with ^(). Add a space before
+    # the complement operator to parse consecutive complement operators.
+    g = re_compl_cell.sub(r' ^(\1)', g)
+    g = re_compl_surf.sub(r' _(', g)
+
     # remove spaces after '(' and before ')'
     g = re_pareno.sub('(', g)
     g = re_parenc.sub(')', g)
 
-    # remove spaces around complement operators: represent complement of
-    # surfaces with _() and complement of cells with ^()
-    g = re_compl_cell.sub(r'^(\1)', g)
-    g = re_compl_surf.sub(r'_(', g)
-
     # replace one or more spaces with exactly one '*'.
-    g = re_spaces.sub('*', g)
+    g = re_spaces.sub('*', g.strip())
 
     return g
 
