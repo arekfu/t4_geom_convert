@@ -17,8 +17,8 @@ def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
     '''A function that orchestrates the conversion steps for TRIPOLI-4
     volumes.'''
     dic_vol_t4 = DictVolumeT4()
-    mcnp_dict = ParseMCNPCell(mcnp_parser, cell_cache_path,
-                              lattice_params).parse()
+    mcnp_dict, skipped_cells = ParseMCNPCell(mcnp_parser, cell_cache_path,
+                                             lattice_params).parse()
 
     free_key = max(int(k) for k in mcnp_dict) + 1
     free_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
@@ -112,7 +112,7 @@ def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
         dic_vol_t4.replace_key(j, key)
     print('... done', flush=True)
 
-    return dic_vol_t4, mcnp_dict, dic_surface_t4
+    return dic_vol_t4, mcnp_dict, dic_surface_t4, skipped_cells
 
 
 def remove_empty_cells(dic_volume):

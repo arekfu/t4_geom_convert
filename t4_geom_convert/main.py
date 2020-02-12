@@ -115,15 +115,19 @@ def conversion(args):
 
     lattice_params = parse_lattice(args.lattice)
     with t4_output_filename.open('w') as ofile:
-        dic_surf_mcnp, dic_vol, mcnp_new_dict = writeT4Geometry(mcnp_parser,
-                                                                lattice_params,
-                                                                args, ofile)
+        geom_conv = writeT4Geometry(mcnp_parser, lattice_params, args, ofile)
+        dic_surf_mcnp, dic_vol, mcnp_new_dict, skipped_cells = geom_conv
         if not args.skip_compositions:
             writeT4Composition(mcnp_parser, mcnp_new_dict, ofile)
         if not args.skip_geomcomp:
             writeT4GeomComp(dic_vol, mcnp_new_dict, ofile)
         if not args.skip_boundary_conditions:
             writeT4BoundCond(dic_surf_mcnp, ofile)
+
+    if skipped_cells:
+        print('\nNOTE: the following cells have been omitted from the '
+              'conversion\n      because their importance is equal to zero:'
+              '\n      {}'.format(skipped_cells))
 
     end = datetime.now()
     elapsed = end - start

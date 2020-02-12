@@ -70,7 +70,7 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 pickle.dump(vol_conv, dicfile)
                 print(' done', flush=True)
 
-    dic_volume, mcnp_new_dict, dic_surface_t4 = vol_conv
+    dic_volume, mcnp_new_dict, dic_surface_t4, skipped_cells = vol_conv
     dic_surface_t4, surf_renumbering = remove_duplicate_surfaces(dic_surface_t4)
     dic_volume = renumber_surfaces(dic_volume, surf_renumbering)
 
@@ -87,4 +87,4 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
     ofile.write("\n")
     ofile.write("ENDG")
     ofile.write("\n")
-    return dic_surfaceMCNP, dic_volume, mcnp_new_dict
+    return dic_surfaceMCNP, dic_volume, mcnp_new_dict, skipped_cells

@@ -1,4 +1,4 @@
-Test for double-sheet cones with 0 as sheet param
+Test for plane through three points
 c cells
     1 1 -1.0 446 -1000
     2 2 -1.0 -446 -1000

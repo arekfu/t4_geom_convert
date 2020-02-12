@@ -80,26 +80,27 @@ class ParseMCNPCell:
         and as a value, a object from the :class:`~.CellMCNP` class.
         '''
         if self.cell_cache_path is None:
-            dict_cell = self.parse_all_cells()
+            dict_cell, skipped_cells = self.parse_all_cells()
         else:
             try:
                 with self.cell_cache_path.open('rb') as dicfile:
                     print('reading MCNP cells from file {}...'
                           .format(self.cell_cache_path.resolve()), end='')
-                    dict_cell = pickle.load(dicfile)
+                    dict_cell, skipped_cells = pickle.load(dicfile)
                     print(' done')
             except IOError:
-                dict_cell = self.parse_all_cells()
+                dict_cell, skipped_cells = self.parse_all_cells()
                 with self.cell_cache_path.open('wb') as dicfile:
                     print('writing MCNP cells to file {}...'
                           .format(self.cell_cache_path.resolve()), end='')
-                    pickle.dump(dict_cell, dicfile)
+                    pickle.dump((dict_cell, skipped_cells), dicfile)
                     print(' done')
-        return dict_cell
+        return dict_cell, skipped_cells
 
     def parse_all_cells(self):
         '''Actually parse the cells.'''
         dict_cell = OrderedDict()
+        skipped_cells = []
         parsed_cells = get_cells(self.mcnp_parser, lim=None)
         lencell = len(parsed_cells)
         fmt_string = ('\rparsing MCNP cell {{:{}d}} ({{:3d}}%)'
@@ -117,10 +118,12 @@ class ParseMCNPCell:
             except MissingLatticeOptError as err:
                 msg = '{} for cell {}'.format(err, key)
                 raise MissingLatticeOptError(msg) from None
-            if cell is not None:
+            if cell is None:
+                skipped_cells.append(key)
+            else:
                 dict_cell[key] = cell
         print('... done', flush=True)
-        return dict_cell
+        return dict_cell, skipped_cells
 
     def parse_one_cell(self, parsed_cells, rank, lat_opt, parsed_cell):
         '''Handle the ``LIKE n BUT`` syntax, delegate the real parsing to
