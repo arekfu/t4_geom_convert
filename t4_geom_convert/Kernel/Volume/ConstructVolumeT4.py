@@ -42,6 +42,7 @@ def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
             mcnp_dict[key] = cell
         print('... done', flush=True)
 
+    # treat complements
     n_compl = len(mcnp_dict)
     fmt_string = ('\rconverting complement for cell {{:{}d}} ({{:3d}}%)'
                   .format(len(str(max(mcnp_dict)))))

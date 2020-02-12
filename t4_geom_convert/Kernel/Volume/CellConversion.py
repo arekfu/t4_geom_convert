@@ -128,6 +128,13 @@ class CellConversion:
 
         if not isLeaf(p_tree):
             operator, *args = p_tree
+            if operator == '^':
+                # complements stay complements at this stage (they will be
+                # handled later)
+                return p_tree
+
+            # recursively apply the transformation to the arguments of the
+            # operator
             new_args = [self.pot_transform(node, p_transf) for node in args]
             new_tree = [operator]
             new_tree.extend(new_args)

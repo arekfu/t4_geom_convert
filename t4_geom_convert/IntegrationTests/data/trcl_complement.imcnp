@@ -1,0 +1,22 @@
+TRCL with complements
+c cells
+10 1 -1. -10       imp:n=1 trcl=1
+20 2 -1. #10 -20   imp:n=1
+30 3 -1. -1000 20  imp:n=1
+1000 0 1000        imp:n=0
+
+c surfaces
+10 SO 3
+20 SO 7
+1000 SO 30
+
+m1 13027 1.
+m2 13027 1.
+m3 13027 1.
+TR1 1 1 1  1 0 0  0 1 0  0 0 1
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 30
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000
