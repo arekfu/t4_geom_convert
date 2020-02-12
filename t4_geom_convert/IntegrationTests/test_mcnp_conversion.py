@@ -80,3 +80,20 @@ def test_extra_mcnp(extra_input, tmp_path, mcnp, oracle):
     '''Test conversion + oracle for any MCNP input files provided via the
     --extra-mcnp-inputs CLI option.'''
     do_test_oracle(extra_input, tmp_path, mcnp, oracle)
+
+
+def test_density_zeros(datadir, tmp_path):
+    '''Test that the the conversion of :file:`density_zeros.imcnp` produces
+    only one material.
+
+    This input file contains two material cards, but the materials appear
+    multiple times, with densities that differ only in the number of trailing
+    zeros.
+    '''
+    mcnp_i = datadir / 'density_zeros.imcnp'
+    conv_opts, _, _ = get_options(mcnp_i)
+    t4_o = do_conversion(mcnp_i, tmp_path, conv_opts)
+    t4_text = t4_o.read_text()
+    assert 'COMPOSITION\n3' in t4_text, t4_text
+    assert 'm1_-2.7 ' in t4_text, t4_text
+    assert 'm2_-1.0 ' in t4_text, t4_text

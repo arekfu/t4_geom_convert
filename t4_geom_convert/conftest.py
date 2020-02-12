@@ -73,11 +73,12 @@ def datadir(tmp_path, request):
     directory as the test module and, if available, moving all contents to a
     temporary directory so tests can use them freely.
     '''
+    import py
     filename = request.fspath
     test_dir = filename.dirpath('data')
 
     if test_dir.check():
-        test_dir.copy(tmp_path)
+        test_dir.copy(py.path.local(tmp_path))
 
     return tmp_path
 

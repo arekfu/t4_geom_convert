@@ -59,7 +59,16 @@ void MCNPGeometry::associateCell2Density()
         std::cerr << currentLine << endl;
         exit(EXIT_FAILURE);
       }
-      addCell2Density(cellNum, {matNum, density});
+      auto last_non_zero = density.find_last_not_of('0');
+      if(last_non_zero == std::string::npos) {
+        addCell2Density(cellNum, {matNum, density});
+      } else {
+        std::string density_norm = density.substr(0, last_non_zero+1);
+        if(density_norm.back() == '.') {
+          density_norm.push_back('0');
+        }
+        addCell2Density(cellNum, {matNum, density_norm});
+      }
     }
   }
 }

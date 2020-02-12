@@ -173,7 +173,7 @@ class ParseMCNPCell:
         if int(material_id) == 0:
             density = None
         else:
-            density = material.split()[1]
+            density = normalize_density(material.split()[1])
         return material_id, density
 
     @staticmethod
@@ -230,7 +230,7 @@ class ParseMCNPCell:
                 keywords['u'] = int(float(kw_list.pop()))
             elif 'rho' in elt:
                 # only relevant for LIKE n BUT cells
-                keywords['density'] = kw_list.pop()
+                keywords['density'] = normalize_density(kw_list.pop())
             elif 'mat' in elt:
                 # only relevant for LIKE n BUT cells
                 keywords['material'] = kw_list.pop()
@@ -312,3 +312,28 @@ class ParseMCNPCell:
         elif '*' in elt:
             trcl_params[3:] = list(map(to_cos, trcl_params[3:12]))
         return tuple(trcl_params)
+
+
+def normalize_density(density):
+    '''Return a normalized version of the density, removing any trailing
+    zeros, except one if it is the only digit after the decimal point.
+
+    Examples:
+
+    >>> normalize_density('1.0')
+    '1.0'
+    >>> normalize_density('1.23000')
+    '1.23'
+    >>> normalize_density('-1.23000')
+    '-1.23'
+    >>> normalize_density('-.23000')
+    '-.23'
+    >>> normalize_density('7')
+    '7'
+    >>> normalize_density('10')
+    '10'
+    '''
+    norm = re.sub(r'^([-+]?[0-9]*\.[0-9]*[^0])0+$', r'\1', density)
+    if norm[-1] == '.':
+        norm += '0'
+    return norm
