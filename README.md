@@ -50,6 +50,15 @@ $ pip3 install -U pip setuptools
 $ pip3 install t4_geom_convert
 ```
 
+If `pip3` and/or `venv` are not available on your machine, you can use your
+package manager to install them:
+
+```
+# apt install python3-pip python3-venv  # as root, on Debian/Ubuntu
+# yum install python3-pip python3-libs  # as root, on Fedora/CentOS
+```
+
+
 ### Dependencies
 
 The MCNP input file is parsed by [MIP]. We use a slightly modified version of
