@@ -9,6 +9,8 @@ import re
 import pickle
 from collections import OrderedDict, defaultdict
 
+import tatsu.exceptions
+
 from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.transforms import get_transforms, to_cos
@@ -118,6 +120,10 @@ class ParseMCNPCell:
             except MissingLatticeOptError as err:
                 msg = '{} for cell {}'.format(err, key)
                 raise MissingLatticeOptError(msg) from None
+            except tatsu.exceptions.ParseException:
+                msg = ('TatSu parsing failed for cell {}. Check the syntax of '
+                       'this cell.'.format(key))
+                raise ParseMCNPCellError(msg)
             if cell is None:
                 skipped_cells.append(key)
             else:
