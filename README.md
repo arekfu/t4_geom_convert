@@ -62,8 +62,7 @@ package manager to install them:
 ### Dependencies
 
 The MCNP input file is parsed by [MIP]. We use a slightly modified version of
-MIP, which is shipped along with `t4_geom_convert`. MIP depends on [TatSu]
-4.3.0.
+MIP, which is shipped along with `t4_geom_convert`. MIP depends on [TatSu].
 
 `t4_geom_convert` also depends on `numpy`.
 
@@ -262,24 +261,6 @@ may be able to do in the future (in roughly decreasing order of likelihood):
   - Use a SAT solver in the general case?
 - [ ] Convert (some) MCNP source definitions
 - [ ] Convert (some) MCNP tally definitions
-
-A couple of limitations are due to MIP/TatSu:
-
-- [ ] MIP does not support TatSu>4.3.0 (something breaks, but I'm not sure what
-  exactly yet)
-- [X] ~~Input files cannot contain unusual or non-ASCII characters such as `&`
-  or `é`; you need to remove these characters from your input file before
-  attempting the conversion~~
-
-  **Fixed upstream**
-- [X] ~~Spaces are not permitted in a cell definition between a complement
-  operator `#` and its argument:~~
-  - ~~good: `#42`~~
-  - ~~good: `#(123 -124)`~~
-  - ~~bad: `# 42`~~
-  - ~~bad: `# (123 -124)`~~
-
-  **Fixed in issue #10**
 
 Your help is welcome! Feel free to open an issue if you would like to implement
 a new feature or contribute to the project in any way.

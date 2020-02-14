@@ -16,12 +16,14 @@ grammar = get_data('MIP.geom.grammars', 'geom.ebnf').decode('utf-8')
 parser = tatsu.compile(grammar)  # , left_recurion=False)
 
 # patterns to replace space denoting intersection with '*'
-re_union = re.compile('\s*:\s*')
-re_pareno = re.compile('\(\s*')
-re_parenc = re.compile('\s*\)')
-re_spaces = re.compile('\s+')
-re_compl_cell = re.compile('#\s*(\d+)')
-re_compl_surf = re.compile('#\s*\(')
+re_union = re.compile(r'\s*:\s*')
+re_pareno = re.compile(r'\(\s*')
+re_parenc = re.compile(r'\s*\)')
+re_spaces = re.compile(r'\s+')
+re_compl_cell = re.compile(r'#\s*(\d+)')
+re_compl_surf = re.compile(r'#\s*\(')
+re_pareno_before = re.compile(r'([^\(:^_])\(')
+re_parenc_after = re.compile(r'\)([^\):^_])')
 
 
 def normalize(geom):
@@ -44,6 +46,8 @@ def normalize(geom):
     # remove spaces after '(' and before ')'
     g = re_pareno.sub('(', g)
     g = re_parenc.sub(')', g)
+    g = re_pareno_before.sub(r'\1 (', g)
+    g = re_parenc_after.sub(r') \1', g)
 
     # replace one or more spaces with exactly one '*'.
     g = re_spaces.sub('*', g.strip())

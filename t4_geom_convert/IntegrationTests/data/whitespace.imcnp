@@ -1,0 +1,66 @@
+Test for brackets and whitespace
+c                CELLS
+    1001 347 -2.7  -1(    2   -3)  vol=31415.927
+    2001 346 -2.7  (-1 3)-4  vol=31415.927
+    3001 345 -2.7  (-1    4  )(-5)  vol=31415.927
+c Hors-Univers
+ 1000 0 1 : 5 : -2
+
+c ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c
+c                SURFACES
+c
+c     Comment (if any) Applies to Following Surface
+c
+c ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    1  CZ   100
+    2  PZ   -1.5
+    3  PZ   -0.5
+    4  PZ   0.5
+    5  PZ   1.5
+
+c ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c
+c                DATA
+c
+c ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c
+c      MATERIALS
+c
+c Aluminium 5083 (d = -2.66 g/cm³)
+m345
+              13000        1.0
+m346
+              13000        1.0
+m347
+              13000        1.0
+mode h n p e
+c
+c IMPORTANCES
+c
+imp:h   1 1 1 0
+imp:n   1 1 1 0
+imp:p   1 1 1 0
+imp:e   1 1 1 0
+c
+c PHYSICS
+c
+lca 2 1 1 0023 1 1 0 1 0
+lea 1 4 1 0 1 0 2 1
+phys:n 200  j j j j j j 20
+phys:h 200  j 20  j 1 j j
+phys:p 200  j j -1 j
+phys:e 200  0 j j j j j j j j
+cut:e j 0.1
+c
+c SOURCE
+c
+sdef pos=0 0 0 axs=0 0 1 rad=d1 ext=d2 erg=14
+si1 0 100
+sp1 0 1
+si2 -1.5 1.5
+sp2 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000
