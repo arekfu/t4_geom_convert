@@ -10,7 +10,8 @@ Created on 5 févr. 2019
 from MIP.geom.semantics import GeomExpression, Surface
 from MIP.geom.main import extract_surfaces_list
 
-from .TreeFunctions import isLeaf, isIntersection, isUnion
+from .TreeFunctions import (isLeaf, isIntersection, isUnion,
+                            largestPureIntersectionNode)
 from .VolumeT4 import VolumeT4
 from .Lattice import (LatticeSpec, latticeVector, LatticeError,
                       squareLatticeBaseVectors, hexLatticeBaseVectors)
@@ -58,20 +59,22 @@ class CellConversion:
                 plus_surfs.append(elt)
         return plus_surfs, minus_surfs
 
-    def conv_int_union(self, operator, *ids):
-        '''Analyze the type of conversion needed between a T4 INTERSECTION and
-        a T4 UNION and return a tuple with the information of the T4 VOLUME'''
-        if operator == '*':
-            pluses = []
-            minuses = []
-            ops = ('INTE', ids)
-        elif operator == ':':
-            pluses, minuses = self.conv_equa([self.union_ids[0],
-                                              -self.union_ids[1]])
-            ops = ('UNION', ids)
-        else:
-            raise ValueError('Converting cell with unexpected operator: {}'
-                             .format(operator))
+    def conv_intersection(self, *ids):
+        '''Convert a T4 INTE and return a tuple with the information of the T4
+        VOLUME'''
+        return ('INTE', ids)
+
+    def conv_union(self, *ids):
+        '''Convert a T4 UNION and return a tuple with the information of the T4
+        VOLUME'''
+        return ('UNION', ids)
+
+    def conv_union_helpers(self, *ids):
+        '''Convert a T4 UNION and return a tuple with the information of the T4
+        VOLUME'''
+        pluses, minuses = self.conv_equa([self.union_ids[0],
+                                          -self.union_ids[1]])
+        ops = ('UNION', ids)
         return pluses, minuses, ops
 
     def pot_fill(self, key, dict_universe):
@@ -166,7 +169,7 @@ class CellConversion:
 
         return Surface(new_key) if p_tree >= 0 else Surface(-new_key)
 
-    def pot_conversion(self, p_tree, idorigin):
+    def pot_convert(self, p_tree, idorigin):
         '''
         :brief: method which take the tree create by m_postOrderTraversalFlag
         and filled a dictionary (of VolumeT4 instance)
@@ -194,19 +197,18 @@ class CellConversion:
             if surfs:
                 pluses, minuses = self.conv_equa(surfs)
                 if nodes:
-                    arg_ids = [self.pot_conversion(node, idorigin)
+                    arg_ids = [self.pot_convert(node, idorigin)
                                for node in nodes]
-                    pluses2, minuses2, ops = self.conv_int_union(operator,
-                                                                 *arg_ids)
-                    pluses += pluses2
-                    minuses += minuses2
+                    ops = self.conv_intersection(*arg_ids)
                 else:
                     ops = None
             else:
                 # we assume that nodes is not empty
-                arg_ids = [self.pot_conversion(node, idorigin)
+                arg_ids = [self.pot_convert(node, idorigin)
                            for node in nodes]
-                pluses, minuses, ops = self.conv_int_union(operator, *arg_ids)
+                pluses = []
+                minuses = []
+                ops = self.conv_intersection(*arg_ids)
             self.dic_vol_t4[p_id] = VolumeT4(pluses=pluses, minuses=minuses,
                                              ops=ops, idorigin=idorigin)
             return p_id
@@ -215,9 +217,18 @@ class CellConversion:
         if operator != ':':
             raise ValueError('Converting cell with unexpected operator: {}'
                              .format(operator))
-        arg_ids = [self.pot_conversion(arg, idorigin)
-                   for arg in args]
-        pluses, minuses, ops = self.conv_int_union(operator, *arg_ids)
+        largest = largestPureIntersectionNode(args)
+        if largest is None:
+            arg_ids = [self.pot_convert(arg, idorigin) for arg in args]
+            pluses, minuses, ops = self.conv_union_helpers(*arg_ids)
+        else:
+            main = args.pop(largest)
+            main_id = self.pot_convert(main, idorigin)
+            pluses = self.dic_vol_t4[main_id].pluses
+            minuses = self.dic_vol_t4[main_id].minuses
+            arg_ids = [self.pot_convert(arg, idorigin) for arg in args]
+            ops = self.conv_union(*arg_ids)
+            del self.dic_vol_t4[main_id]
         self.dic_vol_t4[p_id] = VolumeT4(pluses=pluses, minuses=minuses,
                                          ops=ops, idorigin=idorigin)
         return p_id

@@ -50,7 +50,7 @@ def pytest_generate_tests(metafunc):
         else:
             with extra_inputs_file.open() as extra_file:
                 extra_inputs = extra_file.readlines()
-            extra_inputs_path = extra_inputs_file.parent
+            extra_inputs_path = extra_inputs_file.parent.resolve()
             paths = []
             for name in extra_inputs:
                 path = pathlib.Path(name.strip())

@@ -105,7 +105,7 @@ def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
         if opt_tree is None:
             # the cell is empty, do not emit a converted cell
             continue
-        j = conv.pot_conversion(opt_tree, val.idorigin)
+        j = conv.pot_convert(opt_tree, val.idorigin)
         dic_vol_t4[j].fictive = False
         if j == key:
             continue
