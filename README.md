@@ -26,22 +26,18 @@ at least partially supported and converted by `t4_geom_convert`:
 Installation
 ------------
 
-If you want to install the latest stable version, just type the following
-command in a terminal:
+`t4_geom_convert` is available on [PyPI][pypi]. The suggested way to install it
+is to use [the `pip`/`pip3` package manager][pip] and [the `venv`
+module][venv]. If `pip3` and `venv` are not available on your machine, you can
+use your package manager to install them:
 
 ```
-$ pip3 install t4_geom_convert
+# sudo apt install python3-pip python3-venv  # on Debian/Ubuntu
+# sudo yum install python3-pip python3-libs  # on Fedora/CentOS
 ```
 
-You can also install the latest development version with
-
-```
-$ pip3 install git+https://github.com/arekfu/t4_geom_convert.git@next
-```
-
-You might want to pass the `--user` option to `pip3` for a local install. Even
-better, you can create a virtual environment and install `t4_geom_convert`
-there with
+You can then create a virtual Python environment and install the latest stable
+version of `t4_geom_convert` there with
 
 ```
 $ python3 -m venv /path/to/some/folder
@@ -50,13 +46,18 @@ $ pip3 install -U pip setuptools
 $ pip3 install t4_geom_convert
 ```
 
-If `pip3` and/or `venv` are not available on your machine, you can use your
-package manager to install them:
+This will install the `t4_geom_convert` executable in
+`/path/to/some/folder/bin/t4_geom_convert`. Sourcing
+`/path/to/some/folder/bin/activate` will put `t4_geom_convert` in your `PATH`.
+
+You can also install the latest development version with
 
 ```
-# apt install python3-pip python3-venv  # as root, on Debian/Ubuntu
-# yum install python3-pip python3-libs  # as root, on Fedora/CentOS
+$ pip3 install git+https://github.com/arekfu/t4_geom_convert.git@next
 ```
+
+You can find more information about [`pip3`][pip] and [`venv`][venv] on the
+web.
 
 
 ### Dependencies
@@ -64,7 +65,7 @@ package manager to install them:
 The MCNP input file is parsed by [MIP]. We use a slightly modified version of
 MIP, which is shipped along with `t4_geom_convert`. MIP depends on [TatSu].
 
-`t4_geom_convert` also depends on `numpy`.
+`t4_geom_convert` also depends on [NumPy].
 
 
 Usage
@@ -223,34 +224,24 @@ Current limitations
 Here is a list of some things that `t4_geom_convert` cannot currently do, but
 may be able to do in the future (in roughly decreasing order of likelihood):
 
-- [ ] Convert SQ surfaces (tracked in issue #11)
-- [ ] Import the title of the MCNP input file (tracked in issue #5)
+- [ ] Convert SQ surfaces (tracked in [issue
+  #11](https://github.com/arekfu/t4_geom_convert/issues/11))
+- [ ] Import the title of the MCNP input file (tracked in [issue
+  #5](https://github.com/arekfu/t4_geom_convert/issues/5))
 - [ ] Handle affine transformations with `m=-1` (the last parameter of the
-  affine transformation) (tracked in issue #12)
+  affine transformation) (tracked in [issue
+  #12](https://github.com/arekfu/t4_geom_convert/issues/12))
 - [ ] Optimize fills with negative universes (do not intersect with the
-  enclosing cell) (tracked in issue #13)
+  enclosing cell) (tracked in [issue
+  #13](https://github.com/arekfu/t4_geom_convert/issues/13))
 - [ ] Warn about isotopes that are missing from the TRIPOLI-4 dictionary
   (currently you need to edit the converted file by hand and remove the
   occurrences of the missing isotopes)
-- [X] ~~Convert MCNP macrobodies~~
-
-  **Fixed in issue #25**
 - [ ] Convert cell temperatures
-- [X] ~~In the fully-specified lattice syntax, handle the case where the
-  subcell universe is equal to the universe of the lattice cell.~~
-
-  **Fixed in issue #16**
-- [X] ~~Convert hexagonal lattices~~
-
-  **Fixed in issue #22**
-- [ ] Import comments describing the MCNP cells/surfaces (tracked in issue #9)
+- [ ] Import comments describing the MCNP cells/surfaces (tracked in [issue
+  #9](https://github.com/arekfu/t4_geom_convert/issues/9))
 - [ ] Provide a way to specify lattice fill ranges per enclosing cell(s) (this
   needs to be specified in such a way that it works with nested lattices, too)
-- [X] ~~Deduplicate repeated surface definitions, i.e. remove duplicate surface
-  definitions in favour of one of the replicas (this is especially an issue for
-  lattices, that tend to generate lots of identical surfaces)~~
-
-  **Fixed in issue #19**
 - [ ] Deduplicate repeated cell definitions (this is a bit harder than
   deduplicating surfaces)
 - [ ] Produce a TRIPOLI-4 connectivity map for as many cells as possible
@@ -289,11 +280,15 @@ consortium. `t4_geom_convert` is released under the terms of the  [GNU Public
 Licence, version 3](COPYING).
 
 
-[MCNP]: https://mcnp.lanl.gov/
-[TRIPOLI-4®]: http://www.cea.fr/nucleaire/tripoli-4
-[MIP]: https://github.com/travleev/mip
-[TatSu]: https://tatsu.readthedocs.io/en/stable/
 [bugs]: https://github.com/arekfu/t4_geom_convert/issues
 [EUROfusion]: https://www.euro-fusion.org/
 [lattice_example]: pics/lattice_example.png
 [lattice_fully_specified]: pics/lattice_fully_specified.png
+[MCNP]: https://mcnp.lanl.gov/
+[MIP]: https://github.com/travleev/mip
+[NumPy]: https://numpy.org/
+[pip]: https://packaging.python.org/tutorials/installing-packages/
+[pypi]: https://pypi.org/project/t4-geom-convert/
+[TatSu]: https://tatsu.readthedocs.io/en/stable/
+[TRIPOLI-4®]: http://www.cea.fr/nucleaire/tripoli-4
+[venv]: https://docs.python.org/3/tutorial/venv.html
