@@ -114,19 +114,25 @@ void MCNPGeometry::parseINP()
 {
   if (inputFile) {
     int emptyLinesRemaining = 1;
+    bool isContinuation = false, isPrevContinuation = false;
     getline(inputFile, currentLine);
     if(currentLine.substr(0, 8) == "message:" || currentLine.substr(0, 8) == "message:") {
       ++emptyLinesRemaining;
     }
     while (getline(inputFile, currentLine)) {
-      if (currentLine.empty()) {
+      if(isLineAComment(currentLine)) {
+        continue;
+      }
+      isContinuation = isLineAContinuation(currentLine) || isPrevContinuation;
+      isPrevContinuation = lineEndsInContinuation(currentLine);
+      if(isContinuation) {
+        continue;
+      }
+      if(isLineEmpty(currentLine)) {
         --emptyLinesRemaining;
       }
       if(emptyLinesRemaining == 0) {
         break;
-      }
-      if(isLineAComment(currentLine)) {
-        continue;
       }
       auto const pos = currentLine.find_first_of("0123456789");
       if(pos != std::string::npos && pos < 5) {
@@ -152,9 +158,30 @@ bool MCNPGeometry::isLineAComment(std::string const &lineContent) const
   return lineContent[0] == 'c' || lineContent[0] == 'C';
 }
 
+bool MCNPGeometry::isLineAContinuation(std::string const &lineContent) const
+{
+  auto const pos = lineContent.find_first_not_of(" \t");
+  return pos != std::string::npos && pos >= 5;
+}
+
+bool MCNPGeometry::lineEndsInContinuation(std::string const &lineContent) const
+{
+  auto const pos = lineContent.find_last_not_of(" \t");
+  if(pos == std::string::npos) {
+    return false;
+  }
+  return lineContent[pos] == '&';
+}
+
 bool MCNPGeometry::isLineAMaterial(std::string const &lineContent) const
 {
   return lineContent[0] == 'm' || lineContent[0] == 'M';
+}
+
+bool MCNPGeometry::isLineEmpty(std::string const &lineContent) const
+{
+  auto const pos = lineContent.find_first_not_of(" \t");
+  return pos == std::string::npos;
 }
 
 std::string MCNPGeometry::getCellDensity(unsigned long cellID) const

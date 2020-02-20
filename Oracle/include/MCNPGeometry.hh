@@ -250,6 +250,29 @@ public:
   bool isLineAComment(std::string const &lineContent) const;
 
   /**
+   * Determines whether the current has a continuation character at the end
+   *
+   *
+   * @returns true if current line ends in a continuation character
+   */
+  bool lineEndsInContinuation(std::string const &lineContent) const;
+
+  /**
+   * Determines whether the current is a continuation
+   *
+   *
+   * @returns true if current line starts at column < 6
+   */
+  bool isLineAContinuation(std::string const &lineContent) const;
+
+  /**
+   * Determines whether the line is empty (only spaces)
+   *
+   * @returns true if the line is empty
+   */
+  bool isLineEmpty(std::string const &lineContent) const;
+
+  /**
    * Determines whether the current is a material definition
    *
    *

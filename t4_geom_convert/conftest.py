@@ -78,7 +78,7 @@ def datadir(tmp_path, request):
     test_dir = filename.dirpath('data')
 
     if test_dir.check():
-        test_dir.copy(py.path.local(tmp_path))
+        test_dir.copy(py.path.local(tmp_path))  # pylint: disable=no-member
 
     return tmp_path
 
@@ -135,7 +135,8 @@ def foreach_data(*args, **kwargs):
             raise ValueError('No kwargs allowed with a positional '
                              'argument to @foreach_data')
         fix_name = args[0]
-        def fil(name):
+
+        def fil(_):
             return True
     else:
         if len(kwargs) != 1:
@@ -178,9 +179,13 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
         cli = [str(self.path),
                'inp={}'.format(input_file),
                'name={}'.format(run_name)]
-        sub.check_call(cli, cwd=str(self.work_path))
         output = self.work_path / (run_name + 'o')
         ptrac = self.work_path / (run_name + 'p')
+        try:
+            sub.check_call(cli, cwd=str(self.work_path))
+        except sub.CalledProcessError:
+            msg = 'MCNP run failed. The output is here: {}'.format(str(output))
+            raise ValueError(msg)
         return output, ptrac
 
 
@@ -215,9 +220,23 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
         cli = [str(self.path), str(t4_o), str(mcnp_i), str(mcnp_ptrac)]
         if oracle_opts is not None:
             cli += oracle_opts
-        output = sub.check_output(cli, cwd=str(self.work_path),
-                                  stderr=sub.STDOUT)
+        stdout_fname = self.work_path / 'stdout'
+        try:
+            with stdout_fname.open('w') as stdout:
+                sub.check_call(cli, cwd=str(self.work_path), stdout=stdout,
+                               stderr=sub.STDOUT)
+        except sub.CalledProcessError:
+            msg = ('Oracle run failed. The output is:\n'
+                   + stdout_fname.read_text())
+            raise ValueError(msg)
         failed_path = self.work_path / (t4_o.stem + '.failedpoints.dat')
+        n_points, dist = self.check_failed_points(failed_path)
+        return n_points, dist, stdout_fname
+
+    @staticmethod
+    def check_failed_points(failed_path):
+        '''Read the `failed_path` file and return the number of failed points
+        and the maximum distance for them.'''
         n_points, dist = 0, 0
         with failed_path.open() as failed_path_file:
             for line in failed_path_file:
@@ -225,7 +244,7 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
                 fields = line.strip().split()
                 assert len(fields) == 8
                 dist = max(dist, float(fields[6]))
-        return n_points, dist, output
+        return n_points, dist
 
 
 @pytest.fixture
