@@ -1,3 +1,13 @@
+include COPYING
+include README.md
+include CHANGELOG.md
+graft pics
 include MIP/geom/grammars/geom.ebnf
 prune Oracle
 prune t4_geom_convert/UnitTests
+prune t4_geom_convert/IntegrationTests
+global-exclude .*rc
+exclude Jenkinsfile
+global-exclude .git*
+global-exclude .project
+global-exclude *.py[cod]
