@@ -40,7 +40,7 @@ setup(name=name,
           "Operating System :: POSIX :: Linux",
           "Topic :: Scientific/Engineering :: Physics",
           ],
-      install_requires=['TatSu==5.5.0', 'numpy==1.18.1'],
+      install_requires=['TatSu==4.4.0', 'numpy==1.18.1'],
       tests_require=test_deps,
       extras_require={'dev': dev_deps},
       command_options={
