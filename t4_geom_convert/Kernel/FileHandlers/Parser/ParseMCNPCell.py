@@ -13,10 +13,11 @@ import tatsu.exceptions
 
 from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
-from MIP.geom.transforms import get_transforms, to_cos
+from MIP.geom.transforms import to_cos
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
 from ...MCNPDataCards import expand_data_card
+from ...Transformation.Transformation import get_mcnp_transforms
 
 
 class ParseMCNPCellError(Exception):
@@ -43,7 +44,7 @@ class ParseMCNPCell:
         self.cell_cache_path = cell_cache_path
         self.lattice_params = lattice_params.copy()
         self.importances = self.parse_importance_cards()
-        self.transforms = get_transforms(self.mcnp_parser)
+        self.transforms = get_mcnp_transforms(self.mcnp_parser)
         for transform in self.transforms.values():
             if len(transform) == 13 and int(transform[-1]) != 1:
                 raise NotImplementedError('affine transformations with m!=1 '
