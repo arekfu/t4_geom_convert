@@ -42,11 +42,7 @@ def transformation(trpl, surface):
     '''Apply a transformation to the given surface parameters.
 
     :param trpl: the transformation
-    :param type_surf: the surface type
-    :param frame: the surface frame
-    :param params: the surface parameters, if any
-    :param bound: the boundary conditions attached to the surface
-    :param idorigin: a list of origin information about this surface
+    :param SurfaceMCNP surface: an MCNP surface
     '''
     if not trpl:
         return surface

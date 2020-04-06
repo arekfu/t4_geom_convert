@@ -66,8 +66,7 @@ def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
     surf = SurfaceMCNP(bound_cond, enum_surface, params,
                        compl_params, idorigin)
     if transform_id:
-        idorigin.append('via transformation {}'
-                        .format(int(transform_id)))
+        idorigin.append(transform_id)
         surf = transformation(transform_parsed[int(transform_id)], surf)
     return surf
 

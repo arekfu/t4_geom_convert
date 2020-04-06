@@ -25,7 +25,7 @@ class SurfaceT4:
 
         self.type_surface = type_surface
         self.param_surface = param_surface
-        self.idorigin = idorigin.copy() if idorigin is not None else []
+        self.idorigin = idorigin if idorigin is not None else ()
 
     def __str__(self):
         as_str = ' '.join(str(element)
