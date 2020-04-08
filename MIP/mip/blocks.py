@@ -104,7 +104,11 @@ def get_block_positions(text, firstblock=None):
 
     cb = firstblock
     while bi:
-        dres[bid[cb]] = bi[0], line
+        try:
+            dres[bid[cb]] = bi[0], line
+        except IndexError as err:
+            raise ValueError('Cannot parse MCNP input file. Please check that '
+                             'the file does not contain spurious blank lines.')
         line += utils.nol(text, *bi[0])
         bi.pop(0)
         cb += 1

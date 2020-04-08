@@ -24,9 +24,9 @@ class SurfaceMCNP:
         '''
         self.boundary_cond = boundary_cond
         self.type_surface = type_surface
-        self.param_surface = param_surface
-        self.compl_param = compl_param
-        self.idorigin = idorigin.copy() if idorigin is not None else []
+        self.param_surface = tuple(param_surface)
+        self.compl_param = tuple(compl_param)
+        self.idorigin = tuple(idorigin) if idorigin is not None else ()
 
     def __repr__(self):
         return ('SurfaceMCNP({!r}, {!r}, {!r}, {!r}, {!r})'

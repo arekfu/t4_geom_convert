@@ -82,12 +82,12 @@ class CellConversion:
         if cell.fillid is None:
             return [key]
         new_cells = []
-        to_process = []
         mcnp_key_geom = cell.geometry
         mcnp_key_filltr = cell.filltr
         universe = int(cell.fillid)
-        for element in dict_universe[universe]:
-            to_process.extend(self.pot_fill(element, dict_universe))
+        to_process = tuple(cell
+                           for element in dict_universe[universe]
+                           for cell in self.pot_fill(element, dict_universe))
         for element in to_process:
             element_cell = self.dic_cell_mcnp[element]
             mcnp_element_geom = element_cell.geometry
@@ -103,11 +103,12 @@ class CellConversion:
             # new_cell.trcl = new_trcl
             new_cell.idorigin = element_cell.idorigin.copy()
             new_cell.idorigin.append((element, key))
-            self.dic_cell_mcnp[new_key] = new_cell
+            del new_cell.geometry
             tree = self.pot_transform(mcnp_element_geom, mcnp_key_filltr)
             if cell.trcl:
                 tree = self.apply_trcl(cell.trcl, tree)
-            self.dic_cell_mcnp[new_key].geometry = ['*', mcnp_key_geom, tree]
+            new_cell.geometry = ('*', mcnp_key_geom, tree)
+            self.dic_cell_mcnp[new_key] = new_cell
             new_cells.append(new_key)
         return new_cells
 
@@ -141,13 +142,12 @@ class CellConversion:
             new_args = [self.pot_transform(node, p_transf) for node in args]
             new_tree = [operator]
             new_tree.extend(new_args)
-            return new_tree
+            return tuple(new_tree)
 
         surfs = self.dic_surf_mcnp[abs(p_tree)]
         surf_colls = []
         mcnp_surfs = []
         for surface_object, side in surfs:
-            surface_object.idorigin += ['via tr']
             new_mcnp_surf = transformation(p_transf, surface_object)
             mcnp_surfs.append((new_mcnp_surf, side))
             surf_coll = conversion_surface_params(p_tree, new_mcnp_surf)
@@ -158,7 +158,7 @@ class CellConversion:
         for surf, side in surf_coll.surfs[1:]:
             self.new_surf_key += 1
             new_key = self.new_surf_key
-            surf.idorigin.append('aux surf')
+            surf.idorigin = tuple(list(surf.idorigin) + ['aux surf'])
             self.dic_surf_t4[new_key] = (surf, [])
             aux_ids.append(side * new_key)
 

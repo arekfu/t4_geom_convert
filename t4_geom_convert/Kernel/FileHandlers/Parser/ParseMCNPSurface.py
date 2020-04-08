@@ -9,11 +9,11 @@ Created on 6 févr. 2019
 from collections import OrderedDict
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.surfaces import get_surfaces
-from MIP.geom.transforms import get_transforms
 from ...Surface.SurfaceMCNP import SurfaceMCNP
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from ...Surface.ESurfaceTypeMCNP import string_to_enum, mcnp_to_mip
-from ...Transformation.Transformation import transformation
+from ...Transformation.Transformation import (get_mcnp_transforms,
+                                              transformation)
 from ...VectUtils import planeParamsFromPoints
 from ...Surface import MacroBodies as MB
 
@@ -26,7 +26,7 @@ def parseMCNPSurface(mcnp_parser):
     and as a value, a object from the :class:`SurfaceMCNP` class.
     '''
     surface_parsed = get_surfaces(mcnp_parser, lim=None)
-    transform_parsed = get_transforms(mcnp_parser, lim=None)
+    transform_parsed = get_mcnp_transforms(mcnp_parser)
     dict_surface = OrderedDict()
     n_surf = len(surface_parsed)
     fmt_string = ('\rparsing MCNP surface {{:{}d}} ({{:3d}}%)'
@@ -66,8 +66,7 @@ def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
     surf = SurfaceMCNP(bound_cond, enum_surface, params,
                        compl_params, idorigin)
     if transform_id:
-        idorigin.append('via transformation {}'
-                        .format(int(transform_id)))
+        idorigin.append(transform_id)
         surf = transformation(transform_parsed[int(transform_id)], surf)
     return surf
 

@@ -5,7 +5,10 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 '''
 
+from collections import OrderedDict
+
 from MIP.geom.forcad import transform_frame
+from MIP.geom.transforms import get_transforms
 
 from ..Surface.SurfaceMCNP import SurfaceMCNP
 from .TransformationQuad import transformation_quad
@@ -14,15 +17,32 @@ from .TransformationError import TransformationError
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 
 
+
+def get_mcnp_transforms(parser):
+    '''Return the dictionary of parsed MCNP transformation, in a canonical,
+    12-parameter form.
+
+    :param parser: the MCNP parser
+    :returns: a dictionary associating each transformation number to a list of
+        12 transformation parameters.
+    '''
+    mcnp_transforms = get_transforms(parser)
+    transforms = OrderedDict()
+    for transf_id, transf in mcnp_transforms.items():
+        if len(transf) == 12 or transf[-1] == 1:
+            transforms[transf_id] = transf[:12]
+        else:
+            raise ValueError('Transformations with m=-1 are not supported '
+                             'yet. The problematic transformation was TR{}={}'
+                             .format(transf_id, transf))
+    return transforms
+
+
 def transformation(trpl, surface):
     '''Apply a transformation to the given surface parameters.
 
     :param trpl: the transformation
-    :param type_surf: the surface type
-    :param frame: the surface frame
-    :param params: the surface parameters, if any
-    :param bound: the boundary conditions attached to the surface
-    :param idorigin: a list of origin information about this surface
+    :param SurfaceMCNP surface: an MCNP surface
     '''
     if not trpl:
         return surface

@@ -13,10 +13,11 @@ import tatsu.exceptions
 
 from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
-from MIP.geom.transforms import get_transforms, to_cos
+from MIP.geom.transforms import to_cos
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
 from ...MCNPDataCards import expand_data_card
+from ...Transformation.Transformation import get_mcnp_transforms
 
 
 class ParseMCNPCellError(Exception):
@@ -43,7 +44,7 @@ class ParseMCNPCell:
         self.cell_cache_path = cell_cache_path
         self.lattice_params = lattice_params.copy()
         self.importances = self.parse_importance_cards()
-        self.transforms = get_transforms(self.mcnp_parser)
+        self.transforms = get_mcnp_transforms(self.mcnp_parser)
         for transform in self.transforms.values():
             if len(transform) == 13 and int(transform[-1]) != 1:
                 raise NotImplementedError('affine transformations with m!=1 '
@@ -60,7 +61,7 @@ class ParseMCNPCell:
         if not importance_cards:
             return []
         # here all the lists, dicts, etc. have at least one element
-        importances = [expand_data_card(card)
+        importances = [expand_data_card(card)[0]
                        for card in importance_cards.values()]
         lens = [len(importance) for importance in importances]
         if any(len_ != lens[0] for len_ in lens):
@@ -248,7 +249,7 @@ class ParseMCNPCell:
     def parse_fill_kw(self, elt, kw_list):
         '''Parse the arguments of the FILL/*FILL keywords.'''
         fillid_bounds = None
-        fillid_universes = None
+        fillid_u = None
         fill_params = []
         first_arg = kw_list.pop()
         if ':' in first_arg:
@@ -257,16 +258,17 @@ class ParseMCNPCell:
                 str_bounds.append(kw_list.pop())
             bounds = parse_ranges(str_bounds)
             try:
-                fill_universes = [kw_list.pop() for _ in range(bounds.size())]
-            except IndexError:
+                fillid_u, consumed = expand_data_card(list(reversed(kw_list)),
+                                                      expected=bounds.size(),
+                                                      dtype='int')
+            except ValueError:
                 msg = ('expected {} universe specifications after FILL '
-                       'keyword, found {}'
-                       .format(bounds.size(), len(fill_universes)))
+                       'keyword'.format(bounds.size()))
                 raise ParseMCNPCellError(msg) from None
+            del kw_list[-consumed:]  # remove the last `consumed` elements
             fillid_bounds = bounds
-            fillid_universes = expand_data_card(fill_universes, dtype='int')
         else:
-            fillid_universes = int(float(first_arg))
+            fillid_u = int(float(first_arg))
         while kw_list and kw_list[-1][0] in '0123456789.+-':
             fill_params.append(float(kw_list.pop()))
         # now handle the case where the number of the
@@ -284,7 +286,7 @@ class ParseMCNPCell:
         elif '*' in elt:
             fill_params[3:] = list(map(to_cos, fill_params[3:12]))
 
-        return fillid_bounds, fillid_universes, tuple(fill_params)
+        return fillid_bounds, fillid_u, tuple(fill_params)
 
     @staticmethod
     def parse_lat_kw(kw_list):
