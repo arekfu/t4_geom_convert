@@ -71,8 +71,9 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
                 print(' done', flush=True)
 
     dic_volume, mcnp_new_dict, dic_surface_t4, skipped_cells = vol_conv
-    dic_surface_t4, surf_renumbering = remove_duplicate_surfaces(dic_surface_t4)
-    dic_volume = renumber_surfaces(dic_volume, surf_renumbering)
+    if not args.skip_deduplication:
+        dic_surface_t4, surf_renumbering = remove_duplicate_surfaces(dic_surface_t4)
+        dic_volume = renumber_surfaces(dic_volume, surf_renumbering)
 
     remove_empty_cells(dic_volume)
     surf_used = extract_used_surfaces(dic_volume.values())

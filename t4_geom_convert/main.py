@@ -158,6 +158,8 @@ def parse_args(argv):
                            default=None)
     g_general.add_argument('-e', '--encoding',
                            help='encoding of the input file', default='utf-8')
+    g_general.add_argument('--skip-deduplication', action='store_true',
+                           help='skip deduplication of surfaces')
     g_general.add_argument('--skip-compositions', action='store_true',
                            help='skip conversion of the compositions')
     g_general.add_argument('--skip-geomcomp', action='store_true',
