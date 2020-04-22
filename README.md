@@ -276,8 +276,8 @@ Licence and acknowledgments
 ---------------------------
 
 The development of `t4_geom_convert` was partially financed by the [EUROfusion]
-consortium. `t4_geom_convert` is released under the terms of the  [GNU Public
-Licence, version 3](COPYING).
+consortium. `t4_geom_convert` is released under the terms of the  [GNU General
+Public Licence, version 3](COPYING).
 
 
 [bugs]: https://github.com/arekfu/t4_geom_convert/issues
