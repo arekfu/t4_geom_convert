@@ -21,11 +21,14 @@ def constructSurfaceT4(mcnpParser):
     dic_surface_t4, dic_surfaceMCNP = conversionSurfaceMCNPToT4(mcnpParser)
     free_id = max(int(k) for k in dic_surface_t4.keys()) + 1
     n_surfaces = len(dic_surface_t4)
-    fmt_string = ('\rconverting surface {{:{}d}} ({{:3d}}%)'
-                  .format(len(str(max(dic_surface_t4)))))
+    fmt_string = ('\rconverting surface {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
+                  '{{:3d}}%)'
+                  .format(len(str(max(dic_surface_t4))),
+                          len(str(n_surfaces))))
     for i, (key, surf_coll) in enumerate(dic_surface_t4.items()):
         percent = int(100.0*i/(n_surfaces-1)) if n_surfaces > 1 else 100
-        print(fmt_string.format(key, percent), end='', flush=True)
+        print(fmt_string.format(key, i+1, n_surfaces, percent),
+              end='', flush=True)
         aux_ids = []
         for surf, side in surf_coll.surfs[1:]:
             dic_surface_t4_new[free_id] = (surf, [])

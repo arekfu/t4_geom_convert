@@ -24,11 +24,14 @@ def writeT4Composition(mcnp_parser, mcnp_new_dict, ofile):
 
     if dic_composition:
         n_compos = len(dic_composition)
-        fmt_string = ('\rconverting composition {{:{}d}} ({{:3d}}%)'
-                      .format(len(str(max(dic_composition)))))
+        fmt_string = ('\rconverting composition {{:{0}d}} ({{:{1}d}}/'
+                      '{{:{1}d}}, {{:3d}}%)'
+                      .format(len(str(max(dic_composition))),
+                              len(str(n_compos))))
         for j, (key, mats) in enumerate(dic_composition.items()):
             percent = int(100.0*j/(n_compos-1)) if n_compos > 1 else 100
-            print(fmt_string.format(key, percent), end='', flush=True)
+            print(fmt_string.format(key, j+1, n_compos, percent),
+                  end='', flush=True)
             for mat in mats:
                 typ = mat.typeDensity
                 density = mat.valueOfDensity

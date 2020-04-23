@@ -106,11 +106,14 @@ class ParseMCNPCell:
         skipped_cells = []
         parsed_cells = get_cells(self.mcnp_parser, lim=None)
         lencell = len(parsed_cells)
-        fmt_string = ('\rparsing MCNP cell {{:{}d}} ({{:3d}}%)'
-                      .format(len(str(max(parsed_cells)))))
+        fmt_string = ('\rparsing MCNP cell {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
+                      '{{:3d}}%)'
+                      .format(len(str(max(parsed_cells))),
+                              len(str(lencell))))
         for rank, (key, parsed_cell) in enumerate(parsed_cells.items()):
             percent = int(100.0*rank/(lencell-1)) if lencell > 1 else 100
-            print(fmt_string.format(key, percent), end='', flush=True)
+            print(fmt_string.format(key, rank+1, lencell, percent),
+                  end='', flush=True)
             lat_opt = self.lattice_params.get(key, None)
             try:
                 cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
