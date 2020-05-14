@@ -49,6 +49,8 @@ def conversion_surface_params(key, val):
         type_surface, param = convert_cylinder(val)
     elif val.type_surface in (MS.SO, MS.S, MS.SX, MS.SY, MS.SZ):
         type_surface, param = convert_sphere(val)
+    elif val.type_surface == MS.SQ:
+        type_surface, param = convert_special_quadric(val)
     elif val.type_surface == MS.GQ:
         type_surface, param = convert_quadric(val)
     elif val.type_surface in (MS.TX, MS.TY, MS.TZ, MS.T):
@@ -111,6 +113,28 @@ def convert_sphere(val):
     type_surface = T4S.SPHERE
     param = [p_x, p_y, p_z, radius]
     return type_surface, param
+
+
+def convert_special_quadric(val):
+    '''Convert the parameters for a quadric in SQ form.'''
+    sq_params = val.compl_param
+    asq = sq_params[0]
+    bsq = sq_params[1]
+    csq = sq_params[2]
+    dsq = sq_params[3]
+    esq = sq_params[4]
+    fsq = sq_params[5]
+    gsq = sq_params[6]
+    xsq = sq_params[7]
+    ysq = sq_params[8]
+    zsq = sq_params[9]
+    gq_params = [asq, bsq, csq, 0.0, 0.0, 0.0,
+                 2.0*dsq - 2.0*asq*xsq,
+                 2.0*esq - 2.0*bsq*ysq,
+                 2.0*fsq - 2.0*csq*zsq,
+                 asq*xsq**2 + bsq*ysq**2 + csq*zsq**2
+                 - 2.0*(dsq*xsq + esq*ysq + fsq*zsq) + gsq]
+    return T4S.QUAD, gq_params
 
 
 def convert_quadric(val):

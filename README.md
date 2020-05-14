@@ -12,7 +12,7 @@ Features
 Here is a list of features of the MCNP modelling engine that are
 at least partially supported and converted by `t4_geom_convert`:
 
-* All surface types (except SQ)
+* All surface types
 * Boolean cell operators
 * `LIKE n BUT` syntax
 * Affine transformations on surfaces and on cells (see the [Current
@@ -224,8 +224,6 @@ Current limitations
 Here is a list of some things that `t4_geom_convert` cannot currently do, but
 may be able to do in the future (in roughly decreasing order of likelihood):
 
-- [ ] Convert SQ surfaces (tracked in [issue
-  #11](https://github.com/arekfu/t4_geom_convert/issues/11))
 - [ ] Import the title of the MCNP input file (tracked in [issue
   #5](https://github.com/arekfu/t4_geom_convert/issues/5))
 - [ ] Handle affine transformations with `m=-1` (the last parameter of the

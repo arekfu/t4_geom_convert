@@ -156,6 +156,12 @@ def _torus(x, y, z, A, B, C, r1, r2, r3):
     return 't', frm, srf, pin
 
 
+def sq(params):
+    frm = None, None
+    srf = params.copy()
+    return 'sq', frm, srf, None
+
+
 def gq(params):
     frm = None, None
     srf = params.copy()
@@ -534,6 +540,7 @@ mcnp2cad['ty'] = ty
 mcnp2cad['tz'] = tz
 mcnp2cad['x'] = xx
 mcnp2cad['z'] = zz
+mcnp2cad['sq'] = sq
 mcnp2cad['gq'] = gq
 
 

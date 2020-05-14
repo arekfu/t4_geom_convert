@@ -46,7 +46,7 @@ def transformation(trpl, surface):
     '''
     if not trpl:
         return surface
-    if surface.type_surface == MS.GQ:
+    if surface.type_surface in (MS.SQ, MS.GQ):
         frame = tuple(surface.param_surface)
         params = transformation_quad(surface.compl_param, trpl)
     else:

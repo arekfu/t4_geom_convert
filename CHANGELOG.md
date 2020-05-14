@@ -1,3 +1,8 @@
+v0.4.0
+======
+* Implement conversion of `SQ` surfaces (fixes [issue
+  #11](https://github.com/arekfu/t4_geom_convert/issues/11))
+
 v0.3.0
 ======
 

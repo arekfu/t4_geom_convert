@@ -42,7 +42,7 @@ def parseMCNPSurface(mcnp_parser):
     return dict_surface
 
 
-def normalizeSurface(typ, params):
+def normalize_surface(typ, params):
     '''Put the surface parametrization in a canonical form. For instance,
     planes defined by three points are transformed into the equivalent
     (A,B,C,D) representation.'''
@@ -60,7 +60,7 @@ def normalizeSurface(typ, params):
 def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
                     transform_id, enum_surface, params, transform_parsed):
     '''Convert the parsed surface into a :class:`SurfaceMCNP`.'''
-    enum_surface, params = normalizeSurface(enum_surface, params)
+    enum_surface, params = normalize_surface(enum_surface, params)
     mip_transf = mcnp2cad[mcnp_to_mip(enum_surface)]
     typ, params, compl_params, _ = mip_transf(params)
     enum_surface = string_to_enum(typ)
