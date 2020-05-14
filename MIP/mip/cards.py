@@ -80,6 +80,37 @@ def get_cards(block, skipcomments=False):
         yield r
 
 
+def expand_tabs(line):
+    r'''Expand tabs in a line.
+
+    The MCNP manual says that "tabs are replaced by blanks to the next
+    8-character tab stop.
+
+    >>> expand_tabs('\tdodo')
+    '        dodo'
+    >>> expand_tabs('  \tdodo')
+    '        dodo'
+    >>> expand_tabs('      \tdodo')
+    '        dodo'
+    >>> expand_tabs('       \tdodo')
+    '        dodo'
+    >>> expand_tabs('        \tdodo')
+    '                dodo'
+    >>> expand_tabs('\t\tdodo')
+    '                dodo'
+    '''
+    expanded = []
+    i = 0
+    for char in line:
+        if char != '\t':
+            expanded.append(char)
+            i += 1
+        else:
+            n_spaces = 8-(i%8)
+            expanded.append(' '*n_spaces)
+            i += n_spaces
+    return ''.join(expanded)
+
 def is_continuation(l, prev=None):
     """
     Check if l is a continuation line.
@@ -88,6 +119,7 @@ def is_continuation(l, prev=None):
     """
     # If l has 5 or more leading spaces, it is a continuation independently
     # on prev
+    l = expand_tabs(l)
     if re_continuation_spaces.match(l):
         return True
     elif prev and re_continuation_prev.match(prev):
