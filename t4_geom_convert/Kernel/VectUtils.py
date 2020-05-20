@@ -244,3 +244,25 @@ def isVectorParallelToPlane(vector, plane, *, tol=1e-10):
     False
     '''
     return isclose(scal(plane[1], vector), 0.0, abs_tol=tol)
+
+
+def transpose(matrix):
+    '''Transpose a 3x3 matrix.
+
+    >>> mat = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    >>> transpose(mat)
+    [1, 4, 7, 2, 5, 8, 3, 6, 9]
+    '''
+    assert len(matrix) == 9
+    return [elem for i in range(3) for elem in matrix[i::3]]
+
+
+def matrix_rows(matrix):
+    '''Transform a 3x3 matrix into the list of its rows.
+
+    >>> mat = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    >>> matrix_rows(mat)
+    [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    '''
+    assert len(matrix) == 9
+    return [matrix[3*i:3*i+3] for i in range(3)]

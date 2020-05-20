@@ -14,9 +14,9 @@ import tatsu.exceptions
 from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.transforms import to_cos
+from MIP.mip.datacard import expand_data_card
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
-from ...MCNPDataCards import expand_data_card
 from ...Transformation.Transformation import get_mcnp_transforms
 
 
