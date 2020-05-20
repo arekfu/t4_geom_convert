@@ -81,10 +81,12 @@ pipeline {
     stage('Install t4_geom_convert') {
       steps {
         sh """#!/bin/bash
-        python3 -m venv "${VENV}"
-        . "${VENV}/bin/activate"
-        python3 -m pip install --upgrade pip setuptools
-        python3 -m pip install ${SRC}[dev]
+        PYTHON=python3.8
+        /usr/bin/which python3.6 && PYTHON=python3.6
+        \${PYTHON} -m venv '${VENV}'
+        . '${VENV}/bin/activate'
+        \${PYTHON} -m pip install --upgrade pip setuptools
+        \${PYTHON} -m pip install '${SRC}[dev]'
         """
       }
     }
