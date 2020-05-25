@@ -48,7 +48,7 @@ re_void = re.compile(r"""^(\s*[0-9]+)        # name
                           (.*)$              # geometry""",
                      re.IGNORECASE + re.VERBOSE)
 re_nonvoid = re.compile(r"""^(\s*[0-9]+)        # name
-                             (\s+\S+\s+\S+)     # material and density
+                             (\s+\S+\s+[^\s(]+) # material and density
                              (.*)$              # geometry""",
                         re.IGNORECASE + re.VERBOSE)
 
