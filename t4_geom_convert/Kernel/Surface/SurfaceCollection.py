@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 '''Module containing the :class:`SurfaceCollection` class.'''
 
+from .SurfaceConversionError import SurfaceConversionError
+
 
 class SurfaceCollection:  # pylint: disable=too-few-public-methods
     '''A class that represents a single surface as a collection of surfaces.

@@ -11,10 +11,7 @@ from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
 from .SurfaceT4 import SurfaceT4
 from .SurfaceCollection import SurfaceCollection
-
-
-class SurfaceConversionError(Exception):
-    '''An error in surface conversion.'''
+from .SurfaceConversionError import SurfaceConversionError
 
 
 def conversionSurfaceMCNPToT4(mcnp_parser):
