@@ -17,7 +17,7 @@ operand =
 
 compl = union;
 
-surface = /[-+]{0,1}\d+/;
+surface = /[-+]{0,1}\d+(?:\.\d)?/;
 
 cell = /_\d+/;
 

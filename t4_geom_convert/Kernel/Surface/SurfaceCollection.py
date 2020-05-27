@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 '''Module containing the :class:`SurfaceCollection` class.'''
 
+from collections.abc import Sequence
 from .SurfaceConversionError import SurfaceConversionError
 
 
-class SurfaceCollection:  # pylint: disable=too-few-public-methods
+class SurfaceCollection(Sequence):
     '''A class that represents a single surface as a collection of surfaces.
 
     This class is necessary to represent, for instance, MCNP's macrobodies or
@@ -16,14 +17,14 @@ class SurfaceCollection:  # pylint: disable=too-few-public-methods
         :param surfs: list of (surface, side) pairs
         '''
         if not surfs:
-            raise ValueError('need a non-empty list of surfaces in '
-                             'SurfaceCollection')
-        self.surfs = sorted(surfs, key=lambda pair: -pair[1])
-        if self.surfs[0][1] != 1:
-            msg = ('At least one surface of the surface collection must be '
-                   'oriented in the same way as the collection itself" {}'
-                   .format(surfs))
-            raise ValueError(msg) from None
+            raise SurfaceConversionError('need a non-empty list of surfaces '
+                                         'in SurfaceCollection')
+        self.surfs = tuple(surfs)
+        # if self.surfs[0][1] != 1:
+        #     msg = ('At least one surface of the surface collection must be '
+        #            'oriented in the same way as the collection itself: {}'
+        #            .format(surfs))
+        #     raise SurfaceConversionError(msg)
 
     @classmethod
     def join(cls, surf_colls):
@@ -36,3 +37,21 @@ class SurfaceCollection:  # pylint: disable=too-few-public-methods
 
     def __repr__(self):
         return 'SurfaceCollection({!r})'.format(self.surfs)
+
+    def __iter__(self):
+        yield from self.surfs
+
+    def __len__(self):
+        return len(self.surfs)
+
+    def __getitem__(self, item):
+        return self.surfs[item]
+
+    def __eq__(self, other):
+        return sorted(self.surfs) == sorted(other.surfs)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return hash(self.surfs)

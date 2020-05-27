@@ -6,6 +6,6 @@ Created on 19 févr. 2019
 '''
 from enum import Enum
 
-ESurfaceTypeT4Eng = Enum('ESurfaceTypeT4Eng', 'PLANEX PLANEY PLANEZ PLANE '
-                         'SPHERE CYLX CYLY CYLZ CYL CONEX CONEY CONEZ CONE '
-                         'QUAD TORUSX TORUSY TORUSZ')
+ESurfaceTypeT4 = Enum('ESurfaceTypeT4', 'PLANEX PLANEY PLANEZ PLANE '
+                      'SPHERE CYLX CYLY CYLZ CYL CONEX CONEY CONEZ CONE '
+                      'QUAD TORUSX TORUSY TORUSZ')

@@ -7,13 +7,16 @@ Created on 6 févr. 2019
 '''
 
 from ..FileHandlers.Parser.ParseMCNPCell import ParseMCNPCell
+from ..Surface.SurfaceT4 import SurfaceT4
+from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
 from .DictVolumeT4 import DictVolumeT4
 from .CellConversion import CellConversion
+from .CellConversionError import CellConversionError
 from .ByUniverse import by_universe
 
 
-def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
-                      dic_surface_t4, dic_surface_mcnp, aux_ids):
+def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
+                        dic_surface_t4, dic_surface_mcnp):
     '''A function that orchestrates the conversion steps for TRIPOLI-4
     volumes.'''
     dic_vol_t4 = DictVolumeT4()
@@ -24,8 +27,7 @@ def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
     free_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
                         max(int(k) for k in dic_surface_t4) + 1)
     conv = CellConversion(free_key, free_surf_key, dic_vol_t4,
-                          dic_surface_t4, dic_surface_mcnp, mcnp_dict,
-                          aux_ids)
+                          dic_surface_t4, dic_surface_mcnp, mcnp_dict)
 
     # treat TRCL
     trcl_keys = [key for key, value in mcnp_dict.items()
@@ -107,25 +109,41 @@ def constructVolumeT4(mcnp_parser, lattice_params, cell_cache_path,
     fmt_string = ('\rconverting cell {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
                   .format(len(str(max(key for key, _ in conv_keys))),
                           len(str(n_conv_keys))))
+
+    t4_surf_numbering, matching = dic_surface_t4.number_items()
+    # insert union planes into the T4 surface dictionary
+    free_surf_id = max(int(k) for k in t4_surf_numbering) + 1
+    union_ids = free_surf_id + 1, free_surf_id + 2
+    t4_surf_numbering[union_ids[0]] = SurfaceT4(T4S.PLANEX,
+                                                [1],
+                                                ['aux plane for unions'])
+    t4_surf_numbering[union_ids[1]] = SurfaceT4(T4S.PLANEX,
+                                                [-1],
+                                                ['aux plane for unions'])
+
     for i, (key, val) in enumerate(conv_keys):
         percent = int(100.0*i/(n_conv_keys-1)) if n_conv_keys > 1 else 100
         print(fmt_string.format(key, i+1, n_conv_keys, percent),
               end='', flush=True)
         root = val.geometry
         tup = conv.pot_flag(root)
-        replace = conv.pot_replace(tup)
+        try:
+            replace = conv.pot_replace(tup, matching)
+        except CellConversionError as err:
+            raise CellConversionError('{} (while converting cell {})'
+                                      .format(err, key)) from None
         opt_tree = conv.pot_optimise(replace)
         if opt_tree is None:
             # the cell is empty, do not emit a converted cell
             continue
-        j = conv.pot_convert(opt_tree, val.idorigin)
+        j = conv.pot_convert(opt_tree, val.idorigin, union_ids)
         dic_vol_t4[j].fictive = False
         if j == key:
             continue
         dic_vol_t4.replace_key(j, key)
     print('... done', flush=True)
 
-    return dic_vol_t4, mcnp_dict, dic_surface_t4, skipped_cells
+    return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells
 
 
 def remove_empty_cells(dic_volume):

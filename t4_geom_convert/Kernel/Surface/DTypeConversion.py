@@ -6,7 +6,7 @@
 :file : DTypeConversion.py
 '''
 from .ESurfaceTypeMCNP import ESurfaceTypeMCNP as e_surfaceMCNP
-from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as e_surfaceT4
+from .ESurfaceTypeT4 import ESurfaceTypeT4 as e_surfaceT4
 
 
 '''

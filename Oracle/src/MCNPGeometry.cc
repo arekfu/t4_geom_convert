@@ -50,6 +50,8 @@ void MCNPGeometry::associateCell2Density()
       addCell2Density(cellNum, {0, "void"});
     } else {
       iss >> density;
+      // remove trailing brackets
+      density = density.substr(0, density.find('('));
       std::istringstream istest(density);
       double fdensity;
       istest >> fdensity;
@@ -171,11 +173,6 @@ bool MCNPGeometry::lineEndsInContinuation(std::string const &lineContent) const
     return false;
   }
   return lineContent[pos] == '&';
-}
-
-bool MCNPGeometry::isLineAMaterial(std::string const &lineContent) const
-{
-  return lineContent[0] == 'm' || lineContent[0] == 'M';
 }
 
 bool MCNPGeometry::isLineEmpty(std::string const &lineContent) const

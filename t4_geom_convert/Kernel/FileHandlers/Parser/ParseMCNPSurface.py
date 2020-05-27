@@ -9,7 +9,9 @@ Created on 6 févr. 2019
 from collections import OrderedDict
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.surfaces import get_surfaces
+from MIP.geom.semantics import Surface
 from ...Surface.SurfaceMCNP import SurfaceMCNP
+from ...Surface.CollectionDict import CollectionDict
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from ...Surface.ESurfaceTypeMCNP import string_to_enum, mcnp_to_mip
 from ...Transformation.Transformation import (get_mcnp_transforms,
@@ -20,14 +22,16 @@ from ...Surface import MacroBodies as MB
 
 def parseMCNPSurface(mcnp_parser):
     '''
-    :brief method which permit to recover the information of each line
-    of the block SURFACE
-    :return: dictionary which contains the ID of the surfaces as a key
-    and as a value, a object from the :class:`SurfaceMCNP` class.
+    :brief method which permit to recover the information of each line of the
+        block SURFACE
+    :return: dictionary with keys given by the ID of the surfaces, as a
+        :class:`~MIP.geom.semantics.Surface`, and value given by lists of
+        `(:class:`SurfaceMCNP`, int)` pairs. The integer represents the side of
+        the subsurface.
     '''
     surface_parsed = get_surfaces(mcnp_parser, lim=None)
     transform_parsed = get_mcnp_transforms(mcnp_parser)
-    dict_surface = OrderedDict()
+    dict_surface = CollectionDict()
     n_surf = len(surface_parsed)
     fmt_string = ('\rparsing MCNP surface {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
                   '{{:3d}}%)'
@@ -36,7 +40,9 @@ def parseMCNPSurface(mcnp_parser):
     for i, (key, surface) in enumerate(surface_parsed.items()):
         percent = int(100.0*i/(n_surf-1)) if n_surf > 1 else 100
         print(fmt_string.format(key, i+1, n_surf, percent), end='', flush=True)
-        dict_surface[key] = to_surfaces_mcnp(key, surface, transform_parsed)
+        mcnp_surfs = to_surfaces_mcnp(key, surface, transform_parsed)
+        dict_surface[key] = mcnp_surfs
+
     print('... done', flush=True)
 
     return dict_surface

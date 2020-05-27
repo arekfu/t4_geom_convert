@@ -1,46 +1,30 @@
 '''This module contains utilities to simplify surface dictionaries.'''
 
+from .CollectionDict import CollectionDict
+
 
 def remove_duplicate_surfaces(surfs):
     '''This function that detects duplicate surfaces from a surface dictionary,
     removes them and provides a dictionary where the IDs of the deleted
     surfaces are associated with the ID of the surface that replaced them.'''
     renumbering = {}
-    new_surfs = {}
-    tuple_surf_to_id = {}
+    new_surfs = CollectionDict()
+    surf_to_id = {}
 
     n_surfs = len(surfs)
     fmt_string = ('\rdetecting duplicates for surface {{:{0}d}} '
                   '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
                   .format(len(str(max(surfs))), len(str(n_surfs))))
-    for i, (key, (surf, aux)) in enumerate(sorted(surfs.items())):
+    for i, (key, surf) in enumerate(sorted(surfs.items())):
         percent = int(100.0*i/(n_surfs-1)) if n_surfs > 1 else 100
         print(fmt_string.format(key, i+1, n_surfs, percent),
               end='', flush=True)
-        tuple_surf = (surf.type_surface, tuple(surf.param_surface))
-        if tuple_surf in tuple_surf_to_id:
-            renumbering[key] = tuple_surf_to_id[tuple_surf]
+        if surf in surf_to_id:
+            renumbering[key] = surf_to_id[surf]
         else:
-            new_surfs[key] = (surf, aux)
+            new_surfs[key] = surf
             renumbering[key] = key
-            tuple_surf_to_id[tuple_surf] = key
-    print('... done', flush=True)
-
-    # renumbering aux surfaces
-    n_surfs = len(new_surfs)
-    fmt_string = ('\rrenumbering auxiliary surfaces for surface {{:{0}d}} '
-                  '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                  .format(len(str(max(new_surfs))), len(str(n_surfs))))
-    for i, (key, (_, aux)) in enumerate(new_surfs.items()):
-        percent = int(100.0*i/(n_surfs-1)) if n_surfs > 1 else 100
-        print(fmt_string.format(key, i+1, n_surfs, percent),
-              end='', flush=True)
-        for i in range(len(aux)):
-            surf = aux[i]
-            if surf > 0:
-                aux[i] = renumbering[aux[i]]
-            else:
-                aux[i] = -renumbering[-aux[i]]
+            surf_to_id[surf] = key
     print('... done', flush=True)
 
     return new_surfs, renumbering

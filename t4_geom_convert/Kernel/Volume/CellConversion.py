@@ -18,13 +18,14 @@ from .Lattice import (LatticeSpec, latticeVector, LatticeError,
 from ..Transformation.Transformation import transformation
 from ..Surface.ConversionSurfaceMCNPToT4 import conversion_surface_params
 from ..Surface.SurfaceCollection import SurfaceCollection
+from .CellConversionError import CellConversionError
 
 
 class CellConversion:
     '''Class which contains methods to convert the Cell of MCNP in T4 Volume'''
 
     def __init__(self, int_cell, int_surf, d_dictClassT4, d_dictSurfaceT4,
-                 d_dicSurfaceMCNP, d_dicCellMCNP, union_ids):
+                 d_dicSurfaceMCNP, d_dicCellMCNP):
         '''
         Constructor
         :param: int_i : id of the volume created
@@ -37,7 +38,6 @@ class CellConversion:
         self.dic_surf_t4 = d_dictSurfaceT4
         self.dic_surf_mcnp = d_dicSurfaceMCNP
         self.dic_cell_mcnp = d_dicCellMCNP
-        self.union_ids = union_ids
 
     @staticmethod
     def conv_equa(list_surface):
@@ -69,11 +69,11 @@ class CellConversion:
         VOLUME'''
         return ('UNION', ids)
 
-    def conv_union_helpers(self, *ids):
+    def conv_union_helpers(self, *ids, union_ids):
         '''Convert a T4 UNION and return a tuple with the information of the T4
         VOLUME'''
-        pluses, minuses = self.conv_equa([self.union_ids[0],
-                                          -self.union_ids[1]])
+        pluses, minuses = self.conv_equa([union_ids[0],
+                                          -union_ids[1]])
         ops = ('UNION', ids)
         return pluses, minuses, ops
 
@@ -145,6 +145,7 @@ class CellConversion:
             return tuple(new_tree)
 
         surfs = self.dic_surf_mcnp[abs(p_tree)]
+
         surf_colls = []
         mcnp_surfs = []
         for surface_object, side in surfs:
@@ -154,22 +155,17 @@ class CellConversion:
             surf_colls.append((surf_coll, side))
 
         surf_coll = SurfaceCollection.join(surf_colls)
-        aux_ids = []
-        for surf, side in surf_coll.surfs[1:]:
-            self.new_surf_key += 1
-            new_key = self.new_surf_key
+        for surf, _ in surf_coll.surfs[1:]:
             surf.idorigin = tuple(list(surf.idorigin) + ['aux surf'])
-            self.dic_surf_t4[new_key] = (surf, [])
-            aux_ids.append(side * new_key)
 
         self.new_surf_key += 1
         new_key = self.new_surf_key
-        self.dic_surf_t4[new_key] = (surf_coll.surfs[0][0], aux_ids)
+        self.dic_surf_t4[new_key] = surf_coll
         self.dic_surf_mcnp[new_key] = mcnp_surfs
 
         return Surface(new_key) if p_tree >= 0 else Surface(-new_key)
 
-    def pot_convert(self, p_tree, idorigin):
+    def pot_convert(self, p_tree, idorigin, union_ids):
         '''
         :brief: method which take the tree create by m_postOrderTraversalFlag
         and filled a dictionary (of VolumeT4 instance)
@@ -197,14 +193,14 @@ class CellConversion:
             if surfs:
                 pluses, minuses = self.conv_equa(surfs)
                 if nodes:
-                    arg_ids = [self.pot_convert(node, idorigin)
+                    arg_ids = [self.pot_convert(node, idorigin, union_ids)
                                for node in nodes]
                     ops = self.conv_intersection(*arg_ids)
                 else:
                     ops = None
             else:
                 # we assume that nodes is not empty
-                arg_ids = [self.pot_convert(node, idorigin)
+                arg_ids = [self.pot_convert(node, idorigin, union_ids)
                            for node in nodes]
                 pluses = []
                 minuses = []
@@ -215,18 +211,21 @@ class CellConversion:
 
         # here operator == ':'
         if operator != ':':
-            raise ValueError('Converting cell with unexpected operator: {}'
-                             .format(operator))
+            raise CellConversionError('Converting cell with unexpected '
+                                      'operator: {}'.format(operator))
         largest = largestPureIntersectionNode(args)
         if largest is None:
-            arg_ids = [self.pot_convert(arg, idorigin) for arg in args]
-            pluses, minuses, ops = self.conv_union_helpers(*arg_ids)
+            arg_ids = [self.pot_convert(arg, idorigin, union_ids)
+                       for arg in args]
+            pluses, minuses, ops = self.conv_union_helpers(*arg_ids,
+                                                           union_ids=union_ids)
         else:
             main = args.pop(largest)
-            main_id = self.pot_convert(main, idorigin)
+            main_id = self.pot_convert(main, idorigin, union_ids)
             pluses = self.dic_vol_t4[main_id].pluses
             minuses = self.dic_vol_t4[main_id].minuses
-            arg_ids = [self.pot_convert(arg, idorigin) for arg in args]
+            arg_ids = [self.pot_convert(arg, idorigin, union_ids)
+                       for arg in args]
             ops = self.conv_union(*arg_ids)
             del self.dic_vol_t4[main_id]
         self.dic_vol_t4[p_id] = VolumeT4(pluses=pluses, minuses=minuses,
@@ -240,6 +239,7 @@ class CellConversion:
 
         if isLeaf(p_tree):
             return p_tree
+
         p_id, operator, *args = p_tree
         new_args = [self.pot_optimise(node) for node in args]
         new_node = [p_id, operator]
@@ -264,38 +264,48 @@ class CellConversion:
 
         return new_node
 
-    def pot_replace(self, p_tree):
+    def pot_replace(self, p_tree, matching):
         '''Replace collections of surfaces with ASTs representing the
-        intersection/union of the collection. Necessary for one-nappe cones and
-        macrobodies.
+        intersection/union of the collection (necessary for one-nappe cones and
+        macrobodies). Also replace MCNP surface IDs with T4 surface IDs.
         '''
         if not isLeaf(p_tree):
             p_id, operator, *args = p_tree
             new_tree = [p_id, operator]
-            new_tree.extend(self.pot_replace(node) for node in args)
+            new_tree.extend(self.pot_replace(node, matching)
+                            for node in args)
             return new_tree
 
-        abs_id = abs(p_tree)
-        if abs_id not in self.dic_surf_t4:
-            return p_tree
+        assert isinstance(p_tree, Surface)
+        t4_ids = matching[abs(p_tree.surface)]
 
-        surf_t4 = self.dic_surf_t4[abs_id]
-        if not surf_t4[1]:
-            return p_tree
+        if p_tree.sub is not None:
+            if p_tree.sub > len(t4_ids):
+                msg = ('found facet {0} of surface {1} in a cell definition, '
+                       'but surface {1} does not have enough facets ({2})'
+                       .format(p_tree.sub, p_tree.surface, len(t4_ids)))
+                raise CellConversionError(msg)
+            sub_surf = t4_ids[p_tree.sub - 1]
+            return sub_surf if p_tree.surface > 0 else -sub_surf
+
+        if len(t4_ids) == 1:
+            surf = t4_ids[0]
+            return surf if p_tree.surface > 0 else -surf
 
         self.new_cell_key += 1
-        if p_tree < 0:
-            new_node = [self.new_cell_key, '*', p_tree]
-            new_node.extend(Surface(-surf) for surf in surf_t4[1])
+        if p_tree.surface < 0:
+            new_node = [self.new_cell_key, '*']
+            new_node.extend(-surf for surf in t4_ids)
         else:
-            new_node = [self.new_cell_key, ':', p_tree]
-            new_node.extend(Surface(surf) for surf in surf_t4[1])
+            new_node = [self.new_cell_key, ':']
+            new_node.extend(surf for surf in t4_ids)
         return GeomExpression(new_node)
 
     def pot_complement(self, tree):
         if not isinstance(tree, (list, tuple)):
             return tree
         if tree[0] == '^':
+            assert all(isinstance(k, int) for k in self.dic_cell_mcnp)
             cell = self.dic_cell_mcnp[int(tree[1])]
             new_geom = self.pot_complement(cell.geometry)
             return new_geom.inverse()
