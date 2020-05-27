@@ -128,10 +128,9 @@ class ParseMCNPCell:
                 msg = ('TatSu parsing failed for cell {}. Check the syntax of '
                        'this cell.'.format(key))
                 raise ParseMCNPCellError(msg)
-            if cell is None:
+            if cell.importance == 0:
                 skipped_cells.append(key)
-            else:
-                dict_cell[key] = cell
+            dict_cell[key] = cell
         print('... done', flush=True)
         return dict_cell, skipped_cells
 
@@ -164,8 +163,6 @@ class ParseMCNPCell:
                 kws['importance'] = self.importances[rank]
             except IndexError:
                 raise ParseMCNPCellError('Cannot find importance') from None
-        if kws['importance'] == 0.0:
-            return None
         if kws['u'] is None:
             kws['u'] = 0
         if kws['material'] is not None:

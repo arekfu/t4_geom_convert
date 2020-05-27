@@ -84,6 +84,8 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
     ofile.write("\n")
 
     for key, val in dic_volume.items():
+        if key in skipped_cells:
+            continue
         ofile.write('VOLU {} {} ENDV{}\n'.format(key, val, val.comment()))
     ofile.write("\n")
     ofile.write("ENDG")
