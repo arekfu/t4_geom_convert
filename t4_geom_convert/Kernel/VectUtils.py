@@ -132,10 +132,42 @@ def planeParamsFromPoints(pt1, pt2, pt3):
                          .format(pt1, pt2, pt3))
     unit_normal = renorm(normal)
     pos = scal(unit_normal, pt1)
-    if pos > 0.:  # make sure the origin lies on the negative side of the plane
-        return [unit_normal[0], unit_normal[1], unit_normal[2], pos]
-    return [-unit_normal[0], -unit_normal[1], -unit_normal[2], -pos]
 
+    epsilon = 1e-14
+    params = [unit_normal[0], unit_normal[1], unit_normal[2], pos]
+    flipped_params = [-unit_normal[0], -unit_normal[1], -unit_normal[2], -pos]
+
+    if pos < -epsilon:
+        # make sure the origin lies on the negative side of the plane
+        return flipped_params
+    if pos > epsilon:
+        return params
+
+    # Here we are in the D=0 case. The origin lies in the plane; ensure that
+    # (0, 0, ∞) lies on the positive side of the plane
+    if unit_normal[2] < -epsilon:
+        return flipped_params
+    if unit_normal[2] > epsilon:
+        return params
+
+    # Here we are in the D=C=0 case. Ensure that (0, ∞, 0) lies on the positive
+    # side of the plane
+    if unit_normal[1] < -epsilon:
+        return flipped_params
+    if unit_normal[1] > epsilon:
+        return params
+
+    # Here we are in the D=C=B=0 case. Ensure that (∞, 0, 0) lies on the
+    # positive side of the plane
+    if unit_normal[0] < -epsilon:
+        return flipped_params
+    if unit_normal[0] > epsilon:
+        return params
+
+    # What are we even doing here?
+    raise ValueError('Cannot convert plane from three points because the '
+                     'points are collinear or almost so: {}, {}, {}'
+                     .format(pt1, pt2, pt3))
 
 def planeParamsFromNormalAndPoint(normal, point):
     '''Return the MCNP-style parameters of the plane having the given normal
