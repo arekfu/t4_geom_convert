@@ -168,6 +168,7 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
         if oracle_opts is not None:
             cli += oracle_opts
         stdout_fname = self.work_path / 'stdout'
+        print('Running oracle...\n' + '---8<---'*9)
         try:
             with stdout_fname.open('w') as stdout:
                 sub.check_call(cli, cwd=str(self.work_path), stdout=stdout,
@@ -176,6 +177,7 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
             msg = ('Oracle run failed. The output is:\n'
                    + stdout_fname.read_text())
             raise ValueError(msg)
+        print(stdout_fname.read_text() + '---8<---'*9)
         failed_path = self.work_path / (t4_o.stem + '.failedpoints.dat')
         n_points, dist = self.check_failed_points(failed_path)
         return n_points, dist, stdout_fname
