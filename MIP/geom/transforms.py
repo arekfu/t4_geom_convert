@@ -1,9 +1,12 @@
 # Return dictionary describing transformations
 from collections import OrderedDict
 from math import cos, radians
+from ..mip.datacard import expand_data_card
 
 
 def to_cos(a):
+    if a is None:
+        return None
     return cos(radians(a))
 
 
@@ -12,11 +15,12 @@ def normalize_transform(name, dtype, params):
     return complete list of paramters for the tr card.
     """
     name = int(name)
-    pl = list(map(float, params.split()))
+    pl = expand_data_card(params.split(), dtype='float')
+    pl = list(pl[0])
     if len(pl) == 3:
         # no rotational matrix is given. Use the identical one
         dtype = dtype.replace('*', '')
-        pl = pl + [1, 0, 0, 0, 1, 0, 0, 0, 1]
+        pl += [1, 0, 0, 0, 1, 0, 0, 0, 1]
     if dtype[0] == '*':
         pl[3:12] = map(to_cos, pl[3:12])
     return name, pl

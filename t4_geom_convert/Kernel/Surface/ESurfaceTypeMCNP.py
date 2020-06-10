@@ -7,7 +7,7 @@ Created on 19 févr. 2019
 from enum import Enum
 
 ESurfaceTypeMCNP = Enum('ESurfaceTypeMCNP', 'PX PY PZ P SO S SX SY SZ C_X '
-                        'C_Y C_Z CX CY CZ C K_X K_Y K_Z KX KY KZ K GQ '
+                        'C_Y C_Z CX CY CZ C K_X K_Y K_Z KX KY KZ K SQ GQ '
                         'T TX TY TZ X Y Z '
                         # macrobody surface types
                         'BOX RPP SPH RCC HEX RHP REC TRC ELL WED ARB')

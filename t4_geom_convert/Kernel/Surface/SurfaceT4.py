@@ -24,7 +24,7 @@ class SurfaceT4:
         '''
 
         self.type_surface = type_surface
-        self.param_surface = param_surface
+        self.param_surface = tuple(param_surface)
         self.idorigin = idorigin if idorigin is not None else ()
 
     def __str__(self):
@@ -43,3 +43,15 @@ class SurfaceT4:
         if self.idorigin:
             return ' // ' + '; '.join(map(str, self.idorigin))
         return ''
+
+    def __eq__(self, other):
+        # idorigin intentionally omitted
+        return (self.type_surface == other.type_surface
+                and self.param_surface == other.param_surface)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        # idorigin intentionally omitted
+        return hash((self.type_surface, self.param_surface))

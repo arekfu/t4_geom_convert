@@ -272,14 +272,6 @@ public:
    */
   bool isLineEmpty(std::string const &lineContent) const;
 
-  /**
-   * Determines whether the current is a material definition
-   *
-   *
-   * @returns true if current line is a comment, false otherwise
-   */
-  bool isLineAMaterial(std::string const &lineContent) const;
-
   const std::string &getInputPath();
   long getNPS();
   const std::vector<int> &getVolumeList();

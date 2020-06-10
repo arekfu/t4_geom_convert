@@ -14,9 +14,9 @@ import tatsu.exceptions
 from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.transforms import to_cos
+from MIP.mip.datacard import expand_data_card
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
-from ...MCNPDataCards import expand_data_card
 from ...Transformation.Transformation import get_mcnp_transforms
 
 
@@ -106,11 +106,14 @@ class ParseMCNPCell:
         skipped_cells = []
         parsed_cells = get_cells(self.mcnp_parser, lim=None)
         lencell = len(parsed_cells)
-        fmt_string = ('\rparsing MCNP cell {{:{}d}} ({{:3d}}%)'
-                      .format(len(str(max(parsed_cells)))))
+        fmt_string = ('\rparsing MCNP cell {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
+                      '{{:3d}}%)'
+                      .format(len(str(max(parsed_cells))),
+                              len(str(lencell))))
         for rank, (key, parsed_cell) in enumerate(parsed_cells.items()):
             percent = int(100.0*rank/(lencell-1)) if lencell > 1 else 100
-            print(fmt_string.format(key, percent), end='', flush=True)
+            print(fmt_string.format(key, rank+1, lencell, percent),
+                  end='', flush=True)
             lat_opt = self.lattice_params.get(key, None)
             try:
                 cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
@@ -125,10 +128,9 @@ class ParseMCNPCell:
                 msg = ('TatSu parsing failed for cell {}. Check the syntax of '
                        'this cell.'.format(key))
                 raise ParseMCNPCellError(msg)
-            if cell is None:
+            if cell.importance == 0:
                 skipped_cells.append(key)
-            else:
-                dict_cell[key] = cell
+            dict_cell[key] = cell
         print('... done', flush=True)
         return dict_cell, skipped_cells
 
@@ -161,8 +163,6 @@ class ParseMCNPCell:
                 kws['importance'] = self.importances[rank]
             except IndexError:
                 raise ParseMCNPCellError('Cannot find importance') from None
-        if kws['importance'] == 0.0:
-            return None
         if kws['u'] is None:
             kws['u'] = 0
         if kws['material'] is not None:

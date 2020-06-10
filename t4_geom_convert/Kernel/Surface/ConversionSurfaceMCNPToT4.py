@@ -4,37 +4,56 @@
 :data : 06 February 2019
 '''
 from math import pi, fabs
-from collections import OrderedDict
 
-from ..FileHandlers.Parser.ParseMCNPSurface import parseMCNPSurface
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
-from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as T4S
+from ..Surface.CollectionDict import CollectionDict
+from .ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
 from .SurfaceT4 import SurfaceT4
 from .SurfaceCollection import SurfaceCollection
+from .SurfaceConversionError import SurfaceConversionError
 
 
-class SurfaceConversionError(Exception):
-    '''An error in surface conversion.'''
-
-
-def conversionSurfaceMCNPToT4(mcnp_parser):
+def convert_mcnp_surfaces(dic_surface_mcnp):
     '''
     :brief: method which convert MCNP surface and constructing the
     dictionary of Surface T4
     '''
-    dic_surface_t4 = OrderedDict()
-    dic_surface_mcnp = parseMCNPSurface(mcnp_parser)
-    for key, val in dic_surface_mcnp.items():
-        surf_colls = []
-        for surf, side in val:
-            try:
-                surf_coll = conversion_surface_params(key, surf)
-            except SurfaceConversionError as err:
-                msg = '{} (while converting surface {})'.format(err, key)
-                raise SurfaceConversionError(msg) from None
-            surf_colls.append((surf_coll, side))
-        dic_surface_t4[key] = SurfaceCollection.join(surf_colls)
-    return dic_surface_t4, dic_surface_mcnp
+    dic_surface_t4 = CollectionDict()
+
+    free_id = max(int(k) for k in dic_surface_mcnp.keys()) + 1
+    n_surfaces = len(dic_surface_mcnp)
+    fmt_string = ('\rconverting surface {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
+                  '{{:3d}}%)'
+                  .format(len(str(max(dic_surface_mcnp))),
+                          len(str(n_surfaces))))
+    for i, (key, val) in enumerate(dic_surface_mcnp.items()):
+        percent = int(100.0*i/(n_surfaces-1)) if n_surfaces > 1 else 100
+        print(fmt_string.format(key, i+1, n_surfaces, percent),
+              end='', flush=True)
+
+        t4_surfs = convert_mcnp_surface(key, val)
+        dic_surface_t4[key] = t4_surfs
+
+    print('... done', flush=True)
+    return dic_surface_t4
+
+
+def convert_mcnp_surface(key, val):
+    surf_colls = []
+    for surf, side in val:
+        try:
+            surf_coll = conversion_surface_params(key, surf)
+        except SurfaceConversionError as err:
+            msg = '{} (while converting surface {})'.format(err, key)
+            raise SurfaceConversionError(msg) from None
+        surf_colls.append((surf_coll, side))
+    try:
+        t4_surfs = SurfaceCollection.join(surf_colls)
+    except SurfaceConversionError as err:
+        msg = '{} (while converting surface {})'.format(err, key)
+        raise SurfaceConversionError(msg) from None
+    return t4_surfs
+
 
 
 def conversion_surface_params(key, val):
@@ -49,6 +68,8 @@ def conversion_surface_params(key, val):
         type_surface, param = convert_cylinder(val)
     elif val.type_surface in (MS.SO, MS.S, MS.SX, MS.SY, MS.SZ):
         type_surface, param = convert_sphere(val)
+    elif val.type_surface == MS.SQ:
+        type_surface, param = convert_special_quadric(val)
     elif val.type_surface == MS.GQ:
         type_surface, param = convert_quadric(val)
     elif val.type_surface in (MS.TX, MS.TY, MS.TZ, MS.T):
@@ -112,6 +133,50 @@ def convert_sphere(val):
     param = [p_x, p_y, p_z, radius]
     return type_surface, param
 
+
+def convert_special_quadric(val):
+    '''Convert the parameters for a quadric in SQ form.'''
+    sq_params = val.compl_param
+    asq = sq_params[0]
+    bsq = sq_params[1]
+    csq = sq_params[2]
+    dsq = sq_params[3]
+    esq = sq_params[4]
+    fsq = sq_params[5]
+    gsq = sq_params[6]
+    xsq = sq_params[7]
+    ysq = sq_params[8]
+    zsq = sq_params[9]
+    gq_params = [asq, bsq, csq, 0.0, 0.0, 0.0,
+                 2.0*dsq - 2.0*asq*xsq,
+                 2.0*esq - 2.0*bsq*ysq,
+                 2.0*fsq - 2.0*csq*zsq,
+                 asq*xsq**2 + bsq*ysq**2 + csq*zsq**2
+                 - 2.0*(dsq*xsq + esq*ysq + fsq*zsq) + gsq]
+    if eval_quadric(gq_params, (xsq, ysq, zsq)) > 0.0:
+        gq_params = [-param for param in gq_params]
+    return T4S.QUAD, gq_params
+
+
+def eval_quadric(params, point):
+    '''Evaluate the quadric represented by `params` at `point`.
+
+    >>> quad = [1.0, 1.0, 1.0,  # this is a sphere of radius 1.0
+    ...         0.0, 0.0, 0.0,
+    ...         0.0, 0.0, 0.0, -1.0]
+    >>> eval_quadric(quad, (0.0, 0.0, 0.0)) < 0.0
+    True
+    >>> eval_quadric(quad, (0.999, 0.0, 0.0)) < 0.0
+    True
+    >>> eval_quadric(quad, (1.001, 0.0, 0.0)) > 0.0
+    True
+    >>> eval_quadric(quad, (2.000, 0.0, 0.0)) > 0.0
+    True
+    '''
+    x, y, z = point
+    return (params[0]*x**2 + params[1]*y**2 + params[2]*z**2
+            + params[3]*x*y + params[4]*y*z + params[5]*z*x
+            +params[6]*x + params[7]*y + params[8]*z + params[9])
 
 def convert_quadric(val):
     '''Convert the parameters for a quadric.'''

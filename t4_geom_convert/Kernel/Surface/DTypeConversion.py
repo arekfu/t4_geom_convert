@@ -6,7 +6,7 @@
 :file : DTypeConversion.py
 '''
 from .ESurfaceTypeMCNP import ESurfaceTypeMCNP as e_surfaceMCNP
-from .ESurfaceTypeT4 import ESurfaceTypeT4Eng as e_surfaceT4
+from .ESurfaceTypeT4 import ESurfaceTypeT4 as e_surfaceT4
 
 
 '''
@@ -41,3 +41,4 @@ dict_conversionSurfaceType[e_surfaceMCNP.GQ] = e_surfaceT4.QUAD
 dict_conversionSurfaceType[e_surfaceMCNP.TX] = e_surfaceT4.TORUSX
 dict_conversionSurfaceType[e_surfaceMCNP.TY] = e_surfaceT4.TORUSY
 dict_conversionSurfaceType[e_surfaceMCNP.TZ] = e_surfaceT4.TORUSZ
+# SQ intentionally omitted, transformed into equivalent GQ during parsing

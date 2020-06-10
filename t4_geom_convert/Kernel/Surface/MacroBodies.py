@@ -63,12 +63,14 @@ def box(params):
     side_bc = 1 if scal(normal_bc, vec_a) < 0. else -1
     side_ca = 1 if scal(normal_ca, vec_b) < 0. else -1
 
-    return [(MS.P, planeParamsFromNormalAndPoint(normal_ab, base), side_ab),
-            (MS.P, planeParamsFromNormalAndPoint(normal_bc, base), side_bc),
-            (MS.P, planeParamsFromNormalAndPoint(normal_ca, base), side_ca),
-            (MS.P, planeParamsFromNormalAndPoint(normal_ab, pt_c), -side_ab),
-            (MS.P, planeParamsFromNormalAndPoint(normal_bc, pt_a), -side_bc),
-            (MS.P, planeParamsFromNormalAndPoint(normal_ca, pt_b), -side_ca)]
+    return [
+        (MS.P, planeParamsFromNormalAndPoint(normal_bc, pt_a), -side_bc),
+        (MS.P, planeParamsFromNormalAndPoint(normal_bc, base), side_bc),
+        (MS.P, planeParamsFromNormalAndPoint(normal_ca, pt_b), -side_ca),
+        (MS.P, planeParamsFromNormalAndPoint(normal_ca, base), side_ca),
+        (MS.P, planeParamsFromNormalAndPoint(normal_ab, pt_c), -side_ab),
+        (MS.P, planeParamsFromNormalAndPoint(normal_ab, base), side_ab),
+    ]
 
 
 def rpp(params):
@@ -80,12 +82,14 @@ def rpp(params):
     '''
     check_params_length('RPP', 6, params)
     xmin, xmax, ymin, ymax, zmin, zmax = params
-    return [(MS.P, [1, 0, 0, xmin], -1),
-            (MS.P, [1, 0, 0, xmax], 1),
-            (MS.P, [0, 1, 0, ymin], -1),
-            (MS.P, [0, 1, 0, ymax], 1),
-            (MS.P, [0, 0, 1, zmin], -1),
-            (MS.P, [0, 0, 1, zmax], 1)]
+    return [
+        (MS.P, [1, 0, 0, xmax], 1),
+        (MS.P, [1, 0, 0, xmin], -1),
+        (MS.P, [0, 1, 0, ymax], 1),
+        (MS.P, [0, 1, 0, ymin], -1),
+        (MS.P, [0, 0, 1, zmax], 1),
+        (MS.P, [0, 0, 1, zmin], -1),
+    ]
 
 
 def sph(params):
@@ -111,9 +115,11 @@ def rcc(params):
     height = params[3:6]
     radius = params[6]
     base_top = vsum(base_bottom, height)
-    return [(MS.C, base_bottom + [radius] + height, 1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1)]
+    return [
+        (MS.C, base_bottom + [radius] + height, 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
+    ]
 
 
 def rhp(params):
@@ -140,14 +146,16 @@ def rhp(params):
     pt_a_op = vdiff(base_bottom, vec_a)
     pt_b_op = vdiff(base_bottom, vec_b)
     pt_c_op = vdiff(base_bottom, vec_c)
-    return [(MS.P, planeParamsFromNormalAndPoint(vec_a, pt_a), 1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_a, pt_a_op), -1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_b), 1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_b_op), -1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c), 1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c_op), -1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1)]
+    return [
+        (MS.P, planeParamsFromNormalAndPoint(vec_a, pt_a), 1),
+        (MS.P, planeParamsFromNormalAndPoint(vec_a, pt_a_op), -1),
+        (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_b), 1),
+        (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_b_op), -1),
+        (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c), 1),
+        (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_c_op), -1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
+    ]
 
 
 def rec(params):
@@ -182,9 +190,11 @@ def rec(params):
 
     base_top = vsum(base_bottom, height)
 
-    return [(MS.GQ, cyl_params, 1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1)]
+    return [
+        (MS.GQ, cyl_params, 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
+    ]
 
 
 def trc(params):
@@ -204,9 +214,11 @@ def trc(params):
     tan_aperture = math.fabs(rad1-rad0)/mag(height)
     u_height = renorm(height)
     cone_params = apex + (tan_aperture,) + u_height
-    return [(MS.K, cone_params, 1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1)]
+    return [
+        (MS.K, cone_params, 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
+    ]
 
 
 def ell(params):
@@ -290,11 +302,13 @@ def wed(params):
     vec_ab = vdiff(vec_a, vec_b)
     vec_c = vect(vec_ab, height)
     sign_c = 1 if mixed(vec_a, vec_b, vec_c) > 0. else -1
-    return [(MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
-            (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_a), -1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_a, pt_b), -1),
-            (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_a), sign_c)]
+    return [
+        (MS.P, planeParamsFromNormalAndPoint(vec_c, pt_a), sign_c),
+        (MS.P, planeParamsFromNormalAndPoint(vec_a, pt_b), -1),
+        (MS.P, planeParamsFromNormalAndPoint(vec_b, pt_a), -1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_top), 1),
+        (MS.P, planeParamsFromNormalAndPoint(height, base_bottom), -1),
+    ]
 
 
 def parse_facet(facet_int):

@@ -1,4 +1,20 @@
-v0.3.1
+v0.4.0
+======
+* Implement conversion of `SQ` surfaces (fixes [issue
+  #11](https://github.com/arekfu/t4_geom_convert/issues/11))
+* Improve error reporting (works towards fixing [issue
+  #23](https://github.com/arekfu/t4_geom_convert/issues/23), although I doubt
+  this issue can ever be closed).
+* Correctly support MCNP input files containing tabs.
+* Support rotation matrices in short form (3 parameters, 5 parameters, 6
+  parameters).
+* Largely reduce the memory footprint of the conversion process; this is
+  crucial for largish (a few GB) output files.
+* Add a flag (``--skip-deduplication``) to skip surface deduplication.
+* Support references to macrobody facets in cell definitions.
+* Fix a few bugs.
+
+v0.3.0
 ======
 
 * Implement conversion of the `LIKE n BUT` syntax (fixes [issue

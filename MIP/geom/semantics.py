@@ -4,13 +4,64 @@ class Cell(str):
     def evaluate(self):
         return str(self)
 
-class Surface(int):
+class Surface:
+    def __init__(self, surface, sub=None):
+        self.surface = int(surface)
+        self.sub = int(sub) if sub is not None else None
+
+    def __repr__(self):
+        return 'Surface({!r}, {!r})'.format(self.surface, self.sub)
+
+    def __str__(self):
+        if self.sub is None:
+            return 'Surface({!s})'.format(self.surface)
+        return 'Surface({!s}.{!s})'.format(self.surface, self.sub)
+
     def inverse(self):
-        return Surface(-1 * self)
+        return Surface(-self.surface, self.sub)
 
     def evaluate(self):
-        return str(self)
+        if self.sub is None:
+            return str(self)
+        return str(self) + '.' + str(self.sub)
 
+    def __abs__(self):
+        return Surface(abs(self.surface), self.sub)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.surface == other.surface and self.sub == other.sub
+        return False
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __gt__(self, other):
+        if isinstance(other, int):
+            return self.surface > other
+        return self.surface > other.surface
+
+    def __ge__(self, other):
+        if isinstance(other, int):
+            return self.surface >= other
+        return self.surface >= other.surface
+
+    def __lt__(self, other):
+        if isinstance(other, int):
+            return self.surface < other
+        return self.surface < other.surface
+
+    def __le__(self, other):
+        if isinstance(other, int):
+            return self.surface <= other
+        return self.surface <= other.surface
+
+    def __neg__(self):
+        return Surface(-self.surface, self.sub)
+
+    def __hash__(self):
+        # required to use Surfaces as dictionary keys or set elements
+        return hash((self.surface, self.sub))
 
 class GeomExpression(tuple):
     """
@@ -35,7 +86,11 @@ class GeomExpression(tuple):
 
 class GeomSemantics:
     def surface(self, ast):
-        return Surface(ast)
+        if '.' in ast:
+            surface, sub = ast.split('.')
+            return Surface(surface, sub)
+        else:
+            return Surface(ast)
 
     def cell(self, ast):
         return Cell(ast[1:])
