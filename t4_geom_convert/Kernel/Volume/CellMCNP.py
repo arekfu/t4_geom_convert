@@ -63,3 +63,14 @@ class CellMCNP:
                         self.importance, self.universe, self.fillid,
                         self.filltr, self.lattice, self.trcl,
                         self.idorigin))
+
+
+class CellRef:
+    def __init__(self, cell):
+        self.cell = cell
+
+    def __str__(self):
+        return 'CellRef({})'.format(self.cell)
+
+    def __repr__(self):
+        return 'CellRef({!r})'.format(self.cell)

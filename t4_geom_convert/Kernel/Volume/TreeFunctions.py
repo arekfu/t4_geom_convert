@@ -7,6 +7,7 @@ Created on 5 févr. 2019
 :file : TreeFunctions.py
 '''
 from MIP.geom.semantics import GeomExpression, Surface
+from .CellMCNP import CellRef
 
 
 def isLeaf(tree):
@@ -17,10 +18,26 @@ def isLeaf(tree):
     '''
     if isinstance(tree, (tuple, list, GeomExpression)):
         return False
-    elif isinstance(tree, (int, Surface)):
+    if isinstance(tree, (int, Surface, CellRef)):
         return True
-    else:
-        return False
+    return False
+
+
+def isSurface(tree):
+    '''
+    :brief: returns `True` if `tree` is a surface
+    :return: a boolean.
+    '''
+    return isLeaf(tree) and isinstance(tree, (int, Surface))
+
+
+def isCellRef(tree):
+    '''
+    :brief: returns `True` if `tree` is a :class:`~.CellRef`
+    :return: a boolean.
+    '''
+    return isLeaf(tree) and isinstance(tree, CellRef)
+
 
 def isIntersection(tree):
     '''
@@ -33,6 +50,7 @@ def isIntersection(tree):
 
     return False
 
+
 def isUnion(tree):
     '''
     :brief: method which permit to know if a node is a union
@@ -44,10 +62,12 @@ def isUnion(tree):
 
     return False
 
+
 def largestPureIntersectionNode(nodes):
     '''Returns the index of the largest node of the `nodes` list that is an
     intersection of surfaces, or `None` if no such node is present.
 
+    >>> from .CellMCNP import CellRef
     >>> largestPureIntersectionNode([[2, '*', 1, 2], [3, '*', 4, 5, 6]])
     1
     >>> largestPureIntersectionNode([4, 5, 6])
@@ -61,11 +81,14 @@ def largestPureIntersectionNode(nodes):
     ...                              [4, ':', 7, 8, 9, 10]])
     0
     >>> largestPureIntersectionNode([[2, ':', 1, 2], [3, ':', 4, 5, 6]])
+    >>> largestPureIntersectionNode([[3, '*', CellRef(4), 5, 6],
+    ...                              [2, '*', 1, 2]])
+    1
     '''
     largest_index = None
     largest_len = 0
     for index, node in enumerate(nodes):
-        if isLeaf(node) and largest_len < 1:
+        if isSurface(node) and largest_len < 1:
             largest_len = 1
             largest_index = index
             continue
@@ -73,7 +96,7 @@ def largestPureIntersectionNode(nodes):
             continue
         if node[1] != '*':
             continue
-        if not all(isLeaf(subnode) for subnode in node[2:]):
+        if not all(isSurface(subnode) for subnode in node[2:]):
             continue
         if len(node) > largest_len:
             largest_len = len(node)

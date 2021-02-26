@@ -125,22 +125,17 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
         percent = int(100.0*i/(n_conv_keys-1)) if n_conv_keys > 1 else 100
         print(fmt_string.format(key, i+1, n_conv_keys, percent),
               end='', flush=True)
-        root = val.geometry
-        tup = conv.pot_flag(root)
         try:
-            replace = conv.pot_replace(tup, matching)
+            j = conv.pot_convert(val, matching, union_ids)
         except CellConversionError as err:
             raise CellConversionError('{} (while converting cell {})'
                                       .format(err, key)) from None
-        opt_tree = conv.pot_optimise(replace)
-        if opt_tree is None:
-            # the cell is empty, do not emit a converted cell
-            continue
-        j = conv.pot_convert(opt_tree, val.idorigin, union_ids)
-        dic_vol_t4[j].fictive = False
-        if j == key:
+        if j is None:
+            # the converted cell is empty
             continue
         dic_vol_t4.replace_key(j, key)
+        dic_vol_t4[key].fictive = False
+        conv.replace_t4_volume(j, key)
     print('... done', flush=True)
 
     return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells

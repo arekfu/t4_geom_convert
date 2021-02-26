@@ -26,11 +26,9 @@ class DictVolumeT4(MutableMapping):
         self.dict_[key] = value
 
     def replace_key(self, key_old, key_new):
-        '''Replace the key of an element with the new key. This method also
-        updates the ``id`` field of the :class:`VolumeT4` object associated to
-        `key_old`.
-        '''
-        self.dict_[key_old].id = key_new
+        '''Replace the key of an element with the new key.'''
+        if key_old == key_new:
+            return
         self.dict_[key_new] = self.dict_[key_old]
         del self.dict_[key_old]
 

@@ -10,14 +10,15 @@ Created on 5 févr. 2019
 from MIP.geom.semantics import GeomExpression, Surface
 from MIP.geom.main import extract_surfaces_list
 
-from .TreeFunctions import (isLeaf, isIntersection, isUnion,
-                            largestPureIntersectionNode)
+from .TreeFunctions import (isLeaf, isIntersection, isUnion, isSurface,
+                            isCellRef, largestPureIntersectionNode)
 from .VolumeT4 import VolumeT4
 from .Lattice import (LatticeSpec, latticeVector, LatticeError,
                       squareLatticeBaseVectors, hexLatticeBaseVectors)
 from ..Transformation.Transformation import transformation
 from ..Surface.ConversionSurfaceMCNPToT4 import conversion_surface_params
 from ..Surface.SurfaceCollection import SurfaceCollection
+from .CellMCNP import CellRef
 from .CellConversionError import CellConversionError
 
 
@@ -38,6 +39,32 @@ class CellConversion:
         self.dic_surf_t4 = d_dictSurfaceT4
         self.dic_surf_mcnp = d_dicSurfaceMCNP
         self.dic_cell_mcnp = d_dicCellMCNP
+        self.convert_cellref_cache = {}
+        self.convert_surface_cache = {}
+        self.convert_surface_rcache = {}
+        self.cell_transform_cache = {}
+        self.cell_transform_rcache = {}
+
+    def replace_t4_volume(self, old_key, new_key):
+        self.replace_value_in_cache(old_key, new_key,
+                                    self.cell_transform_cache,
+                                    self.cell_transform_rcache)
+        self.replace_value_in_cache(old_key, new_key,
+                                    self.convert_surface_cache,
+                                    self.convert_surface_rcache)
+
+    @staticmethod
+    def replace_value_in_cache(old_val, new_val, cache, rcache):
+        if old_val == new_val:
+            return
+        keys = rcache.get(old_val, None)
+        if keys is None:
+            return
+        for key in keys:
+            assert cache[key] == old_val
+            cache[key] = new_val
+        rcache[new_val] = rcache[old_val]
+        del rcache[old_val]
 
     @staticmethod
     def conv_equa(list_surface):
@@ -59,21 +86,28 @@ class CellConversion:
                 plus_surfs.append(elt)
         return plus_surfs, minus_surfs
 
-    def conv_intersection(self, *ids):
+    @staticmethod
+    def conv_intersection(*ids):
         '''Convert a T4 INTE and return a tuple with the information of the T4
         VOLUME'''
-        return ('INTE', ids)
+        if ids:
+            return ('INTE', ids)
+        return None
 
-    def conv_union(self, *ids):
+    @staticmethod
+    def conv_union(*ids):
         '''Convert a T4 UNION and return a tuple with the information of the T4
         VOLUME'''
-        return ('UNION', ids)
+        if ids:
+            return ('UNION', ids)
+        return None
 
-    def conv_union_helpers(self, *ids, union_ids):
+    @staticmethod
+    def conv_union_helpers(*ids, union_ids):
         '''Convert a T4 UNION and return a tuple with the information of the T4
         VOLUME'''
-        pluses, minuses = self.conv_equa([union_ids[0],
-                                          -union_ids[1]])
+        pluses, minuses = CellConversion.conv_equa([union_ids[0],
+                                                    -union_ids[1]])
         ops = ('UNION', ids)
         return pluses, minuses, ops
 
@@ -82,7 +116,6 @@ class CellConversion:
         if cell.fillid is None:
             return [key]
         new_cells = []
-        mcnp_key_geom = cell.geometry
         mcnp_key_filltr = cell.filltr
         universe = int(cell.fillid)
         to_process = tuple(cell
@@ -90,26 +123,22 @@ class CellConversion:
                            for cell in self.pot_fill(element, dict_universe))
         for element in to_process:
             element_cell = self.dic_cell_mcnp[element]
-            mcnp_element_geom = element_cell.geometry
+            new_elt_key = self.cell_transform(element, tuple(mcnp_key_filltr))
+            if cell.trcl:
+                for trcl in cell.trcl:
+                    new_elt_key = self.cell_transform(new_elt_key, tuple(trcl))
+
             self.new_cell_key += 1
-            new_key = self.new_cell_key
+            new_cell_key = self.new_cell_key
             new_cell = cell.copy()
             new_cell.fillid = None
             new_cell.materialID = element_cell.materialID
             new_cell.density = element_cell.density
-            # new_trcl = element_cell.trcl.copy()
-            # if cell.trcl is not None:
-            #     new_trcl.extend(cell.trcl)
-            # new_cell.trcl = new_trcl
             new_cell.idorigin = element_cell.idorigin.copy()
             new_cell.idorigin.append((element, key))
-            del new_cell.geometry
-            tree = self.pot_transform(mcnp_element_geom, mcnp_key_filltr)
-            if cell.trcl:
-                tree = self.apply_trcl(cell.trcl, tree)
-            new_cell.geometry = ('*', mcnp_key_geom, tree)
-            self.dic_cell_mcnp[new_key] = new_cell
-            new_cells.append(new_key)
+            new_cell.geometry = ('*', CellRef(key), CellRef(new_elt_key))
+            self.dic_cell_mcnp[new_cell_key] = new_cell
+            new_cells.append(new_cell_key)
         return new_cells
 
     def pot_flag(self, p_tree):
@@ -144,6 +173,11 @@ class CellConversion:
             new_tree.extend(new_args)
             return tuple(new_tree)
 
+        if isCellRef(p_tree):
+            new_cell_key = self.cell_transform(p_tree.cell, tuple(p_transf))
+            return CellRef(new_cell_key)
+
+        assert isSurface(p_tree)
         surfs = self.dic_surf_mcnp[abs(p_tree)]
 
         surf_colls = []
@@ -165,46 +199,75 @@ class CellConversion:
 
         return Surface(new_key) if p_tree >= 0 else Surface(-new_key)
 
-    def pot_convert(self, p_tree, idorigin, union_ids):
-        '''
-        :brief: method which take the tree create by m_postOrderTraversalFlag
-        and filled a dictionary (of VolumeT4 instance)
-        '''
-        if isLeaf(p_tree):
-            self.new_cell_key += 1
-            p_id = self.new_cell_key
-            pluses, minuses = self.conv_equa([p_tree])
-            self.dic_vol_t4[p_id] = VolumeT4(pluses=pluses, minuses=minuses,
-                                             idorigin=idorigin)
+    def pot_convert(self, cell, matching, union_ids):
+        tup = self.pot_flag(cell.geometry)
+        replace = self.pot_replace(tup, matching)
+        opt_tree = self.pot_optimise(replace)
+        if opt_tree is None:
+            # the cell is empty, do not emit a converted cell
+            return None
+        return self.pot_to_t4_cell(opt_tree, cell.idorigin, matching,
+                                   union_ids)
+
+    def convert_surface(self, surf, idorigin):
+        p_id = self.convert_surface_cache.get(surf, None)
+        if p_id is not None:
             return p_id
+        self.new_cell_key += 1
+        p_id = self.new_cell_key
+        pluses, minuses = self.conv_equa([surf])
+        self.dic_vol_t4[p_id] = VolumeT4(pluses=pluses,
+                                         minuses=minuses,
+                                         idorigin=idorigin)
+        self.convert_surface_cache[surf] = p_id
+        self.convert_surface_rcache.setdefault(p_id, []).append(surf)
+        return p_id
+
+    def convert_cellref(self, cell, matching, union_ids):
+        p_id = self.convert_cellref_cache.get(cell, None)
+        if p_id is not None:
+            return p_id
+        mcnp_cell = self.dic_cell_mcnp[cell]
+        p_id = self.pot_convert(mcnp_cell, matching, union_ids)
+        self.convert_cellref_cache[cell] = p_id
+        return p_id
+
+    def pot_to_t4_cell(self, p_tree, idorigin, matching, union_ids):
+        '''
+        :brief: take the tree create by :meth:`pot_flag` and fill a dictionary
+        (of VolumeT4 instance)
+        '''
+        if isSurface(p_tree):
+            return self.convert_surface(p_tree, idorigin)
+
+        if isCellRef(p_tree):
+            return self.convert_cellref(p_tree.cell, matching, union_ids)
 
         p_id, operator, *args = p_tree
 
-        if operator == '*':
-            surfs = []
-            nodes = []
-            for arg in args:
-                if isLeaf(arg):
-                    surfs.append(arg)
-                else:
-                    nodes.append(arg)
-            # here we know that paramsOPER starts as ['EQUA', 'INTE', ...]
-            # because operator == '*'
-            if surfs:
-                pluses, minuses = self.conv_equa(surfs)
-                if nodes:
-                    arg_ids = [self.pot_convert(node, idorigin, union_ids)
-                               for node in nodes]
-                    ops = self.conv_intersection(*arg_ids)
-                else:
-                    ops = None
+        surfs = []
+        cellrefs = []
+        nodes = []
+        for arg in args:
+            if isSurface(arg):
+                surfs.append(arg)
+            elif isCellRef(arg):
+                cellrefs.append(arg)
             else:
-                # we assume that nodes is not empty
-                arg_ids = [self.pot_convert(node, idorigin, union_ids)
-                           for node in nodes]
-                pluses = []
-                minuses = []
-                ops = self.conv_intersection(*arg_ids)
+                nodes.append(arg)
+
+        if operator == '*':
+            pluses, minuses = self.conv_equa(surfs)
+
+            arg_ids = [self.pot_to_t4_cell(node, idorigin, matching, union_ids)
+                       for node in nodes]
+            for cellref in cellrefs:
+                t4_cell_id = self.convert_cellref(cellref.cell, matching,
+                                                  union_ids)
+                arg_ids.append(t4_cell_id)
+
+            ops = self.conv_intersection(*arg_ids)
+
             self.dic_vol_t4[p_id] = VolumeT4(pluses=pluses, minuses=minuses,
                                              ops=ops, idorigin=idorigin)
             return p_id
@@ -215,19 +278,27 @@ class CellConversion:
                                       'operator: {}'.format(operator))
         largest = largestPureIntersectionNode(args)
         if largest is None:
-            arg_ids = [self.pot_convert(arg, idorigin, union_ids)
-                       for arg in args]
+            arg_ids = [self.pot_to_t4_cell(arg, idorigin, matching, union_ids)
+                       for arg in args if not isCellRef(arg)]
+            for cellref in cellrefs:
+                t4_cell_id = self.convert_cellref(cellref.cell, matching,
+                                                  union_ids)
+                arg_ids.append(t4_cell_id)
+
             pluses, minuses, ops = self.conv_union_helpers(*arg_ids,
                                                            union_ids=union_ids)
         else:
             main = args.pop(largest)
-            main_id = self.pot_convert(main, idorigin, union_ids)
+            main_id = self.pot_to_t4_cell(main, idorigin, matching, union_ids)
             pluses = self.dic_vol_t4[main_id].pluses
             minuses = self.dic_vol_t4[main_id].minuses
-            arg_ids = [self.pot_convert(arg, idorigin, union_ids)
+            arg_ids = [self.pot_to_t4_cell(arg, idorigin, matching, union_ids)
                        for arg in args]
+            for cellref in cellrefs:
+                t4_cell_id = self.convert_cellref(cellref.cell, matching,
+                                                  union_ids)
+                arg_ids.append(t4_cell_id)
             ops = self.conv_union(*arg_ids)
-            del self.dic_vol_t4[main_id]
         self.dic_vol_t4[p_id] = VolumeT4(pluses=pluses, minuses=minuses,
                                          ops=ops, idorigin=idorigin)
         return p_id
@@ -257,8 +328,10 @@ class CellConversion:
         # surfaces to appear with both signs at the same time
         if operator != '*':
             return new_node
-        pluses = {surf for surf in new_node[2:] if isLeaf(surf) and surf > 0}
-        minuses = {-surf for surf in new_node[2:] if isLeaf(surf) and surf < 0}
+        pluses = {surf for surf in new_node[2:]
+                  if isSurface(surf) and surf > 0}
+        minuses = {-surf for surf in new_node[2:]
+                   if isSurface(surf) and surf < 0}
         if pluses & minuses:
             return None
 
@@ -276,7 +349,10 @@ class CellConversion:
                             for node in args)
             return new_tree
 
-        assert isinstance(p_tree, Surface)
+        if isCellRef(p_tree):
+            return p_tree
+
+        assert isSurface(p_tree)
         t4_ids = matching[abs(p_tree.surface)]
 
         if p_tree.sub is not None:
@@ -305,7 +381,6 @@ class CellConversion:
         if not isinstance(tree, (list, tuple)):
             return tree
         if tree[0] == '^':
-            assert all(isinstance(k, int) for k in self.dic_cell_mcnp)
             cell = self.dic_cell_mcnp[int(tree[1])]
             new_geom = self.pot_complement(cell.geometry)
             return new_geom.inverse()
@@ -327,7 +402,6 @@ class CellConversion:
             return
         assert isinstance(cell.fillid, LatticeSpec)
         assert cell.lattice in (1, 2)
-        mcnp_element_geom = cell.geometry
         surfaces = self.extract_surfaces(cell)
         try:
             if cell.lattice == 1:
@@ -361,9 +435,8 @@ class CellConversion:
                 continue
             transl = latticeVector(lat_base_vectors, index)
             trnsf = list(transl) + [1., 0., 0., 0., 1., 0., 0., 0., 1.]
-            new_cell = cell.copy()
-            tree = self.pot_transform(mcnp_element_geom, trnsf)
-            new_cell.geometry = tree
+            new_cell_key = self.cell_transform(key, tuple(trnsf))
+            new_cell = self.dic_cell_mcnp[new_cell_key]
             if universe == cell.universe:
                 new_cell.fillid = None
                 new_cell.materialID = cell.materialID
@@ -397,3 +470,27 @@ class CellConversion:
         for trcl in trcls:
             geometry = self.pot_transform(geometry, trcl)
         return geometry
+
+    def cell_transform(self, cell_key, transform):
+        '''Apply `transform` to `cell`, update dictionaries and return the ID
+        of the new cell.'''
+        cache_key = (cell_key, tuple(transform))
+        new_key = self.cell_transform_cache.get(cache_key, None)
+        if new_key is not None:
+            return new_key
+        if not transform:
+            self.cell_transform_cache[cache_key] = cell_key
+            (self.cell_transform_rcache
+             .setdefault(cell_key, [])
+             .append(cache_key))
+            return cell_key
+        cell = self.dic_cell_mcnp[cell_key]
+        new_cell = cell.copy()
+        tree = self.pot_transform(new_cell.geometry, transform)
+        new_cell.geometry = tree
+        self.new_cell_key += 1
+        new_key = self.new_cell_key
+        self.dic_cell_mcnp[new_key] = new_cell
+        self.cell_transform_cache[cache_key] = new_key
+        self.cell_transform_rcache.setdefault(new_key, []).append(cache_key)
+        return new_key

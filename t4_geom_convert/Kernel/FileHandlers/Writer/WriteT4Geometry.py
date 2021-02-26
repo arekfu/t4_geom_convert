@@ -21,7 +21,6 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
     the first for the surface and the second for the volume
     This method fills a file of the geometry for the input file of T4
     '''
-    ofile.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
     input_file = Path(args.input)
     t4_vol_cache_path = input_file.with_suffix('.volumes.cache')
     t4_surf_cache_path = input_file.with_suffix('.surfaces.cache')
@@ -79,11 +78,15 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
     remove_empty_cells(dic_volume)
     surf_used = extract_used_surfaces(dic_volume.values())
 
+    print('writing out {:d} surfaces...'.format(len(surf_used)))
+    ofile.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
     for key in sorted(surf_used):
         surf = dic_surface_t4[key]
         ofile.write("SURF {} {}{}\n".format(key, surf, surf.comment()))
     ofile.write("\n")
 
+    n_volumes = sum(1 for key in dic_volume.keys() if key not in skipped_cells)
+    print('writing out {:d} volumes...'.format(n_volumes))
     for key, val in dic_volume.items():
         if key in skipped_cells:
             continue
