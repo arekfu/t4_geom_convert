@@ -11,7 +11,8 @@ from pathlib import Path
 from ...Surface.ConstructSurfaceT4 import construct_surface_t4
 from ...Surface.Duplicates import remove_duplicate_surfaces, renumber_surfaces
 from ...Volume.ConstructVolumeT4 import (construct_volume_t4,
-                                         remove_empty_cells,
+                                         remove_empty_volumes,
+                                         remove_unused_volumes,
                                          extract_used_surfaces)
 
 
@@ -75,7 +76,8 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
         dic_surface_t4, renumber = remove_duplicate_surfaces(dic_surface_t4)
         dic_volume = renumber_surfaces(dic_volume, renumber)
 
-    remove_empty_cells(dic_volume)
+    remove_empty_volumes(dic_volume)
+    remove_unused_volumes(dic_volume)
     surf_used = extract_used_surfaces(dic_volume.values())
 
     print('writing out {:d} surfaces...'.format(len(surf_used)))

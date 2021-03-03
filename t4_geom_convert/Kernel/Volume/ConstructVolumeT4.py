@@ -141,7 +141,7 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
     return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells
 
 
-def remove_empty_cells(dic_volume):
+def remove_empty_volumes(dic_volume):
     '''Remove cells that are patently empty.'''
     removed = set()
     to_remove = [key for key, val in dic_volume.items()
@@ -170,3 +170,28 @@ def remove_empty_cells(dic_volume):
 def extract_used_surfaces(volumes):
     '''Return the IDs of the surfaces used in the given volumes, as a set.'''
     return set(surf for volume in volumes for surf in volume.surface_ids())
+
+
+def remove_unused_volumes(dic):
+    '''Remove unused virtual (``FICTIVE``) volumes from the given dictionary.
+    This function modifies the given dictionary in place.
+
+    :param DictVolumeT4 dic: a dictionary of :class:`~.VolumeT4` objects.
+
+    >>> from .VolumeT4 import VolumeT4
+    >>> dic = DictVolumeT4()
+    >>> dic[1] = VolumeT4([], [], ops=['UNION', (2, 3)], fictive=False)
+    >>> dic[2] = VolumeT4([], [], ops=None, fictive=True)
+    >>> dic[3] = VolumeT4([], [], ops=None, fictive=True)
+    >>> dic[4] = VolumeT4([], [], ops=None, fictive=True)
+    >>> dic[5] = VolumeT4([], [], ops=None, fictive=False)
+    >>> remove_unused_volumes(dic)
+    >>> sorted(list(dic.keys()))
+    [1, 2, 3, 5]
+    '''
+    fictives = set(key for key, volume in dic.items() if volume.fictive)
+    used = set(key for volume in dic.values() if volume.ops is not None
+               for args in volume.ops[1:] for key in args)
+    unused = fictives - used
+    for key in unused:
+        del dic[key]
