@@ -12,7 +12,8 @@ from datetime import datetime
 from MIP import mip
 
 from . import __version__
-from .Kernel.FileHandlers.Writer.WriteT4Geometry import writeT4Geometry
+from .Kernel.FileHandlers.Writer.WriteT4Geometry import (convertMCNPGeometry,
+                                                         writeT4Geometry)
 from .Kernel.FileHandlers.Writer.WriteT4Composition import writeT4Composition
 from .Kernel.FileHandlers.Writer.WriteT4GeomComp import writeT4GeomComp
 from .Kernel.FileHandlers.Writer.WriteT4BoundCond import writeT4BoundCond
@@ -114,13 +115,15 @@ def conversion(args):
         raise UnicodeError(msg)
 
     lattice_params = parse_lattice(args.lattice)
+    geom_conv = convertMCNPGeometry(mcnp_parser, lattice_params, args)
     with t4_output_filename.open('w') as ofile:
-        geom_conv = writeT4Geometry(mcnp_parser, lattice_params, args, ofile)
-        dic_surf_mcnp, dic_vol, mcnp_new_dict, skipped_cells = geom_conv
+        (dic_surf_mcnp, dic_surface_t4, dic_volumes_t4, mcnp_new_dict,
+         skipped_cells) = geom_conv
+        writeT4Geometry(dic_surface_t4, dic_volumes_t4, skipped_cells, ofile)
         if not args.skip_compositions:
             writeT4Composition(mcnp_parser, mcnp_new_dict, ofile)
         if not args.skip_geomcomp:
-            writeT4GeomComp(dic_vol, mcnp_new_dict, ofile)
+            writeT4GeomComp(dic_volumes_t4, mcnp_new_dict, ofile)
         if not args.skip_boundary_conditions:
             writeT4BoundCond(dic_surf_mcnp, ofile)
 

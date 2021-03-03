@@ -16,12 +16,8 @@ from ...Volume.ConstructVolumeT4 import (construct_volume_t4,
                                          extract_used_surfaces)
 
 
-def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
-    '''
-    :brief: method separated in two part,
-    the first for the surface and the second for the volume
-    This method fills a file of the geometry for the input file of T4
-    '''
+def convertMCNPGeometry(mcnpParser, lattice_params, args):
+    '''Convert an MCNP geometry to T4.'''
     input_file = Path(args.input)
     t4_vol_cache_path = input_file.with_suffix('.volumes.cache')
     t4_surf_cache_path = input_file.with_suffix('.surfaces.cache')
@@ -78,8 +74,15 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
 
     remove_empty_volumes(dic_volume)
     remove_unused_volumes(dic_volume)
-    surf_used = extract_used_surfaces(dic_volume.values())
 
+    return (dic_surface_mcnp, dic_surface_t4, dic_volume, mcnp_new_dict,
+            skipped_cells)
+
+
+def writeT4Geometry(dic_surface_t4, dic_volume, skipped_cells, ofile):
+    '''Write out a T4 geometry to the given file. '''
+
+    surf_used = extract_used_surfaces(dic_volume.values())
     print('writing out {:d} surfaces...'.format(len(surf_used)))
     ofile.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
     for key in sorted(surf_used):
@@ -96,4 +99,3 @@ def writeT4Geometry(mcnpParser, lattice_params, args, ofile):
     ofile.write("\n")
     ofile.write("ENDG")
     ofile.write("\n")
-    return dic_surface_mcnp, dic_volume, mcnp_new_dict, skipped_cells
