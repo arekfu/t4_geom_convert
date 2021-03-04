@@ -10,6 +10,7 @@ from collections import OrderedDict
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.surfaces import get_surfaces
 from MIP.geom.semantics import Surface
+from ...Progress import Progress
 from ...Surface.SurfaceMCNP import SurfaceMCNP
 from ...Surface.CollectionDict import CollectionDict
 from ...Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
@@ -32,18 +33,12 @@ def parseMCNPSurface(mcnp_parser):
     surface_parsed = get_surfaces(mcnp_parser, lim=None)
     transform_parsed = get_mcnp_transforms(mcnp_parser)
     dict_surface = CollectionDict()
-    n_surf = len(surface_parsed)
-    fmt_string = ('\rparsing MCNP surface {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
-                  '{{:3d}}%)'
-                  .format(len(str(max(surface_parsed))),
-                          len(str(n_surf))))
-    for i, (key, surface) in enumerate(surface_parsed.items()):
-        percent = int(100.0*i/(n_surf-1)) if n_surf > 1 else 100
-        print(fmt_string.format(key, i+1, n_surf, percent), end='', flush=True)
-        mcnp_surfs = to_surfaces_mcnp(key, surface, transform_parsed)
-        dict_surface[key] = mcnp_surfs
-
-    print('... done', flush=True)
+    with Progress('parsing MCNP surface',
+                  len(surface_parsed), max(surface_parsed)) as progress:
+        for i, (key, surface) in enumerate(surface_parsed.items()):
+            progress.update(i, key)
+            mcnp_surfs = to_surfaces_mcnp(key, surface, transform_parsed)
+            dict_surface[key] = mcnp_surfs
 
     return dict_surface
 

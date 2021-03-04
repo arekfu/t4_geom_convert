@@ -1,5 +1,6 @@
 '''This module contains utilities to simplify surface dictionaries.'''
 
+from ..Progress import Progress
 from .CollectionDict import CollectionDict
 
 
@@ -11,39 +12,30 @@ def remove_duplicate_surfaces(surfs):
     new_surfs = CollectionDict()
     surf_to_id = {}
 
-    n_surfs = len(surfs)
-    fmt_string = ('\rdetecting duplicates for surface {{:{0}d}} '
-                  '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                  .format(len(str(max(surfs))), len(str(n_surfs))))
-    for i, (key, surf) in enumerate(sorted(surfs.items())):
-        percent = int(100.0*i/(n_surfs-1)) if n_surfs > 1 else 100
-        print(fmt_string.format(key, i+1, n_surfs, percent),
-              end='', flush=True)
-        if surf in surf_to_id:
-            renumbering[key] = surf_to_id[surf]
-        else:
-            new_surfs[key] = surf
-            renumbering[key] = key
-            surf_to_id[surf] = key
-    print('... done', flush=True)
+    with Progress('detecting duplicates for surface',
+                  len(surfs), max(surfs)) as progress:
+        for i, (key, surf) in enumerate(sorted(surfs.items())):
+            progress.update(i, key)
+            if surf in surf_to_id:
+                renumbering[key] = surf_to_id[surf]
+            else:
+                new_surfs[key] = surf
+                renumbering[key] = key
+                surf_to_id[surf] = key
 
     return new_surfs, renumbering
 
 
 def renumber_surfaces(volus, renumbering):
+    '''Apply the given surface renumbering to the volume definitions.'''
     volus = volus.copy()
 
-    n_volus = len(volus)
-    fmt_string = ('\rrenumbering surfaces in cell {{:{0}d}} '
-                  '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                  .format(len(str(max(volus))), len(str(n_volus))))
-    for i, (key, volu) in enumerate(volus.items()):
-        percent = int(100.0*i/(n_volus-1)) if n_volus > 1 else 100
-        print(fmt_string.format(key, i+1, n_volus, percent),
-              end='', flush=True)
-        new_pluses = set(renumbering[s] for s in volu.pluses)
-        new_minuses = set(renumbering[s] for s in volu.minuses)
-        volu.pluses = new_pluses
-        volu.minuses = new_minuses
-    print('... done', flush=True)
+    with Progress('renumbering surfaces in cell',
+                  len(volus), max(volus)) as progress:
+        for i, (key, volu) in enumerate(volus.items()):
+            progress.update(i, key)
+            new_pluses = set(renumbering[s] for s in volu.pluses)
+            new_minuses = set(renumbering[s] for s in volu.minuses)
+            volu.pluses = new_pluses
+            volu.minuses = new_minuses
     return volus

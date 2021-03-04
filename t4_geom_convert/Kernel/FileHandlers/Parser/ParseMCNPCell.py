@@ -15,6 +15,7 @@ from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.transforms import to_cos
 from MIP.mip.datacard import expand_data_card
+from ...Progress import Progress
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
 from ...Transformation.Transformation import get_mcnp_transforms
@@ -105,33 +106,27 @@ class ParseMCNPCell:
         dict_cell = OrderedDict()
         skipped_cells = []
         parsed_cells = get_cells(self.mcnp_parser, lim=None)
-        lencell = len(parsed_cells)
-        fmt_string = ('\rparsing MCNP cell {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
-                      '{{:3d}}%)'
-                      .format(len(str(max(parsed_cells))),
-                              len(str(lencell))))
-        for rank, (key, parsed_cell) in enumerate(parsed_cells.items()):
-            percent = int(100.0*rank/(lencell-1)) if lencell > 1 else 100
-            print(fmt_string.format(key, rank+1, lencell, percent),
-                  end='', flush=True)
-            lat_opt = self.lattice_params.get(key, None)
-            try:
-                cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
-                                           parsed_cell)
-            except ParseMCNPCellError as err:
-                msg = '{} (in cell {})'.format(err, key)
-                raise ParseMCNPCellError(msg) from None
-            except MissingLatticeOptError as err:
-                msg = '{} for cell {}'.format(err, key)
-                raise MissingLatticeOptError(msg) from None
-            except tatsu.exceptions.ParseException:
-                msg = ('TatSu parsing failed for cell {}. Check the syntax of '
-                       'this cell.'.format(key))
-                raise ParseMCNPCellError(msg)
-            if cell.importance == 0:
-                skipped_cells.append(key)
-            dict_cell[key] = cell
-        print('... done', flush=True)
+        with Progress('parsing MCNP cell',
+                      len(parsed_cells), max(parsed_cells)) as progress:
+            for rank, (key, parsed_cell) in enumerate(parsed_cells.items()):
+                progress.update(rank, key)
+                lat_opt = self.lattice_params.get(key, None)
+                try:
+                    cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
+                                               parsed_cell)
+                except ParseMCNPCellError as err:
+                    msg = '{} (in cell {})'.format(err, key)
+                    raise ParseMCNPCellError(msg) from None
+                except MissingLatticeOptError as err:
+                    msg = '{} for cell {}'.format(err, key)
+                    raise MissingLatticeOptError(msg) from None
+                except tatsu.exceptions.ParseException:
+                    msg = ('TatSu parsing failed for cell {}. Check the '
+                           'syntax of this cell.'.format(key))
+                    raise ParseMCNPCellError(msg)
+                if cell.importance == 0:
+                    skipped_cells.append(key)
+                dict_cell[key] = cell
         return dict_cell, skipped_cells
 
     def parse_one_cell(self, parsed_cells, rank, lat_opt, parsed_cell):

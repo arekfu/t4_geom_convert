@@ -6,6 +6,7 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 '''
 
+from ..Progress import Progress
 from ..FileHandlers.Parser.ParseMCNPCell import ParseMCNPCell
 from ..Surface.SurfaceT4 import SurfaceT4
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
@@ -33,47 +34,30 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
     trcl_keys = [key for key, value in mcnp_dict.items()
                  if value.trcl is not None]
     if trcl_keys:
-        n_trcl_keys = len(trcl_keys)
-        fmt_string = ('\rapplying TRCL transformation to cell {{:{0}d}} '
-                      '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                      .format(len(str(max(trcl_keys))),
-                              len(str(n_trcl_keys))))
-        for i, key in enumerate(trcl_keys):
-            percent = int(100.0*i/(n_trcl_keys-1)) if n_trcl_keys > 1 else 100
-            print(fmt_string.format(key, i+1, n_trcl_keys, percent),
-                  end='', flush=True)
-            cell = mcnp_dict[key]
-            cell.geometry = conv.apply_trcl(cell.trcl, cell.geometry)
-            mcnp_dict[key] = cell
-        print('... done', flush=True)
+        with Progress('applying TRCL transformation to cell',
+                      len(trcl_keys), max(trcl_keys)) as progress:
+            for i, key in enumerate(trcl_keys):
+                progress.update(i, key)
+                cell = mcnp_dict[key]
+                cell.geometry = conv.apply_trcl(cell.trcl, cell.geometry)
+                mcnp_dict[key] = cell
 
     # treat complements
-    n_compl = len(mcnp_dict)
-    fmt_string = ('\rconverting complement for cell {{:{0}d}} '
-                  '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                  .format(len(str(max(mcnp_dict))), len(str(n_compl))))
-    for i, key in enumerate(mcnp_dict):
-        percent = int(100.0*i/(n_compl-1)) if n_compl > 1 else 100
-        print(fmt_string.format(key, i+1, n_compl, percent),
-              end='', flush=True)
-        new_geom = conv.pot_complement(mcnp_dict[key].geometry)
-        mcnp_dict[key].geometry = new_geom
-    print('... done', flush=True)
+    with Progress('converting complement for cell',
+                  len(mcnp_dict), max(mcnp_dict)) as progress:
+        for i, key in enumerate(mcnp_dict):
+            progress.update(i, key)
+            new_geom = conv.pot_complement(mcnp_dict[key].geometry)
+            mcnp_dict[key].geometry = new_geom
 
     # treat LAT
     lat_cells = [key for key, value in mcnp_dict.items() if value.lattice]
     if lat_cells:
-        n_lat_cells = len(lat_cells)
-        fmt_string = ('\rdeveloping lattice in cell {{:{0}d}} '
-                      '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                      .format(len(str(max(lat_cells))),
-                              len(str(n_lat_cells))))
-        for i, key in enumerate(lat_cells):
-            percent = int(100.0*i/(n_lat_cells-1)) if n_lat_cells > 1 else 100
-            print(fmt_string.format(key, i+1, n_lat_cells, percent),
-                  end='', flush=True)
-            conv.develop_lattice(key)
-        print('... done', flush=True)
+        with Progress('developing lattice in cell',
+                      len(lat_cells), max(lat_cells)) as progress:
+            for i, key in enumerate(lat_cells):
+                progress.update(i, key)
+                conv.develop_lattice(key)
 
     # update volume and surface free keys
     conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
@@ -85,17 +69,11 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
     fill_keys = [key for key, value in mcnp_dict.items()
                  if value.fillid is not None]
     if fill_keys:
-        n_fill_keys = len(fill_keys)
-        fmt_string = ('\rdeveloping fill in cell {{:{0}d}} '
-                      '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                      .format(len(str(max(fill_keys))),
-                              len(str(n_fill_keys))))
-        for i, key in enumerate(fill_keys):
-            percent = int(100.0*i/(n_fill_keys-1)) if n_fill_keys > 1 else 100
-            print(fmt_string.format(key, i+1, n_fill_keys, percent),
-                  end='', flush=True)
-            conv.pot_fill(key, dict_universe)
-        print('... done', flush=True)
+        with Progress('developing fill in cell',
+                      len(fill_keys), max(fill_keys)) as progress:
+            for i, key in enumerate(fill_keys):
+                progress.update(i, key)
+                conv.pot_fill(key, dict_universe)
 
     # update volume and surface free keys
     conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
@@ -105,10 +83,6 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
     conv_keys = [(key, value) for key, value in mcnp_dict.items()
                  if value.importance != 0 and value.universe == 0
                  and value.fillid is None]
-    n_conv_keys = len(conv_keys)
-    fmt_string = ('\rconverting cell {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                  .format(len(str(max(key for key, _ in conv_keys))),
-                          len(str(n_conv_keys))))
 
     t4_surf_numbering, matching = dic_surface_t4.number_items()
     # insert union planes into the T4 surface dictionary
@@ -121,22 +95,21 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
                                                 [-1],
                                                 ['aux plane for unions'])
 
-    for i, (key, val) in enumerate(conv_keys):
-        percent = int(100.0*i/(n_conv_keys-1)) if n_conv_keys > 1 else 100
-        print(fmt_string.format(key, i+1, n_conv_keys, percent),
-              end='', flush=True)
-        try:
-            j = conv.pot_convert(val, matching, union_ids)
-        except CellConversionError as err:
-            raise CellConversionError('{} (while converting cell {})'
-                                      .format(err, key)) from None
-        if j is None:
-            # the converted cell is empty
-            continue
-        dic_vol_t4.replace_key(j, key)
-        dic_vol_t4[key].fictive = False
-        conv.replace_t4_volume(j, key)
-    print('... done', flush=True)
+    with Progress('converting cell', len(conv_keys),
+                  max(key for key, _ in conv_keys)) as progress:
+        for i, (key, val) in enumerate(conv_keys):
+            progress.update(i, key)
+            try:
+                j = conv.pot_convert(val, matching, union_ids)
+            except CellConversionError as err:
+                raise CellConversionError('{} (while converting cell {})'
+                                          .format(err, key)) from None
+            if j is None:
+                # the converted cell is empty
+                continue
+            dic_vol_t4.replace_key(j, key)
+            dic_vol_t4[key].fictive = False
+            conv.replace_t4_volume(j, key)
 
     return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells
 

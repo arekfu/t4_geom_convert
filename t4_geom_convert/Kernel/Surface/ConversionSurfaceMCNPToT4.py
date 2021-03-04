@@ -5,6 +5,7 @@
 '''
 from math import pi, fabs
 
+from ..Progress import Progress
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
 from ..Surface.CollectionDict import CollectionDict
 from .ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
@@ -20,25 +21,18 @@ def convert_mcnp_surfaces(dic_surface_mcnp):
     '''
     dic_surface_t4 = CollectionDict()
 
-    free_id = max(int(k) for k in dic_surface_mcnp.keys()) + 1
-    n_surfaces = len(dic_surface_mcnp)
-    fmt_string = ('\rconverting surface {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
-                  '{{:3d}}%)'
-                  .format(len(str(max(dic_surface_mcnp))),
-                          len(str(n_surfaces))))
-    for i, (key, val) in enumerate(dic_surface_mcnp.items()):
-        percent = int(100.0*i/(n_surfaces-1)) if n_surfaces > 1 else 100
-        print(fmt_string.format(key, i+1, n_surfaces, percent),
-              end='', flush=True)
+    with Progress('converting surface',
+                  len(dic_surface_mcnp), max(dic_surface_mcnp)) as progress:
+        for i, (key, val) in enumerate(dic_surface_mcnp.items()):
+            progress.update(i, key)
+            t4_surfs = convert_mcnp_surface(key, val)
+            dic_surface_t4[key] = t4_surfs
 
-        t4_surfs = convert_mcnp_surface(key, val)
-        dic_surface_t4[key] = t4_surfs
-
-    print('... done', flush=True)
     return dic_surface_t4
 
 
 def convert_mcnp_surface(key, val):
+    '''Perform the actual conversion of an MCNP surface.'''
     surf_colls = []
     for surf, side in val:
         try:

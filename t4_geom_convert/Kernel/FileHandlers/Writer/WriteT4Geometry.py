@@ -8,6 +8,7 @@ Created on 6 févr. 2019
 import pickle
 from pathlib import Path
 
+from ...Progress import Progress
 from ...Surface.ConstructSurfaceT4 import construct_surface_t4
 from ...Surface.Duplicates import remove_duplicate_surfaces, renumber_surfaces
 from ...Volume.ConstructVolumeT4 import (construct_volume_t4,
@@ -32,14 +33,16 @@ def convertMCNPGeometry(mcnpParser, lattice_params, args):
         try:
             with t4_surf_cache_path.open('rb') as dicfile:
                 print('reading surfaces from file {}...'
-                      .format(t4_surf_cache_path.resolve()), end='', flush=True)
+                      .format(t4_surf_cache_path.resolve()), end='',
+                      flush=True)
                 surf_conv = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
             surf_conv = constructSurfaceT4(mcnpParser)
             with t4_surf_cache_path.open('wb') as dicfile:
                 print('writing surfaces to file {}...'
-                      .format(t4_surf_cache_path.resolve()), end='', flush=True)
+                      .format(t4_surf_cache_path.resolve()), end='',
+                      flush=True)
                 pickle.dump(surf_conv, dicfile)
                 print(' done', flush=True)
     dic_surface_t4, dic_surface_mcnp = surf_conv
@@ -83,19 +86,22 @@ def writeT4Geometry(dic_surface_t4, dic_volume, skipped_cells, ofile):
     '''Write out a T4 geometry to the given file. '''
 
     surf_used = extract_used_surfaces(dic_volume.values())
-    print('writing out {:d} surfaces...'.format(len(surf_used)))
-    ofile.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
-    for key in sorted(surf_used):
-        surf = dic_surface_t4[key]
-        ofile.write("SURF {} {}{}\n".format(key, surf, surf.comment()))
-    ofile.write("\n")
+    with Progress('writing out surface',
+                  len(surf_used), max(surf_used)) as progress:
+        ofile.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
+        for i, key in enumerate(sorted(surf_used)):
+            progress.update(i, key)
+            surf = dic_surface_t4[key]
+            ofile.write("SURF {} {}{}\n".format(key, surf, surf.comment()))
+        ofile.write("\n")
 
-    n_volumes = sum(1 for key in dic_volume.keys() if key not in skipped_cells)
-    print('writing out {:d} volumes...'.format(n_volumes))
-    for key, val in dic_volume.items():
-        if key in skipped_cells:
-            continue
-        ofile.write('VOLU {} {} ENDV{}\n'.format(key, val, val.comment()))
+    with Progress('writing out volume',
+                  len(dic_volume), max(dic_volume)) as progress:
+        for i, (key, val) in enumerate(dic_volume.items()):
+            progress.update(i, key)
+            if key in skipped_cells:
+                continue
+            ofile.write('VOLU {} {} ENDV{}\n'.format(key, val, val.comment()))
     ofile.write("\n")
     ofile.write("ENDG")
     ofile.write("\n")
