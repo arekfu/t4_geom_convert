@@ -185,11 +185,27 @@ def parse_args(argv):
                            default=False)
 
     # lattice args
-    g_lattice = parser.add_argument_group('arguments for the conversion of '
-                                          'lattices')
-    g_lattice.add_argument('--lattice', metavar='LATTICE_SPEC',
-                           help='bounds for converting a given lattice',
-                           action='append', default=[])
+    g_conversion = parser.add_argument_group('arguments that control the '
+                                             'conversion')
+    g_conversion.add_argument('--lattice', metavar='LATTICE_SPEC',
+                              help='bounds for converting a given lattice',
+                              action='append', default=[])
+    g_conversion.add_argument('--always-inline-filling', action='store_true',
+                              help='inline the definitions of cells from '
+                              'FILLing universes into the T4 volume '
+                              'definition. Try this option if you run into '
+                              'very large output files (especially with '
+                              'lattices)', default=False)
+    g_conversion.add_argument('--always-inline-filled', action='store_true',
+                              help='inline the definitions of the FILLed '
+                              'cells into the T4 volume definition. Try this '
+                              'option if you run into very large output files '
+                              '(especially with lattices)', default=False)
+    g_conversion.add_argument('--max-inline-score', metavar='SCORE',
+                              help='maximum score for cell inlining. Try '
+                              'fiddling with this option if you run into very '
+                              'large output files (especially with lattices).',
+                              default=1.0, type=float)
 
     args = parser.parse_args(argv)
     return args

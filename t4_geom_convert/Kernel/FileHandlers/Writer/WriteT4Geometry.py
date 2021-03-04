@@ -51,7 +51,10 @@ def convertMCNPGeometry(mcnpParser, lattice_params, args):
         vol_conv = construct_volume_t4(mcnpParser, lattice_params,
                                        mcnp_cell_cache_path,
                                        dic_surface_t4,
-                                       dic_surface_mcnp)
+                                       dic_surface_mcnp,
+                                       args.always_inline_filled,
+                                       args.always_inline_filling,
+                                       args.max_inline_score)
     else:
         try:
             with t4_vol_cache_path.open('rb') as dicfile:
@@ -63,7 +66,10 @@ def convertMCNPGeometry(mcnpParser, lattice_params, args):
             vol_conv = construct_volume_t4(mcnpParser, lattice_params,
                                            mcnp_cell_cache_path,
                                            dic_surface_t4,
-                                           dic_surface_mcnp)
+                                           dic_surface_mcnp,
+                                           args.always_inline_filled,
+                                           args.always_inline_filling,
+                                           args.max_inline_score)
             with t4_vol_cache_path.open('wb') as dicfile:
                 print('writing cells to file {}...'
                       .format(t4_vol_cache_path.resolve()), end='', flush=True)

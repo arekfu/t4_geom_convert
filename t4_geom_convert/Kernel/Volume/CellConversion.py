@@ -111,7 +111,8 @@ class CellConversion:
         ops = ('UNION', ids)
         return pluses, minuses, ops
 
-    def pot_fill(self, key, dict_universe):
+    def pot_fill(self, key, dict_universe, inline_filled=False,
+                 inline_filling=False):
         cell = self.dic_cell_mcnp[key]
         if cell.fillid is None:
             return [key]
@@ -120,25 +121,40 @@ class CellConversion:
         universe = int(cell.fillid)
         to_process = tuple(cell
                            for element in dict_universe[universe]
-                           for cell in self.pot_fill(element, dict_universe))
+                           for cell in self.pot_fill(element, dict_universe,
+                                                     inline_filled,
+                                                     inline_filling))
         for element in to_process:
             element_cell = self.dic_cell_mcnp[element]
-            new_elt_key = self.cell_transform(element, tuple(mcnp_key_filltr))
-            if cell.trcl:
-                for trcl in cell.trcl:
-                    new_elt_key = self.cell_transform(new_elt_key, tuple(trcl))
-
-            self.new_cell_key += 1
-            new_cell_key = self.new_cell_key
             new_cell = cell.copy()
             new_cell.fillid = None
             new_cell.materialID = element_cell.materialID
             new_cell.density = element_cell.density
             new_cell.idorigin = element_cell.idorigin.copy()
             new_cell.idorigin.append((element, key))
-            new_cell.geometry = ('*', CellRef(key), CellRef(new_elt_key))
-            self.dic_cell_mcnp[new_cell_key] = new_cell
-            new_cells.append(new_cell_key)
+            cache = not inline_filling
+            new_elt_key = self.cell_transform(element, mcnp_key_filltr,
+                                              cache=cache)
+            if cell.trcl:
+                for trcl in cell.trcl:
+                    new_elt_key = self.cell_transform(new_elt_key, trcl,
+                                                      cache=cache)
+            if inline_filling:
+                tree = self.dic_cell_mcnp[new_elt_key].geometry
+                if inline_filled:
+                    new_cell.geometry = ('*', cell.geometry, tree)
+                else:
+                    new_cell.geometry = ('*', CellRef(key), tree)
+            else:
+                if inline_filled:
+                    new_cell.geometry = ('*', cell.geometry,
+                                         CellRef(new_elt_key))
+                else:
+                    new_cell.geometry = ('*', CellRef(key),
+                                         CellRef(new_elt_key))
+            self.new_cell_key += 1
+            self.dic_cell_mcnp[self.new_cell_key] = new_cell
+            new_cells.append(self.new_cell_key)
         return new_cells
 
     def pot_flag(self, p_tree):
@@ -174,7 +190,7 @@ class CellConversion:
             return tuple(new_tree)
 
         if isCellRef(p_tree):
-            new_cell_key = self.cell_transform(p_tree.cell, tuple(p_transf))
+            new_cell_key = self.cell_transform(p_tree.cell, p_transf)
             return CellRef(new_cell_key)
 
         assert isSurface(p_tree)
@@ -435,7 +451,7 @@ class CellConversion:
                 continue
             transl = latticeVector(lat_base_vectors, index)
             trnsf = list(transl) + [1., 0., 0., 0., 1., 0., 0., 0., 1.]
-            new_cell_key = self.cell_transform(key, tuple(trnsf))
+            new_cell_key = self.cell_transform(key, trnsf, cache=False)
             new_cell = self.dic_cell_mcnp[new_cell_key]
             if universe == cell.universe:
                 new_cell.fillid = None
@@ -455,8 +471,6 @@ class CellConversion:
                                    for i, x in enumerate(filltr))
             new_cell.filltr = new_filltr
             new_cell.lattice = False
-            self.new_cell_key += 1
-            self.dic_cell_mcnp[self.new_cell_key] = new_cell
         del self.dic_cell_mcnp[key]
 
     def apply_trcl(self, trcls, geometry):
@@ -471,18 +485,22 @@ class CellConversion:
             geometry = self.pot_transform(geometry, trcl)
         return geometry
 
-    def cell_transform(self, cell_key, transform):
+    def cell_transform(self, cell_key, transform, cache=True):
         '''Apply `transform` to `cell`, update dictionaries and return the ID
         of the new cell.'''
-        cache_key = (cell_key, tuple(transform))
-        new_key = self.cell_transform_cache.get(cache_key, None)
+        if cache:
+            cache_key = (cell_key, tuple(transform))
+            new_key = self.cell_transform_cache.get(cache_key, None)
+        else:
+            new_key = None
         if new_key is not None:
             return new_key
         if not transform:
-            self.cell_transform_cache[cache_key] = cell_key
-            (self.cell_transform_rcache
-             .setdefault(cell_key, [])
-             .append(cache_key))
+            if cache:
+                self.cell_transform_cache[cache_key] = cell_key
+                (self.cell_transform_rcache
+                .setdefault(cell_key, [])
+                .append(cache_key))
             return cell_key
         cell = self.dic_cell_mcnp[cell_key]
         new_cell = cell.copy()
@@ -491,6 +509,7 @@ class CellConversion:
         self.new_cell_key += 1
         new_key = self.new_cell_key
         self.dic_cell_mcnp[new_key] = new_cell
-        self.cell_transform_cache[cache_key] = new_key
-        self.cell_transform_rcache.setdefault(new_key, []).append(cache_key)
+        if cache:
+            self.cell_transform_cache[cache_key] = new_key
+            self.cell_transform_rcache.setdefault(new_key, []).append(cache_key)
         return new_key

@@ -14,10 +14,12 @@ from .DictVolumeT4 import DictVolumeT4
 from .CellConversion import CellConversion
 from .CellConversionError import CellConversionError
 from .ByUniverse import by_universe
+from .CellInlining import inline_cells
 
 
 def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
-                        dic_surface_t4, dic_surface_mcnp):
+                        dic_surface_t4, dic_surface_mcnp, inline_filled,
+                        inline_filling, max_inline_score):
     '''A function that orchestrates the conversion steps for TRIPOLI-4
     volumes.'''
     dic_vol_t4 = DictVolumeT4()
@@ -67,13 +69,17 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
     # treat FILL
     dict_universe = by_universe(mcnp_dict)
     fill_keys = [key for key, value in mcnp_dict.items()
-                 if value.fillid is not None]
+                 if value.fillid is not None and value.universe == 0]
     if fill_keys:
         with Progress('developing fill in cell',
                       len(fill_keys), max(fill_keys)) as progress:
             for i, key in enumerate(fill_keys):
                 progress.update(i, key)
-                conv.pot_fill(key, dict_universe)
+                conv.pot_fill(key, dict_universe, inline_filled,
+                              inline_filling)
+
+    # consider inlining cells
+    inline_cells(mcnp_dict, max_inline_score)
 
     # update volume and surface free keys
     conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
