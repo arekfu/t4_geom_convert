@@ -88,7 +88,8 @@ def writeT4Geometry(dic_surface_t4, dic_volume, skipped_cells, ofile):
     surf_used = extract_used_surfaces(dic_volume.values())
     with Progress('writing out surface',
                   len(surf_used), max(surf_used)) as progress:
-        ofile.write("GEOMETRY\n\nTITLE title\n\nHASH_TABLE\n\n")
+        ofile.write("LANG ENGLISH\n\nGEOMETRY\n\n"
+                    "TITLE title\n\nHASH_TABLE\n\n")
         for i, key in enumerate(sorted(surf_used)):
             progress.update(i, key)
             surf = dic_surface_t4[key]
