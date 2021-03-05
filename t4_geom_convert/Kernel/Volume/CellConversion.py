@@ -499,8 +499,8 @@ class CellConversion:
             if cache:
                 self.cell_transform_cache[cache_key] = cell_key
                 (self.cell_transform_rcache
-                .setdefault(cell_key, [])
-                .append(cache_key))
+                 .setdefault(cell_key, [])
+                 .append(cache_key))
             return cell_key
         cell = self.dic_cell_mcnp[cell_key]
         new_cell = cell.copy()
@@ -511,5 +511,6 @@ class CellConversion:
         self.dic_cell_mcnp[new_key] = new_cell
         if cache:
             self.cell_transform_cache[cache_key] = new_key
-            self.cell_transform_rcache.setdefault(new_key, []).append(cache_key)
+            (self.cell_transform_rcache
+             .setdefault(new_key, []).append(cache_key))
         return new_key

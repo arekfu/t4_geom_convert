@@ -17,7 +17,7 @@ from ...Volume.ConstructVolumeT4 import (construct_volume_t4,
                                          extract_used_surfaces)
 
 
-def convertMCNPGeometry(mcnpParser, lattice_params, args):
+def convertMCNPGeometry(mcnp_parser, lattice_params, args):
     '''Convert an MCNP geometry to T4.'''
     input_file = Path(args.input)
     t4_vol_cache_path = input_file.with_suffix('.volumes.cache')
@@ -28,7 +28,7 @@ def convertMCNPGeometry(mcnpParser, lattice_params, args):
         mcnp_cell_cache_path = None
 
     if not args.cache:
-        surf_conv = construct_surface_t4(mcnpParser)
+        surf_conv = construct_surface_t4(mcnp_parser)
     else:
         try:
             with t4_surf_cache_path.open('rb') as dicfile:
@@ -38,7 +38,7 @@ def convertMCNPGeometry(mcnpParser, lattice_params, args):
                 surf_conv = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
-            surf_conv = constructSurfaceT4(mcnpParser)
+            surf_conv = construct_surface_t4(mcnp_parser)
             with t4_surf_cache_path.open('wb') as dicfile:
                 print('writing surfaces to file {}...'
                       .format(t4_surf_cache_path.resolve()), end='',
@@ -48,7 +48,7 @@ def convertMCNPGeometry(mcnpParser, lattice_params, args):
     dic_surface_t4, dic_surface_mcnp = surf_conv
 
     if not args.cache:
-        vol_conv = construct_volume_t4(mcnpParser, lattice_params,
+        vol_conv = construct_volume_t4(mcnp_parser, lattice_params,
                                        mcnp_cell_cache_path,
                                        dic_surface_t4,
                                        dic_surface_mcnp,
@@ -63,7 +63,7 @@ def convertMCNPGeometry(mcnpParser, lattice_params, args):
                 vol_conv = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
-            vol_conv = construct_volume_t4(mcnpParser, lattice_params,
+            vol_conv = construct_volume_t4(mcnp_parser, lattice_params,
                                            mcnp_cell_cache_path,
                                            dic_surface_t4,
                                            dic_surface_mcnp,

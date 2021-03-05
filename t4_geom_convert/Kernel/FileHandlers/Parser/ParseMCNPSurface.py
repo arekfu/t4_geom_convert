@@ -6,10 +6,8 @@ Created on 6 févr. 2019
 :data : 06 february 2019
 '''
 
-from collections import OrderedDict
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.surfaces import get_surfaces
-from MIP.geom.semantics import Surface
 from ...Progress import Progress
 from ...Surface.SurfaceMCNP import SurfaceMCNP
 from ...Surface.CollectionDict import CollectionDict

@@ -49,7 +49,6 @@ def convert_mcnp_surface(key, val):
     return t4_surfs
 
 
-
 def conversion_surface_params(key, val):
     '''Convert the MCNP surface described by `val` into a TRIPOLI-4 surface.'''
     if val.type_surface in (MS.K_X, MS.K_Y, MS.K_Z, MS.KX, MS.KY, MS.KZ, MS.K):
@@ -167,10 +166,11 @@ def eval_quadric(params, point):
     >>> eval_quadric(quad, (2.000, 0.0, 0.0)) > 0.0
     True
     '''
-    x, y, z = point
+    x, y, z = point  # pylint: disable=invalid-name
     return (params[0]*x**2 + params[1]*y**2 + params[2]*z**2
             + params[3]*x*y + params[4]*y*z + params[5]*z*x
-            +params[6]*x + params[7]*y + params[8]*z + params[9])
+            + params[6]*x + params[7]*y + params[8]*z + params[9])
+
 
 def convert_quadric(val):
     '''Convert the parameters for a quadric.'''
