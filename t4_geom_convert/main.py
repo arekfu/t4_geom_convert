@@ -153,9 +153,8 @@ def parse_args(argv):
     :returns: a namespace containing the parsed arguments.
     '''
     parser = argparse.ArgumentParser(
-        description='Convert source code for a Geant4 detector construction '
-                    'into a geometry that can be read by TRIPOLI-4®.',
-        allow_abbrev=False)
+        description='Convert a geometry from the MCNP format into the '
+        'TRIPOLI-4® format.', allow_abbrev=False)
 
     # general arguments
     g_general = parser.add_argument_group('general arguments')
