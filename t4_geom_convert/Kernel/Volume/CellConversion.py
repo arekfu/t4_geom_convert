@@ -217,8 +217,8 @@ class CellConversion:
 
     def pot_convert(self, cell, matching, union_ids):
         tup = self.pot_flag(cell.geometry)
-        replace = self.pot_replace(tup, matching)
-        opt_tree = self.pot_optimise(replace)
+        expanded = self.pot_expand_surfs(tup, matching)
+        opt_tree = self.pot_optimise(expanded)
         if opt_tree is None:
             # the cell is empty, do not emit a converted cell
             return None
@@ -353,7 +353,7 @@ class CellConversion:
 
         return new_node
 
-    def pot_replace(self, p_tree, matching):
+    def pot_expand_surfs(self, p_tree, matching):
         '''Replace collections of surfaces with ASTs representing the
         intersection/union of the collection (necessary for one-nappe cones and
         macrobodies). Also replace MCNP surface IDs with T4 surface IDs.
@@ -361,7 +361,7 @@ class CellConversion:
         if not isLeaf(p_tree):
             p_id, operator, *args = p_tree
             new_tree = [p_id, operator]
-            new_tree.extend(self.pot_replace(node, matching)
+            new_tree.extend(self.pot_expand_surfs(node, matching)
                             for node in args)
             return new_tree
 
