@@ -303,11 +303,15 @@ class CellConversion:
         :brief: method which permit to optimize the course of the cells MCNP
         '''
 
-        if isLeaf(p_tree):
+        if p_tree is None or isLeaf(p_tree):
             return p_tree
 
         p_id, operator, *args = p_tree
         new_args = [self.pot_optimise(node) for node in args]
+        if operator == '*' and any(node is None for node in new_args):
+            # this cell is empty, propagate the None
+            return None
+        new_args = [node for node in new_args if node is not None]
         new_node = [p_id, operator]
         for node in new_args:
             if isIntersection(node) and operator == '*':
