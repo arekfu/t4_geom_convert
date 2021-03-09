@@ -13,5 +13,5 @@ def convert_isotope(isotope_id):
 
     isotope_id = isotope_id.split('.')[0]
     massNumber = str(int(isotope_id[-3:]))
-    atomicNumber = getattr(EIsotopeAtomicNumber, isotope_id[0:-3])
+    atomicNumber = getattr(EIsotopeAtomicNumber, str(int(isotope_id[0:-3])))
     return atomicNumber, massNumber
