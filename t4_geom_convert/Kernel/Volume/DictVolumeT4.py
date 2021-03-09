@@ -25,13 +25,6 @@ class DictVolumeT4(MutableMapping):
     def __setitem__(self, key, value):
         self.dict_[key] = value
 
-    def replace_key(self, key_old, key_new):
-        '''Replace the key of an element with the new key.'''
-        if key_old == key_new:
-            return
-        self.dict_[key_new] = self.dict_[key_old]
-        del self.dict_[key_old]
-
     def __delitem__(self, key):
         del self.dict_[key]
 

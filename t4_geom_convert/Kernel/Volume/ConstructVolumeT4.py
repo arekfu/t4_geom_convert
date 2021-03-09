@@ -113,9 +113,8 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
             if j is None:
                 # the converted cell is empty
                 continue
-            dic_vol_t4.replace_key(j, key)
+            dic_vol_t4[key] = dic_vol_t4[j].copy()
             dic_vol_t4[key].fictive = False
-            conv.replace_t4_volume(j, key)
 
     return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells
 

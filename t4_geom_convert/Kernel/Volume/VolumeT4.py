@@ -43,6 +43,12 @@ class VolumeT4:
                 'fictive={})'.format(self.pluses, self.minuses, self.ops,
                                      self.idorigin, self.fictive))
 
+    def copy(self):
+        '''Return a copy of `self`.'''
+        return VolumeT4(pluses=self.pluses.copy(), minuses=self.minuses,
+                        ops=None if self.ops is None else self.ops,
+                        idorigin=self.idorigin.copy(), fictive=self.fictive)
+
     def comment(self):
         if self.idorigin:
             return ' // ' + '; '.join(map(str, self.idorigin))

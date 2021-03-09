@@ -45,27 +45,6 @@ class CellConversion:
         self.cell_transform_cache = {}
         self.cell_transform_rcache = {}
 
-    def replace_t4_volume(self, old_key, new_key):
-        self.replace_value_in_cache(old_key, new_key,
-                                    self.cell_transform_cache,
-                                    self.cell_transform_rcache)
-        self.replace_value_in_cache(old_key, new_key,
-                                    self.convert_surface_cache,
-                                    self.convert_surface_rcache)
-
-    @staticmethod
-    def replace_value_in_cache(old_val, new_val, cache, rcache):
-        if old_val == new_val:
-            return
-        keys = rcache.get(old_val, None)
-        if keys is None:
-            return
-        for key in keys:
-            assert cache[key] == old_val
-            cache[key] = new_val
-        rcache[new_val] = rcache[old_val]
-        del rcache[old_val]
-
     @staticmethod
     def conv_equa(list_surface):
         '''Method converting a list of if of surface and return a tuple with
