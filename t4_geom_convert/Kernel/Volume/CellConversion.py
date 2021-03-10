@@ -381,6 +381,13 @@ class CellConversion:
             return tree
         if tree[0] == '^':
             cell = self.dic_cell_mcnp[int(tree[1])]
+            if cell.lattice is not None:
+                # This is a complement of a lattice! What does that even mean
+                # We return a patently empty cell, which hopefully will later
+                # be optimised away by pot_optimise
+                surfaces = extract_surfaces_list(cell.geometry)
+                assert len(surfaces) >= 1  # otherwise things are REALLY weird
+                return ['*', surfaces[0], -surfaces[0]]
             new_geom = self.pot_complement(cell.geometry)
             return new_geom.inverse()
         new_tree = [tree[0]]
@@ -453,7 +460,7 @@ class CellConversion:
                 new_filltr = tuple(x if i > 2 else x + trnsf[i]
                                    for i, x in enumerate(filltr))
             new_cell.filltr = new_filltr
-            new_cell.lattice = False
+            new_cell.lattice = None
         del self.dic_cell_mcnp[key]
 
     def apply_trcl(self, trcls, geometry):
