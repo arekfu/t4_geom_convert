@@ -61,11 +61,6 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
                 progress.update(i, key)
                 conv.develop_lattice(key)
 
-    # update volume and surface free keys
-    conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
-    conv.new_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
-                            max(int(k) for k in dic_surface_t4) + 1)
-
     # treat FILL
     dict_universe = by_universe(mcnp_dict)
     fill_keys = [key for key, value in mcnp_dict.items()
@@ -80,11 +75,6 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
 
     # consider inlining cells
     inline_cells(mcnp_dict, max_inline_score)
-
-    # update volume and surface free keys
-    conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
-    conv.new_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
-                            max(int(k) for k in dic_surface_t4) + 1)
 
     conv_keys = [(key, value) for key, value in mcnp_dict.items()
                  if value.importance != 0 and value.universe == 0
