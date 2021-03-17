@@ -287,3 +287,44 @@ def transformation(trpl, surface):
                 raise TransformationError(msg)
     return SurfaceMCNP(surface.boundary_cond, surface.type_surface, frame,
                        params, surface.idorigin)
+
+
+def transform_vector(trans, vec):
+    '''Apply the (normalised) transformation `trans` to the vector `vec`.
+
+    If `trans` is ``(b, A)``, then this function returns
+
+        v' = A*v+b
+    '''
+    mat, off = to_numpy(trans)
+    vec = np.array(vec)
+    vec2 = mat @ vec + off
+    return vec2
+
+
+def compose_transform(trans1, trans2):
+    '''Compose `trans1` and `trans2`.
+
+    Returns trans2 o trans1 (i.e. `trans1` is applied first).
+    '''
+    mat1, vec1 = to_numpy(trans1)
+    mat2, vec2 = to_numpy(trans2)
+    mat_c = mat2 @ mat1
+    vec_c = mat2 @ vec1 + vec2
+    return [*vec_c, *mat_c.ravel()]
+
+
+def to_numpy(trans):
+    '''Split a transformation into a `NumPy` 3x3 matrix and a vector.
+
+    >>> to_numpy([1., 2., 3.,
+    ...           1., 0., 0.,
+    ...           0., 1., 0.,
+    ...           0., 0., 1.])
+    (array([[1., 0., 0.],
+           [0., 1., 0.],
+           [0., 0., 1.]]), array([1., 2., 3.]))
+    '''
+    vec = np.array(trans[0:3])
+    mat = np.array(trans[3:12]).reshape(3, 3)
+    return mat, vec

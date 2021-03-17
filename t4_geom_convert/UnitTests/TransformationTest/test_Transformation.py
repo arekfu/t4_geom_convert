@@ -11,7 +11,14 @@ from hypothesis.strategies import floats, integers, booleans, composite, one_of
 from t4_geom_convert.Kernel.Transformation.TransformationError import (
     TransformationError)
 from t4_geom_convert.Kernel.Transformation.Transformation import (
-    normalize_matrix)
+    normalize_matrix, compose_transform, transform_vector)
+
+
+@composite
+def vectors(draw):
+    '''Generate a random three-dimensional translation vector.'''
+    component = floats(-1e5, 1e5, allow_nan=False, allow_infinity=False)
+    return draw(component), draw(component), draw(component)
 
 
 def make_euler(alpha, beta, gamma):
@@ -26,11 +33,19 @@ def make_euler(alpha, beta, gamma):
 
 
 @composite
-def rotation(draw):
+def rotations(draw):
     '''Generate a random three-dimensional rotation matrix.'''
     component = floats(-1e5, 1e5, allow_nan=False, allow_infinity=False)
     alpha, beta, gamma = draw(component), draw(component), draw(component)
     return make_euler(alpha, beta, gamma)
+
+
+@composite
+def transformations(draw):
+    '''Generate a random transformation, in the 12-component form.'''
+    transl = draw(vectors())
+    rot = draw(rotations())
+    return [*transl, *rot]
 
 
 def keep3(matrix, index, row):
@@ -78,7 +93,7 @@ def matrix3(draw):
     with the non-truncated matrix.'''
     index = draw(integers(0, 2))
     row = draw(booleans())
-    matrix = draw(rotation())
+    matrix = draw(rotations())
     return matrix, keep3(matrix, index, row)
 
 
@@ -87,7 +102,7 @@ def matrix5(draw):
     '''Generate a random matrix, truncate it to 5 elements and return it along
     with the non-truncated matrix.'''
     i_row, j_col = draw(integers(0, 2)), draw(integers(0, 2))
-    matrix = draw(rotation())
+    matrix = draw(rotations())
     return matrix, keep5(matrix, i_row, j_col)
 
 
@@ -97,14 +112,14 @@ def matrix6(draw):
     with the non-truncated matrix.'''
     index = draw(integers(0, 2))
     row = draw(booleans())
-    matrix = draw(rotation())
+    matrix = draw(rotations())
     return matrix, keep6(matrix, index, row)
 
 
 @composite
 def matrix9(draw):
     '''Return two copies of a random matrix.'''
-    matrix = draw(rotation())
+    matrix = draw(rotations())
     return matrix, matrix.copy()
 
 
@@ -142,3 +157,15 @@ def test_normalized_raises(keep):
     mat[keep:] = [None]*(len(mat)-keep)
     with pytest.raises(TransformationError):
         normalize_matrix(mat)
+
+
+@given(trans1=transformations(), trans2=transformations(),
+       vec=vectors())
+def test_trans_composition(trans1, trans2, vec):
+    '''Test that applying the composed transformation is the same this as
+    applying the two transformations in a sequence.'''
+    trans = compose_transform(trans1, trans2)
+    vec1 = transform_vector(trans1, vec)
+    vec2 = transform_vector(trans2, vec1)
+    vec12 = transform_vector(trans, vec)
+    assert np.allclose(vec2, vec12)

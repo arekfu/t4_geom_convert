@@ -15,7 +15,7 @@ from .TreeFunctions import (isLeaf, isIntersection, isUnion, isSurface,
 from .VolumeT4 import VolumeT4
 from .Lattice import (LatticeSpec, latticeVector, LatticeError,
                       squareLatticeBaseVectors, hexLatticeBaseVectors)
-from ..Transformation.Transformation import transformation
+from ..Transformation.Transformation import transformation, compose_transform
 from ..Surface.ConversionSurfaceMCNPToT4 import conversion_surface_params
 from ..Surface.SurfaceCollection import SurfaceCollection
 from .CellMCNP import CellRef
@@ -112,9 +112,15 @@ class CellConversion:
             new_cell.idorigin = element_cell.idorigin.copy()
             new_cell.idorigin.append((element, key))
             cache = not inline_filling
-            new_elt_key = self.cell_transform(element, mcnp_key_filltr,
-                                              cache=cache)
-            if cell.trcl:
+            new_elt_key = element
+            # the MCNP logic seems to be that if a cell contains a FILL with a
+            # transformation, then any TRCL keyword attached to the cell is
+            # disregarded. This point is tested in integration tests
+            # trcl_fill.imcnp and trcl_filltr.imcnp
+            if mcnp_key_filltr:
+                new_elt_key = self.cell_transform(new_elt_key, mcnp_key_filltr,
+                                                  cache=cache)
+            elif cell.trcl:
                 for trcl in cell.trcl:
                     new_elt_key = self.cell_transform(new_elt_key, trcl,
                                                       cache=cache)
@@ -391,8 +397,7 @@ class CellConversion:
             new_geom = self.pot_complement(cell.geometry)
             return new_geom.inverse()
         new_tree = [tree[0]]
-        for node in tree[1:]:
-            new_tree.append(self.pot_complement(node))
+        new_tree.extend(self.pot_complement(node) for node in tree[1:])
         result = GeomExpression(new_tree)
         return result
 
@@ -448,19 +453,18 @@ class CellConversion:
                 new_cell.materialID = cell.materialID
             else:
                 new_cell.fillid = universe
-            filltr = new_cell.filltr
-            if filltr:
-                new_filltr = tuple(x if i > 2 else x + trnsf[i]
-                                   for i, x in enumerate(filltr))
+            if new_cell.filltr:
+                new_filltr = compose_transform(trnsf, new_cell.filltr)
             else:
-                filltr = [0.0, 0.0, 0.0,
-                          1.0, 0.0, 0.0,
-                          0.0, 1.0, 0.0,
-                          0.0, 0.0, 1.0]
-                new_filltr = tuple(x if i > 2 else x + trnsf[i]
-                                   for i, x in enumerate(filltr))
+                new_filltr = tuple(trnsf)
+            # see self.pot_fill(): if TRCL and FILL with a transformation are
+            # both applied to a cell, TRCL is disregarded
+            if cell.trcl and not cell.filltr:
+                for trcl in cell.trcl:
+                    new_filltr = compose_transform(trcl, new_filltr)
             new_cell.filltr = new_filltr
             new_cell.lattice = None
+
         del self.dic_cell_mcnp[key]
 
     def apply_trcl(self, trcls, geometry):
