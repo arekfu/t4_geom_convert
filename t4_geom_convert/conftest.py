@@ -4,6 +4,7 @@
 '''
 import pathlib
 import subprocess as sub
+import re
 
 import pytest
 
@@ -142,6 +143,31 @@ def mcnp(mcnp_path, tmp_path):
     return MCNPRunner(mcnp_path, tmp_path)
 
 
+def check_failed_points(failed_path):
+    '''Read the `failed_path` file and return the number of failed points
+    and the maximum distance for them.'''
+    n_points, dist = 0, 0
+    with failed_path.open() as failed_path_file:
+        for line in failed_path_file:
+            n_points += 1
+            fields = line.strip().split()
+            assert len(fields) == 8
+            dist = max(dist, float(fields[6]))
+    return n_points, dist
+
+
+def parse_outside_points(stdout_path):
+    '''Parse the file at `stdout_path` and return the number of points that
+    fall outside the geometry.'''
+    outside_re = re.compile(r'Number of OUTSIDE {8}: (\d+)')
+    with stdout_path.open() as stdout:
+        for line in stdout:
+            match = outside_re.match(line)
+            if match:
+                return int(match.group(1))
+    return None
+
+
 class OracleRunner:  # pylint: disable=too-few-public-methods
     '''A helper class to run the test oracle.'''
 
@@ -179,21 +205,9 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
             raise ValueError(msg)
         print(stdout_fname.read_text() + '---8<---'*9)
         failed_path = self.work_path / (t4_o.stem + '.failedpoints.dat')
-        n_points, dist = self.check_failed_points(failed_path)
-        return n_points, dist, stdout_fname
-
-    @staticmethod
-    def check_failed_points(failed_path):
-        '''Read the `failed_path` file and return the number of failed points
-        and the maximum distance for them.'''
-        n_points, dist = 0, 0
-        with failed_path.open() as failed_path_file:
-            for line in failed_path_file:
-                n_points += 1
-                fields = line.strip().split()
-                assert len(fields) == 8
-                dist = max(dist, float(fields[6]))
-        return n_points, dist
+        n_points, dist = check_failed_points(failed_path)
+        n_outside = parse_outside_points(stdout_fname)
+        return n_points, n_outside, dist, stdout_fname
 
 
 @pytest.fixture

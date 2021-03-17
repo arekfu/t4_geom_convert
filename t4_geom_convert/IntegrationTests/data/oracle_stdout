@@ -1,0 +1,86 @@
+*** MCNP / Tripoli-4 geometry comparison ***
+
+--- Reading : /volatile/dm232107/src/t4_geom_convert/tmp_pytest/test_extra_mcnp_2_HCLL_ENEA_MC0/2_HCLL_ENEA_MCNP_WP13SYS02_T06_LAT700_onecell_2053mod.imcnp.t4
+cpp < '/volatile/dm232107/src/t4_geom_convert/tmp_pytest/test_extra_mcnp_2_HCLL_ENEA_MC0/2_HCLL_ENEA_MCNP_WP13SYS02_T06_LAT700_onecell_2053mod.imcnp.t4' | grep -v '^#' | sed -e 's&//.*&&' >|
+  found keyword GEOMETRY
+cpp < '/volatile/dm232107/src/t4_geom_convert/tmp_pytest/test_extra_mcnp_2_HCLL_ENEA_MC0/2_HCLL_ENEA_MCNP_WP13SYS02_T06_LAT700_onecell_2053mod.imcnp.t4' | grep -v '^#' | sed -e 's&//.*&&' >|
+  found bloc GEOMCOMP
+# Compositions - preprocessing file: tmp_GEOMCOMP_2_HCLL_ENEA_MCNP_WP13SYS02_T06_LAT700_onecell_2053mod.imcnp.t4
+# Reading Volumes data
+
+  initializing geometry tables
+
+
+  reading geometry :
+
+  building connectivity map
+
+  building optimization tables for simple volumes
+# Reading Compos data
+...read 564 MCNP cells and their densities
+Starting comparison on 100000000 points...
+Progress: 199933 / 100000000
+Progress: 402605 / 100000000
+Progress: 603595 / 100000000
+Progress: 804485 / 100000000
+Progress: 1006546 / 100000000
+Progress: 1206589 / 100000000
+Progress: 1407264 / 100000000
+Progress: 1608517 / 100000000
+Progress: 1808452 / 100000000
+Progress: 2009225 / 100000000
+Progress: 2210274 / 100000000
+Progress: 2411892 / 100000000
+Progress: 2606736 / 100000000
+Progress: 2803691 / 100000000
+Progress: 2997889 / 100000000
+Progress: 3191745 / 100000000
+Progress: 3387347 / 100000000
+Progress: 3585979 / 100000000
+Progress: 3778663 / 100000000
+Progress: 3972577 / 100000000
+Progress: 4168717 / 100000000
+Progress: 4360398 / 100000000
+Progress: 4553053 / 100000000
+Progress: 4749740 / 100000000
+Progress: 4944858 / 100000000
+Progress: 5137210 / 100000000
+Progress: 5333262 / 100000000
+Progress: 5529686 / 100000000
+Progress: 5728194 / 100000000
+Progress: 5928444 / 100000000
+Progress: 6121651 / 100000000
+Progress: 6319179 / 100000000
+Progress: 6518029 / 100000000
+Progress: 6713654 / 100000000
+Progress: 6907121 / 100000000
+Progress: 7104047 / 100000000
+Progress: 7301759 / 100000000
+Progress: 7498911 / 100000000
+Progress: 7699586 / 100000000
+Progress: 7899931 / 100000000
+Progress: 8096313 / 100000000
+Progress: 8293686 / 100000000
+Progress: 8489665 / 100000000
+Progress: 8686388 / 100000000
+Progress: 8886273 / 100000000
+Progress: 9080707 / 100000000
+Progress: 9274409 / 100000000
+Progress: 9470668 / 100000000
+Progress: 9663936 / 100000000
+Progress: 9861658 / 100000000
+
+---------------------------
+Reporting on MCNP/T4 geometry comparison
+-----------------------------
+Number of SAMPLED points : 10000000
+Number of SUCCESSFUL     : 9990381 -> 99.9038%
+Number of FAILED         : 0 -> 0%
+Number of IGNORED        : 0 -> 0%
+Number of OUTSIDE        : 9619 -> 0.09619%
+Number of COVERED volumes: 473
+Number of INPUT   volumes: 74529
+Average distance to surface for FAILED points: -nan
+Maximum distance to surface for FAILED points: 0
+Elapsed time: 254.063s
+Time per point: 2.54063e-05s
