@@ -50,7 +50,7 @@ def normalize_transform(transf):
     return transf[:3] + normalize_matrix(transf[3:12])
 
 
-def normalize_matrix(matrix):
+def normalize_matrix(matrix):  # pylint: disable=too-many-return-statements
     '''Return a normalized version of the given 3x3 rotation matrix.
 
     The input matrix may be missing some elements (3, 5, 6 and 9 elements are
@@ -64,9 +64,9 @@ def normalize_matrix(matrix):
     # normalize the list so that it always contains 9 elements
     matrix9 = matrix + [None] * (9 - len(matrix))
     n_values = sum(1 for elem in matrix9 if elem is not None)
-    if n_values == 9: # easy
+    if n_values == 9:  # easy
         return matrix
-    if n_values == 0: # easy
+    if n_values == 0:  # easy
         return identity
     if n_values == 5:
         return normalize_matrix5(matrix9)
@@ -175,10 +175,10 @@ def normalize_matrix3(matrix):
     i_row2 = (i_row1 + 1) % 3
     i_row3 = (i_row2 + 1) % 3
     row1 = rows[i_row1]
-    ex = (1.0, 0.0, 0.0)
-    ey = (0.0, 1.0, 0.0)
-    e2 = ey if scal(row1, ex) > 0.999 else ex
-    row2 = renorm(vdiff(e2, renorm(row1, norm=scal(e2, row1))))
+    e_x = (1.0, 0.0, 0.0)
+    e_y = (0.0, 1.0, 0.0)
+    e_2 = e_y if scal(row1, e_x) > 0.999 else e_x
+    row2 = renorm(vdiff(e_2, renorm(row1, norm=scal(e_2, row1))))
     row3 = vect(row1, row2)
     norm_matrix = matrix.copy()
     norm_matrix[3*i_row2:3*i_row2 + 3] = row2
@@ -255,7 +255,7 @@ def normalize_matrix6(matrix):
     matrix = matrix.copy()
     rows = matrix_rows(matrix)
     i_row = next(i for i, r in enumerate(rows) if r[0] is None)
-    row_0, row_1 = rows[(i_row+1)%3], rows[(i_row+2)%3]
+    row_0, row_1 = rows[(i_row+1) % 3], rows[(i_row+2) % 3]
     row_2 = vect(row_0, row_1)
     matrix[3*i_row:3*i_row+3] = row_2
     return matrix
