@@ -31,7 +31,7 @@ setup(name=name,
                                       't4_geom_convert.UnitTests.*',
                                       't4_geom_convert.Debug',
                                       'Oracle']),
-      python_requires='>=3.5, <4',
+      python_requires='>=3.6, <4',
       setup_requires=['pytest-runner', 'setuptools-scm'],
       classifiers=[
           "Programming Language :: Python :: 3",
