@@ -1,5 +1,5 @@
 hexagonal prism lattice
-c converter-flags: --lattice 4,-4:4,-4:4,-1:1
+c converter-flags: --lattice 4,-4:4,-4:4,-3:3
 1 0 -11 -19 29 fill=1 imp:n=1
 2 1 -1. -10         u=3    imp:n=1
 3 2 -1. 10         u=3    imp:n=1
