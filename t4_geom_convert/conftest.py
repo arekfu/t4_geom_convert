@@ -35,14 +35,20 @@ def datadir(tmp_path, request):
 def mcnp_path(request):
     '''Fixture yielding the path to the MCNP executable specified on the
     command line.'''
-    return request.config.getoption('--mcnp-path')
+    path = request.config.getoption('--mcnp-path')
+    if path is not None:
+        path = path.expanduser()
+    return path
 
 
 @pytest.fixture
 def oracle_path(request):
     '''Fixture yielding the path to the oracle executable specified on the
     command line.'''
-    return request.config.getoption('--oracle-path')
+    path = request.config.getoption('--oracle-path')
+    if path is not None:
+        path = path.expanduser()
+    return path
 
 
 def foreach_data(*args, **kwargs):

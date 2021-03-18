@@ -43,6 +43,7 @@ def pytest_generate_tests(metafunc):
         if extra_inputs_file is None:
             paths = []
         else:
+            extra_inputs_file = extra_inputs_file.expanduser()
             with extra_inputs_file.open() as extra_file:
                 extra_inputs = extra_file.readlines()
             extra_inputs_path = extra_inputs_file.parent.resolve()
