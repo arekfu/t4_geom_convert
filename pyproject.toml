@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools >= 40.6.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts = "-v -s -ra --doctest-modules --doctest-continue-on-failure --hypothesis-show-statistics --durations=50"
+norecursedirs = ["data", ".eggs", "doc"]
+testpaths = ["t4_geom_convert"]
+markers = [
+    "oracle: needs --mcnp-path and --oracle-path options to run"
+]
