@@ -16,19 +16,9 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 5 févr. 2019
-
-:author: Sogeti
-:data : 05 february 2019
-:file : VolumeT4.py
-'''
-
 
 class VolumeT4:
-    '''
-    :brief: class which permits to access precisely of the value of a volume T4
-    '''
+    '''Class which permits to access precisely of the value of a volume T4.'''
 
     def __init__(self, pluses, minuses, ops=None, idorigin=None, fictive=True):
         '''

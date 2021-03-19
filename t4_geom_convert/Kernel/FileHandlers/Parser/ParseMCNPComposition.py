@@ -16,12 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 7 févr. 2019
-
-:author: Sogeti
-:data : 07 february 2019
-'''
 
 from collections import OrderedDict
 from MIP.geom.composition import get_material_composition

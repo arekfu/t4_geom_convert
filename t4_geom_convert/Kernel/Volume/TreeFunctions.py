@@ -16,22 +16,16 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 5 févr. 2019
 
-:author: Sogeti
-:data : 05 february 2019
-:file : TreeFunctions.py
-'''
 from MIP.geom.semantics import GeomExpression, Surface
 from .CellMCNP import CellRef
 
 
 def isLeaf(tree):
-    '''
-    :brief: method which permit to know if a tree is an instance of a Surface
-            or a Geometry
-    :return: a boolean.
+    '''Function which tells if a tree is an instance of a Surface or a
+    Geometry.
+
+    :rtype: bool
     '''
     if isinstance(tree, (tuple, list, GeomExpression)):
         return False
@@ -41,25 +35,25 @@ def isLeaf(tree):
 
 
 def isSurface(tree):
-    '''
-    :brief: returns `True` if `tree` is a surface
-    :return: a boolean.
+    '''Returns `True` if `tree` is a surface.
+
+    :rtype: bool
     '''
     return isLeaf(tree) and isinstance(tree, (int, Surface))
 
 
 def isCellRef(tree):
-    '''
-    :brief: returns `True` if `tree` is a :class:`~.CellRef`
-    :return: a boolean.
+    '''Returns `True` if `tree` is a :class:`~.CellRef`.
+
+    :rtype: bool
     '''
     return isLeaf(tree) and isinstance(tree, CellRef)
 
 
 def isIntersection(tree):
-    '''
-    :brief: method which permit to know if a node is an intersection
-    :return: a boolean.
+    '''Function that tells if a node is an intersection.
+
+    :rtype: bool
     '''
     if isinstance(tree, (list, tuple)):
         if tree[1] == '*':
@@ -69,9 +63,9 @@ def isIntersection(tree):
 
 
 def isUnion(tree):
-    '''
-    :brief: method which permit to know if a node is a union
-    :return: a boolean.
+    '''Function that tells if a node is a union.
+
+    :rtype: bool
     '''
     if isinstance(tree, (list, tuple)):
         if tree[1] == ':':

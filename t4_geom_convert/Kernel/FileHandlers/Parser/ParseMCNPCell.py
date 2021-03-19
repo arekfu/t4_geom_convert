@@ -16,12 +16,7 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 5 févr. 2019
 
-:author: Sogeti
-:data : 05 february 2019
-'''
 import re
 import pickle
 from collections import OrderedDict, defaultdict
@@ -47,9 +42,7 @@ class MissingLatticeOptError(Exception):
 
 
 class ParseMCNPCell:
-    '''
-    :brief: Class which parse the block CELLS.
-    '''
+    '''Class that parses the CELLS block.'''
 
     LIKE_RE = re.compile(r'like\s+(\d+)\s+but')
 
@@ -259,7 +252,7 @@ class ParseMCNPCell:
         return keywords
 
     def parse_fill_kw(self, elt, kw_list):
-        '''Parse the arguments of the FILL/*FILL keywords.'''
+        '''Parse the arguments of the FILL and \*FILL keywords.'''
         fillid_bounds = None
         fillid_u = None
         fill_params = []
@@ -316,7 +309,7 @@ class ParseMCNPCell:
         return lattice
 
     def parse_trcl_kw(self, elt, kw_list):
-        '''Parse the arguments of the TRCL/*TRCL keywords.'''
+        '''Parse the arguments of the TRCL and \*TRCL keywords.'''
         trcl_params = []
         while kw_list and kw_list[-1][0] in '0123456789.+-':
             trcl_params.append(kw_list.pop())

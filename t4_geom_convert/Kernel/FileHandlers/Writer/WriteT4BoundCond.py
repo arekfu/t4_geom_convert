@@ -16,20 +16,12 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
 
-:author: Sogeti
-:data : 06 february 2019
-:file : CWriteT4BoundCond.py
-'''
 from ...BoundaryCondition.CConversionBoundaryCondition import CConversionBoundaryCondition
 
 
 def writeT4BoundCond(dic_surf_mcnp, ofile):
-    '''
-    :brief: method writing GeomComp of the T4 input file
-    '''
+    '''Method writing GeomComp to the T4 input file.'''
     d_boundCond = CConversionBoundaryCondition(
         dic_surf_mcnp).conversionBoundCond()
     if not d_boundCond:

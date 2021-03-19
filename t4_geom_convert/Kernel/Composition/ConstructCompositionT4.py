@@ -16,12 +16,7 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
 
-:author: Sogeti
-:data : 06 february 2019
-'''
 from collections import OrderedDict
 from math import fsum
 
@@ -30,10 +25,8 @@ from .CompositionConversionMCNPToT4 import compositionConversionMCNPToT4
 
 
 def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
-    '''
-    :brief: method changing the tuple from compositionConversionMCNPToT4
-    in instance of the VolumeT4 Class
-    '''
+    '''Function changing the tuple from compositionConversionMCNPToT4 in
+    instance of the VolumeT4 class.'''
     dic_new_composition = OrderedDict()
     for key, val in compositionConversionMCNPToT4(mcnp_parser).items():
         fractions = extract_isotopes_fractions(val.isotopes)

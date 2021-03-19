@@ -16,20 +16,12 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
 
-:author: Sogeti
-:data : 06 february 2019
-:file : CIntermediateBoundaryCondition.py
-'''
 from .CBoundCond import CBoundCond
 from collections import OrderedDict
 
 
 class CConversionBoundaryCondition:
-    '''
-    '''
 
     def __init__(self, dic_surf_mcnp):
         '''
@@ -39,8 +31,8 @@ class CConversionBoundaryCondition:
 
     def recuperateBoundaryCondition(self):
         '''
-        :brief: method constructing a dictionary with the id of the
-        material as a key and the instance of CBoundCondT4 as a value
+        Method constructing a dictionary with the id of the material as a key
+        and the instance of CBoundCondT4 as a value
         '''
         d_boundCond = OrderedDict()
         for k, v in self.dic_surf_mcnp.items():

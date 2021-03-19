@@ -16,12 +16,7 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 19 févr. 2019
 
-:author: Sogeti
-:file: ESurfaceTypeT4.py
-'''
 from enum import Enum
 
 ESurfaceTypeT4 = Enum('ESurfaceTypeT4', 'PLANEX PLANEY PLANEZ PLANE '

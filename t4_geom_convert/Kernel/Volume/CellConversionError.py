@@ -16,7 +16,7 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''Module containing the definition of the :class:`CellConversionError:
+'''Module containing the definition of the :class:`CellConversionError`
 class.'''
 
 

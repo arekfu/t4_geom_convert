@@ -16,20 +16,14 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 7 févr. 2019
 
-:author: Sogeti
-:data : 07 february 2019
-:file : CCompositionMCNP.py
-'''
 import math
 
 
 class CCompositionMCNP:
     '''
-    :brief: Class which permit to access precisely to the information
-    of the part material of the block DATA
+    Class which permit to access precisely to the information of the part
+    material of the block DATA
     '''
 
     def __init__(self, l_materialCompositionParameters):

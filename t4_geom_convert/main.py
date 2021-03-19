@@ -16,12 +16,7 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
 
-:author: Sogeti
-:data : 06 february 2019
-'''
 import sys
 import argparse
 from datetime import datetime

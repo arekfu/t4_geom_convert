@@ -16,10 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-:author: Davide Mancusi
-:date: 2019-09-19
-'''
 
 import math
 

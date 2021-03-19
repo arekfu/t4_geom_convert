@@ -16,14 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
-
-:author: Sogeti
-:data : 06 february 2019
-:file : SurfaceMCNP.py
-'''
-
 
 class SurfaceMCNP:
     '''Class that contains the information of the MCNP surface cards.'''

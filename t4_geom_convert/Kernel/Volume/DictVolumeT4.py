@@ -16,20 +16,13 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 5 févr. 2019
-
-:author: Sogeti
-:data : 05 february 2019
-:file : DictVolumeT4.py
-'''
 
 from collections import OrderedDict
 from collections.abc import MutableMapping
 
 
 class DictVolumeT4(MutableMapping):
-    '''A simple wrapper around an :class:`OrderedDict` for storing
+    '''A simple wrapper around an :class:`collections.OrderedDict` for storing
     :class:`~.VolumeT4` objects.'''
 
     def __init__(self):

@@ -94,9 +94,8 @@ def foreach_data(*args, **kwargs):
     Here the argument to the `datafile` keyword argument is a predicate that
     must return `True` if `path` is to be parametrized over, and `False`
     otherwise. Note that the `path` argument to the lambda is a
-    :class:`py._path.local.LocalPath` object.  In this example, `pytest` will
-    parametrize :func:`!test_something` only over files whose name ends in
-    ``'.txt'``.
+    :class:`pathlib.Path` object.  In this example, `pytest` will parametrize
+    :func:`!test_something` only over files whose name ends in ``'.txt'``.
     '''
 
     if args:
@@ -133,9 +132,9 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
         '''Create an instance of :class:`MCNPRunner`.
 
         :param path: path to the MCNP executable
-        :type path: str or path-like object
+        :type path: pathlib.Path
         :param work_path: path to the working directory
-        :type work_path: str or path-like object
+        :type work_path: pathlib.Path
         '''
         self.path = path
         self.work_path = work_path
@@ -144,8 +143,8 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
         '''Run MCNP on the given input file.
 
         :param str input_file: absolute path to the input file
-        :returns: the path to the generated PTRAC file
-        :rtype: str or path-like object
+        :returns: the paths to the generated output and PTRAC files
+        :rtype: (pathlib.Path, pathlib.Path)
         '''
         run_name = 'run_' + input_file.name
         cli = [str(self.path),

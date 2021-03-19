@@ -16,10 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-:author: Sogeti
-:data : 06 February 2019
-'''
 
 from collections import OrderedDict
 
@@ -30,10 +26,8 @@ from .Abundances import Abundances
 
 
 def compositionConversionMCNPToT4(mcnp_parser):
-    '''
-    :brief: method recuperate the dictionary of the composition from MCNP
-    and return a dictionary of the composition for T4
-    '''
+    '''Function that transforms the dictionary of the composition from MCNP
+    into a dictionary of the composition for T4.'''
     d_composition_t4 = OrderedDict()
     dict_compo_mcnp = CDictCompositionMCNP(mcnp_parser).d_compositionMCNP
     for key, val in dict_compo_mcnp.items():

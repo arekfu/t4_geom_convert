@@ -17,18 +17,12 @@
 #
 # vim: set fileencoding=utf-8 :
 '''
-
-:author: Sogeti
-:data : 06 february 2019
-:file : DTypeConversion.py
+Module specifying each conversion of surface type.
 '''
+
 from .ESurfaceTypeMCNP import ESurfaceTypeMCNP as e_surfaceMCNP
 from .ESurfaceTypeT4 import ESurfaceTypeT4 as e_surfaceT4
 
-
-'''
-:brief: Python file specifying each conversion of surface type
-'''
 
 
 dict_conversionSurfaceType = dict()

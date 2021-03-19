@@ -16,21 +16,13 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
 
-:author: Sogeti
-:data : 06 February 2019
-:file : CDictGeomCompT4.py
-'''
 from collections.abc import MutableMapping
 
 
 class CDictGeomCompT4(MutableMapping):
-    '''
-    :brief: Class inheriting of abstract class MutableMapping and listing
-    geomcomp for T4
-    '''
+    '''Class inheriting of abstract class MutableMapping and listing geomcomp
+    for T4.'''
 
     def __init__(self, d_geomCompT4):
         '''

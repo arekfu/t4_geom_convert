@@ -16,20 +16,10 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 5 févr. 2019
-
-:author: Sogeti
-:data : 05 february 2019
-:file : CellMCNP.py
-'''
-
 
 class CellMCNP:
-    '''
-    :brief: Class which permit to access precisely to the
-    information of the block CELLS
-    '''
+    '''Class which permit to access precisely to the information of the block
+    CELLS.'''
 
     def __init__(self, p_materialID, p_density, syntaxTreeMCNP, p_importance,
                  p_universe, fillid, filltr, lattice, trcl, idorigin=None):
@@ -55,15 +45,12 @@ class CellMCNP:
         self.idorigin = [] if idorigin is None else idorigin.copy()
 
     def evaluateASTMCNP(self):
-        '''
-        :brief: method evaluating the syntax tree of the geometry of a cell of MCNP.
+        '''Method evaluating the syntax tree of the geometry of a cell of MCNP.
         '''
         return self.geometry.evaluate()
 
     def inverseASTMCNP(self):
-        '''
-        :brief: method applying the De Morgan law on a syntax tree
-        '''
+        '''Method applying the De Morgan law on a syntax tree.'''
         self.geometry = self.geometry.inverse()
 
     def copy(self):

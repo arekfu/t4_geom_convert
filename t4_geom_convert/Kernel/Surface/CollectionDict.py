@@ -24,8 +24,8 @@ from MIP.geom.semantics import Surface
 
 
 class CollectionDict(MutableMapping):
-    '''This class represents a dictionary mapping MCNP surfaces (type
-    :class:`~MIP.geom.semantics.Surface`) to lists of objects.
+    '''This class represents a dictionary mapping MCNP surfaces to lists of
+    objects.
 
     For example, here we fill a dictionary with a couple of surfaces:
 
@@ -74,12 +74,14 @@ class CollectionDict(MutableMapping):
 1)]
 
     Out-of-range subsurface indices are not allowed:
+
     >>> dic[Surface(2, sub=-1)]
     Traceback (most recent call last):
         ...
     IndexError: out of range subsurface (allowed range: [1, 2])
 
     You can also use two integers to query subsurfaces:
+
     >>> dic[2, 2] == dic[Surface(2, sub=2)]
     True
 

@@ -505,16 +505,16 @@ def hexSortSides(surfs):
 
     The hexagon looks like this:
 
-                      2
-                  ---------
-                 /         \
-             4  /           \ 0
-               /             \
-               \             /
-             1  \           / 5
-                 \         /
-                  ---------
-                      3
+    |                  2
+    |              ---------
+    |             /         \
+    |         4  /           \ 0
+    |           /             \
+    |           \             /
+    |         1  \           / 5
+    |             \         /
+    |              ---------
+    |                  3
 
     The numbers indicate the way we have chosen to order the planes. We
     construct the list of surfaces to respect this constraint:
@@ -534,16 +534,16 @@ def hexSortSides(surfs):
 
     We can also modify the plane numbering. For instance:
 
-                      5
-                  ---------
-                 /         \
-             2  /           \ 0
-               /             \
-               \             /
-             1  \           / 3
-                 \         /
-                  ---------
-                      4
+    |                  5
+    |              ---------
+    |             /         \
+    |         2  /           \ 0
+    |           /             \
+    |           \             /
+    |         1  \           / 3
+    |             \         /
+    |              ---------
+    |                  4
 
     >>> planes = [((vertices[i], normals[i]), -1)  # -1 is the side
     ...           for i in (0, 3, 2, 5, 4, 1)]
@@ -572,16 +572,16 @@ def hexSortSides(surfs):
 
     It looks approximately like this:
 
-                0
-           /---------+
-        3 /          |
-         /           | 4
-        |           /
-      5 |          / 2
-        *---------/
-             1
+    |            0
+    |       /---------+
+    |    3 /          |
+    |     /           | 4
+    |    |           /
+    |  5 |          / 2
+    |    x---------/
+    |         1
 
-    The star represents the first vertex and the sides unfold counterclockwise.
+    The `x` represents the first vertex and the sides unfold counterclockwise.
     We impose the numbering given in the figure:
 
     >>> planes = [((vertices[i], normals[i]), -1)  # -1 is the side

@@ -16,20 +16,10 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 7 févr. 2019
-
-:author: Sogeti
-:data : 07 february 2019
-:file : CGeomCompT4.py
-'''
-
 
 class CGeomCompT4:
-    '''
-    :brief: Class of the object permitting to obtain information of the GeomComp
-    of the T4 file
-    '''
+    '''Class of the object permitting to obtain information of the GeomComp of
+    the T4 file.'''
 
     def __init__(self, p_volumeNumberMaterial, l_listVolumeId):
         '''

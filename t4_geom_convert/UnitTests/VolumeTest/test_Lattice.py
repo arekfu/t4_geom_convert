@@ -16,7 +16,7 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''Unit tests for the :mod:`~.Lattice module.'''
+'''Unit tests for the :mod:`~.Lattice` module.'''
 # pylint: disable=no-value-for-parameter
 
 from math import isclose, fabs, sqrt

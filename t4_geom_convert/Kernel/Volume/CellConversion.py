@@ -16,13 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 5 févr. 2019
-
-:author: Sogeti
-:data : 05 february 2019
-:file : CellConversion.py
-'''
 
 from MIP.geom.semantics import GeomExpression, Surface
 from MIP.geom.main import extract_surfaces_list
@@ -160,10 +153,8 @@ class CellConversion:
         return new_cells
 
     def pot_flag(self, p_tree):
-        '''
-        :brief: method which take a tree and return a tuple of tuple with flag
-        to decorate each tree in the tree
-        '''
+        '''Method that takes a tree and return a tuple of tuple with flag to
+        decorate each tree in the tree.'''
         if isLeaf(p_tree):
             return p_tree
         operator, *args = p_tree
@@ -251,10 +242,8 @@ class CellConversion:
         return p_id
 
     def pot_to_t4_cell(self, p_tree, idorigin, matching, union_ids):
-        '''
-        :brief: take the tree create by :meth:`pot_flag` and fill a dictionary
-        (of VolumeT4 instance)
-        '''
+        '''Take the tree create by :meth:`pot_flag` and fill a dictionary (of
+        VolumeT4 instance).'''
         if isSurface(p_tree):
             return self.convert_surface(p_tree, idorigin)
 
@@ -322,9 +311,7 @@ class CellConversion:
         return p_id
 
     def pot_optimise(self, p_tree):
-        '''
-        :brief: method which permit to optimize the course of the cells MCNP
-        '''
+        '''Method that optimizes the MCNP cells.'''
 
         if p_tree is None or isLeaf(p_tree):
             return p_tree

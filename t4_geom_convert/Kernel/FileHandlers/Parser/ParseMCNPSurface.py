@@ -16,12 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
-
-:author: Sogeti
-:data : 06 february 2019
-'''
 
 from MIP.geom.forcad import mcnp2cad
 from MIP.geom.surfaces import get_surfaces
@@ -37,13 +31,12 @@ from ...Surface import MacroBodies as MB
 
 
 def parseMCNPSurface(mcnp_parser):
-    '''
-    :brief method which permit to recover the information of each line of the
-        block SURFACE
+    '''Function that recovers the information of each line of the block
+    SURFACE.
+
     :return: dictionary with keys given by the ID of the surfaces, as a
-        :class:`~MIP.geom.semantics.Surface`, and value given by lists of
-        `(:class:`SurfaceMCNP`, int)` pairs. The integer represents the side of
-        the subsurface.
+        ``MIP`` Surface, and value given by lists of `(:class:`~.SurfaceMCNP`,
+        int)` pairs. The integer represents the side of the subsurface.
     '''
     surface_parsed = get_surfaces(mcnp_parser, lim=None)
     transform_parsed = get_mcnp_transforms(mcnp_parser)
@@ -75,7 +68,7 @@ def normalize_surface(typ, params):
 
 def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
                     transform_id, enum_surface, params, transform_parsed):
-    '''Convert the parsed surface into a :class:`SurfaceMCNP`.'''
+    '''Convert the parsed surface into a :class:`~.SurfaceMCNP`.'''
     enum_surface, params = normalize_surface(enum_surface, params)
     mip_transf = mcnp2cad[mcnp_to_mip(enum_surface)]
     typ, params, compl_params, _ = mip_transf(params)
@@ -92,7 +85,7 @@ def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
 def to_surfaces_macro(key, bound_cond,  # pylint: disable=too-many-arguments
                       transform_id, enum_surface, params, transform_parsed):
     '''Convert the parsed macro body into a collection of
-    :class:`SurfaceMCNP`.'''
+    :class:`~.SurfaceMCNP`.'''
     if enum_surface == MS.BOX:
         parts = MB.box(params)
     elif enum_surface == MS.RPP:
@@ -124,7 +117,7 @@ def to_surfaces_macro(key, bound_cond,  # pylint: disable=too-many-arguments
 
 def to_surfaces_mcnp(key, parsed_surface, transform_parsed):
     '''Convert the parsed surface into a collection of
-    :class:`SurfaceMCNP`.
+    :class:`~.SurfaceMCNP`.
 
     This function returns a list of ``(int, SurfaceMCNP)`` pairs. The integers
     represent the side of the surface that should be considered as positive

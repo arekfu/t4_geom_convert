@@ -16,13 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
-
-:author: Sogeti
-:data : 06 february 2019
-:file : CIntermediateGeomCompT4.py
-'''
 
 from .CDictGeomCompT4 import CDictGeomCompT4
 from .CGeomCompT4 import CGeomCompT4
@@ -30,10 +23,8 @@ from collections import defaultdict, OrderedDict
 
 
 def constructGeomCompT4(dicVol, dic_cellMCNP):
-    '''
-    :brief: method constructing a dictionary with the id of the
-    material as a key and the instance of CGeomCompT4 as a value
-    '''
+    '''Method constructing a dictionary with the id of the material as a key
+    and the instance of CGeomCompT4 as a value.'''
     dic_geomCompT4 = OrderedDict()
     dic_partialGeomComp = OrderedDict()
     obj_T4 = CDictGeomCompT4(dic_geomCompT4)

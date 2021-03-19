@@ -16,10 +16,7 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-:author: Sogeti
-:data : 06 February 2019
-'''
+
 from math import pi, fabs
 
 from ..Progress import Progress
@@ -32,10 +29,8 @@ from .SurfaceConversionError import SurfaceConversionError
 
 
 def convert_mcnp_surfaces(dic_surface_mcnp):
-    '''
-    :brief: method which convert MCNP surface and constructing the
-    dictionary of Surface T4
-    '''
+    '''Method which convert MCNP surface and constructing the dictionary of
+    Surface T4.'''
     dic_surface_t4 = CollectionDict()
 
     with Progress('converting surface',

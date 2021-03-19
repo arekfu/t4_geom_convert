@@ -16,23 +16,15 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
 
-:author: Sogeti
-:data : 06 February 2019
-:file : CDictCompositionMCNP.py
-'''
 from collections.abc import MutableMapping
 from ..FileHandlers.Parser.ParseMCNPComposition import parseMCNPComposition
 from collections import OrderedDict
 
 
 class CDictCompositionMCNP(MutableMapping):
-    '''
-    :brief: Class inheriting of abstract class MutableMapping and listing
-     material composition from MCNP
-    '''
+    '''Class inheriting of abstract class MutableMapping and listing material
+    composition from MCNP.'''
 
     def __init__(self, mcnpParser):
         '''

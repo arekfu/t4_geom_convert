@@ -29,7 +29,7 @@ def get_options(mcnp_path, n_lines=50):
     '''Detect custom CLI options in the first few lines of an MCNP file.
 
     ;param mcnp_path: the path to the MCNP file
-    :type mcnp_path: :class:`py.path.LocalPath`
+    :type mcnp_path: py.path.LocalPath
     :returns: the parsed options, as a list.
     '''
     if 'latin1' in str(mcnp_path):

@@ -16,12 +16,6 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''
-Created on 6 févr. 2019
-
-:author: Sogeti
-:data : 06 february 2019
-'''
 
 from ...Progress import Progress
 from ...Composition.ConstructCompositionT4 import constructCompositionT4
@@ -29,9 +23,7 @@ from ...Composition.CompositionConversionMCNPToT4 import str_fabs
 
 
 def writeT4Composition(mcnp_parser, mcnp_new_dict, ofile):
-    '''
-    :brief: method writing composition of the T4 input file
-    '''
+    '''Function writing composition of the T4 input file.'''
     ofile.write("\nCOMPOSITION\n")
     temperature = 300
     dic_composition = constructCompositionT4(mcnp_parser, mcnp_new_dict)
