@@ -31,7 +31,6 @@ class CConversionBoundaryCondition:
     '''
     '''
 
-
     def __init__(self, dic_surf_mcnp):
         '''
         Constructor

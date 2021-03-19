@@ -23,6 +23,7 @@
 '''
 from .EIsotopeAtomicNumberMCNP import EIsotopeAtomicNumber
 
+
 def convert_isotope(isotope_id):
     '''
     :brief: method which takes a string and returns a tuple of enum and string

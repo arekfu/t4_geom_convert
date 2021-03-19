@@ -198,8 +198,8 @@ def normalize_matrix3(matrix):
     row2 = renorm(vdiff(e_2, renorm(row1, norm=scal(e_2, row1))))
     row3 = vect(row1, row2)
     norm_matrix = matrix.copy()
-    norm_matrix[3*i_row2:3*i_row2 + 3] = row2
-    norm_matrix[3*i_row3:3*i_row3 + 3] = row3
+    norm_matrix[3 * i_row2:3 * i_row2 + 3] = row2
+    norm_matrix[3 * i_row3:3 * i_row3 + 3] = row3
     return norm_matrix
 
 
@@ -243,10 +243,10 @@ def normalize_matrix5(matrix):
     sin_beta = sqrt(row[1]**2 + row[2]**2)
     cos_beta = row[0]
     if sin_beta != 0.0:
-        cos_gamma = -row[1]/sin_beta
-        sin_gamma = row[2]/sin_beta
-        cos_alpha = col[1]/sin_beta
-        sin_alpha = col[2]/sin_beta
+        cos_gamma = -row[1] / sin_beta
+        sin_gamma = row[2] / sin_beta
+        cos_alpha = col[1] / sin_beta
+        sin_alpha = col[2] / sin_beta
     else:
         cos_gamma = 1.0
         sin_gamma = 0.0
@@ -254,11 +254,11 @@ def normalize_matrix5(matrix):
         sin_alpha = 0.0
     full = np.array([row,
                      [col[1],
-                      cos_alpha*cos_beta*cos_gamma - sin_alpha*sin_gamma,
-                      - cos_gamma*sin_alpha - cos_alpha*cos_beta*sin_gamma],
+                      cos_alpha * cos_beta * cos_gamma - sin_alpha * sin_gamma,
+                      - cos_gamma * sin_alpha - cos_alpha * cos_beta * sin_gamma],
                      [col[2],
-                      cos_alpha*sin_gamma + cos_beta*cos_gamma*sin_alpha,
-                      cos_alpha*cos_gamma - cos_beta*sin_alpha*sin_gamma]])
+                      cos_alpha * sin_gamma + cos_beta * cos_gamma * sin_alpha,
+                      cos_alpha * cos_gamma - cos_beta * sin_alpha * sin_gamma]])
     # reorder the rows and columns
     full = np.roll(full, shift=i_row, axis=0)
     full = np.roll(full, shift=i_col, axis=1)
@@ -272,9 +272,9 @@ def normalize_matrix6(matrix):
     matrix = matrix.copy()
     rows = matrix_rows(matrix)
     i_row = next(i for i, r in enumerate(rows) if r[0] is None)
-    row_0, row_1 = rows[(i_row+1) % 3], rows[(i_row+2) % 3]
+    row_0, row_1 = rows[(i_row + 1) % 3], rows[(i_row + 2) % 3]
     row_2 = vect(row_0, row_1)
-    matrix[3*i_row:3*i_row+3] = row_2
+    matrix[3 * i_row:3 * i_row + 3] = row_2
     return matrix
 
 

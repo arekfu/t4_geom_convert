@@ -138,7 +138,7 @@ class CollectionDict(MutableMapping):
         if key[1] <= 0 or key[1] > len(item):
             raise IndexError('out of range subsurface (allowed range: [1, {}])'
                              .format(len(item)))
-        return [item[key[1]-1]]
+        return [item[key[1] - 1]]
 
     def __setitem__(self, key, value):
         key = self._normalize_key(key)
@@ -159,7 +159,7 @@ class CollectionDict(MutableMapping):
         if key[1] <= 0 or key[1] > len(item):
             raise IndexError('out of range subsurface (allowed range: [1, {}])'
                              .format(len(item)))
-        item[key[1]-1:key[1]] = value
+        item[key[1] - 1:key[1]] = value
 
     def __delitem__(self, item):
         del self.dic[item]
@@ -189,10 +189,10 @@ class CollectionDict(MutableMapping):
         for key, value in self.dic.items():
             first_surf, first_side = value[0]
             numbering[key] = first_surf
-            ids = [first_side*key]
+            ids = [first_side * key]
             for surf, side in value[1:]:
                 numbering[free_id] = surf
-                ids.append(side*free_id)
+                ids.append(side * free_id)
                 free_id += 1
             matching[key] = ids
         return numbering, matching

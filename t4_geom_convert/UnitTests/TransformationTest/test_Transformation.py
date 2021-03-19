@@ -44,9 +44,10 @@ def make_euler(alpha, beta, gamma):
     sin1, cos1 = sin(alpha), cos(alpha)
     sin2, cos2 = sin(beta), cos(beta)
     sin3, cos3 = sin(gamma), cos(gamma)
-    mat = [cos2, -cos3*sin2, sin2*sin3,
-           cos1*sin2, cos1*cos2*cos3 - sin1*sin3, - cos3*sin1 - cos1*cos2*sin3,
-           sin1*sin2, cos1*sin3 + cos2*cos3*sin1, cos1*cos3 - cos2*sin1*sin3]
+    mat = [cos2, -cos3 * sin2, sin2 * sin3,
+           cos1 * sin2, cos1 * cos2 * cos3 - sin1 *
+           sin3, - cos3 * sin1 - cos1 * cos2 * sin3,
+           sin1 * sin2, cos1 * sin3 + cos2 * cos3 * sin1, cos1 * cos3 - cos2 * sin1 * sin3]
     return mat
 
 
@@ -70,9 +71,9 @@ def keep3(matrix, index, row):
     '''Return a new matrix with exactly 3 defined elements (the `index`-th row
     if `row` is True, else the `index`-th column).
     '''
-    trunc = [None]*9
+    trunc = [None] * 9
     if row:
-        trunc[3*index:3*index+3] = matrix[3*index:3*index+3]
+        trunc[3 * index:3 * index + 3] = matrix[3 * index:3 * index + 3]
     else:
         trunc[index::3] = matrix[index::3]
     return trunc
@@ -88,7 +89,7 @@ def keep5(matrix, i_row, j_col):
         for j in range(3):
             if j == j_col:
                 continue
-            matrix[3*i + j] = None
+            matrix[3 * i + j] = None
     return matrix
 
 
@@ -99,9 +100,9 @@ def keep6(matrix, index, row):
     '''
     trunc = matrix.copy()
     if row:
-        trunc[3*index:3*index+3] = [None]*3
+        trunc[3 * index:3 * index + 3] = [None] * 3
     else:
-        trunc[index::3] = [None]*3
+        trunc[index::3] = [None] * 3
     return trunc
 
 
@@ -172,7 +173,7 @@ def test_normalized_raises(keep):
     '''Check that trying to normalize a matrix with an unexpected number of
     missing elements results in an exception.'''
     mat = make_euler(100.0, 200.0, 300.0)
-    mat[keep:] = [None]*(len(mat)-keep)
+    mat[keep:] = [None] * (len(mat) - keep)
     with pytest.raises(TransformationError):
         normalize_matrix(mat)
 

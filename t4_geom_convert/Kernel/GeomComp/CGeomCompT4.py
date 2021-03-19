@@ -24,6 +24,7 @@ Created on 7 févr. 2019
 :file : CGeomCompT4.py
 '''
 
+
 class CGeomCompT4:
     '''
     :brief: Class of the object permitting to obtain information of the GeomComp

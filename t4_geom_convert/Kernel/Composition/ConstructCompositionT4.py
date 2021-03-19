@@ -68,7 +68,7 @@ def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
 
             if key not in dic_new_composition:
                 dic_new_composition[key] = []
-            new_compo = CCompositionT4(type_density_t4, 'm'+str(key),
+            new_compo = CCompositionT4(type_density_t4, 'm' + str(key),
                                        density, compo, val.atom_fracs)
             dic_new_composition[key].append(new_compo)
     return dic_new_composition
@@ -101,6 +101,7 @@ def rescale_fractions(fractions, concentration):
     concs = []
     total_fractions = fsum(float(frac) for _, frac in fractions)
     for isotope, frac in fractions:
-        conc_str = conc_fmt.format(float(frac)*concentration/total_fractions)
+        conc_str = conc_fmt.format(
+            float(frac) * concentration / total_fractions)
         concs.append((isotope, conc_str))
     return concs

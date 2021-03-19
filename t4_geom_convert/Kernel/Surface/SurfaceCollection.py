@@ -28,6 +28,7 @@ class SurfaceCollection(Sequence):
     This class is necessary to represent, for instance, MCNP's macrobodies or
     one-nappe cones.
     '''
+
     def __init__(self, surfs):
         '''Instantiate a :class:`SurfaceCollection`.
 
@@ -47,7 +48,7 @@ class SurfaceCollection(Sequence):
     def join(cls, surf_colls):
         '''Create a :class:`SurfaceCollection` from a list of pairs of
         :class:`SurfaceCollection` objects and integers.'''
-        surfs = [(sub_surf, sub_side*side)
+        surfs = [(sub_surf, sub_side * side)
                  for surf_coll, side in surf_colls
                  for sub_surf, sub_side in surf_coll.surfs]
         return cls(surfs)

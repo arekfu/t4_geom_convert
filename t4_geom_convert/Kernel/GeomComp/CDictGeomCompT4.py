@@ -25,6 +25,7 @@ Created on 6 févr. 2019
 '''
 from collections.abc import MutableMapping
 
+
 class CDictGeomCompT4(MutableMapping):
     '''
     :brief: Class inheriting of abstract class MutableMapping and listing

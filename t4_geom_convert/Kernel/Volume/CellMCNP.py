@@ -24,12 +24,12 @@ Created on 5 févr. 2019
 :file : CellMCNP.py
 '''
 
+
 class CellMCNP:
     '''
     :brief: Class which permit to access precisely to the
     information of the block CELLS
     '''
-
 
     def __init__(self, p_materialID, p_density, syntaxTreeMCNP, p_importance,
                  p_universe, fillid, filltr, lattice, trcl, idorigin=None):
@@ -67,9 +67,14 @@ class CellMCNP:
         self.geometry = self.geometry.inverse()
 
     def copy(self):
-        if hasattr(self.geometry , 'copy'):
-            return CellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
-        return CellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
+        if hasattr(self.geometry, 'copy'):
+            geom_copy = self.geometry.copy() 
+        else:
+            geom_copy = self.geometry
+        return CellMCNP(self.materialID, self.density, geom_copy,
+                        self.importance, self.universe, self.fillid,
+                        self.filltr, self.lattice, self.trcl.copy(),
+                        self.idorigin.copy())
 
     def __repr__(self):
         return ('CellMCNP({!r}, {!r}, {!r},\n'

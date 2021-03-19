@@ -449,7 +449,7 @@ class CellConversion:
                 raise LatticeError(msg)
             n_missing_bounds = len(lat_base_vectors) - len(domain.bounds)
             for i in range(n_missing_bounds):
-                range_ = domain.bounds[-1-i]
+                range_ = domain.bounds[-1 - i]
                 if range_[0] != range_[1]:
                     msg = ('Problem of domain definition for lattice; '
                            'expected {} non-trivial bounds, but the {}:{} '

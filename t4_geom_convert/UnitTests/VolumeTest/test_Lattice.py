@@ -42,10 +42,10 @@ def lattices(draw):
     they are not collinear.'''
     vecs = draw(lists(vectors(), min_size=1, max_size=3))
     for i, vec in enumerate(vecs):
-        for j, other in enumerate(vecs[i+1:]):
+        for j, other in enumerate(vecs[i + 1:]):
             cosangle = fabs(scal(vec, other)) / sqrt(scal(vec, vec)
                                                      * scal(other, other))
-            note('cos(angle {}^{}) = {}'.format(i, j+i+1, cosangle))
+            note('cos(angle {}^{}) = {}'.format(i, j + i + 1, cosangle))
             assume(cosangle < 1 - 1e-5)
     if len(vecs) == 3:
         # check that the vectors are not coplanar

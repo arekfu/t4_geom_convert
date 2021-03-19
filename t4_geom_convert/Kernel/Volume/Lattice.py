@@ -79,16 +79,18 @@ def latticeReciprocal(base_vecs):
     '''
 
     if len(base_vecs) == 1:
-        unit = rescale(1./scal(base_vecs[0], base_vecs[0]), base_vecs[0])
+        unit = rescale(1. / scal(base_vecs[0], base_vecs[0]), base_vecs[0])
         return [unit]
     if len(base_vecs) == 2:
         vec1, vec2 = base_vecs
         vec12 = mag2(vec1)
         vec22 = mag2(vec2)
         vec1_vec2 = scal(vec1, vec2)
-        den = vec12*vec22 - vec1_vec2**2
-        rec1 = vsum(rescale(vec22/den, vec1), rescale(-vec1_vec2/den, vec2))
-        rec2 = vsum(rescale(vec12/den, vec2), rescale(-vec1_vec2/den, vec1))
+        den = vec12 * vec22 - vec1_vec2**2
+        rec1 = vsum(rescale(vec22 / den, vec1),
+                    rescale(-vec1_vec2 / den, vec2))
+        rec2 = vsum(rescale(vec12 / den, vec2),
+                    rescale(-vec1_vec2 / den, vec1))
         return [rec1, rec2]
     vec1, vec2, vec3 = base_vecs
     vec12 = vect(vec1, vec2)
@@ -121,6 +123,7 @@ class LatticeBounds:
     '''A simple class to hold a list of range bounds. It provides some useful
     services such as the :meth:`~.size` method.
     '''
+
     def __init__(self, bounds):
         if not isinstance(bounds, list):
             raise TypeError('Expected a list of pairs of integers')
@@ -251,6 +254,7 @@ class LatticeSpec:
     '''A simple class that holds a list of `n*m*l` integers and provides
     n-dimensional indexing into the list.
     '''
+
     def __init__(self, bounds, spec):
         if not isinstance(bounds, LatticeBounds):
             raise TypeError('Expected a LatticeBounds object for the `bounds` '
@@ -342,7 +346,7 @@ def squareLatticeReciprocalVecs(surfaces):
         point2, _normal2 = surf_2
         point_diff = vdiff(point, point2)
         distance = scal(point_diff, normal)
-        base_vecs.append(rescale(1./distance, normal))
+        base_vecs.append(rescale(1. / distance, normal))
         surfaces = surfaces[2:]
     return base_vecs
 
@@ -601,12 +605,12 @@ def hexSortSides(surfs):
 
     adjacency = {}
     for i in range(6):
-        for j in range(i+1, 6):
+        for j in range(i + 1, 6):
             if i // 2 == j // 2:
                 adjacency[(i, j)] = None
                 continue
             other_group = (i // 2 + j // 2) * 2 % 3
-            k1 = 2*other_group  # pylint: disable=invalid-name
+            k1 = 2 * other_group  # pylint: disable=invalid-name
             k2 = k1 + 1         # pylint: disable=invalid-name
             inters = areHexSidesAdjacent(surfs[i][0], surfs[j][0],
                                          surfs[k1], surfs[k2])

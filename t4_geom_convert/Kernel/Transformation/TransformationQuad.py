@@ -35,10 +35,12 @@ def transformation_quad(params, trans):
     :returns: the parameters of the transformed quadric
     :rtype: list(float)
     '''
-    a_mat = np.array([[params[0], params[3]*0.5, params[5]*0.5, params[6]*0.5],
-                      [params[3]*0.5, params[1], params[4]*0.5, params[7]*0.5],
-                      [params[5]*0.5, params[4]*0.5, params[2], params[8]*0.5],
-                      [params[6]*0.5, params[7]*0.5, params[8]*0.5, params[9]]
+    a_mat = np.array([[params[0], params[3] * 0.5, params[5] * 0.5, params[6] * 0.5],
+                      [params[3] * 0.5, params[1], params[4] * 0.5, params[7] * 0.5],
+                      [params[5] * 0.5, params[4] * 0.5,
+                          params[2], params[8] * 0.5],
+                      [params[6] * 0.5, params[7] * 0.5,
+                          params[8] * 0.5, params[9]]
                       ])
     r_mat = np.array([[trans[3], trans[4], trans[5], 0.0],
                       [trans[6], trans[7], trans[8], 0.0],
@@ -54,12 +56,12 @@ def transformation_quad(params, trans):
         params_transf = [a_trans_mat.item(0, 0),
                          a_trans_mat.item(1, 1),
                          a_trans_mat.item(2, 2),
-                         a_trans_mat.item(0, 1)*2,
-                         a_trans_mat.item(1, 2)*2,
-                         a_trans_mat.item(0, 2)*2,
-                         a_trans_mat.item(0, 3)*2,
-                         a_trans_mat.item(1, 3)*2,
-                         a_trans_mat.item(2, 3)*2,
+                         a_trans_mat.item(0, 1) * 2,
+                         a_trans_mat.item(1, 2) * 2,
+                         a_trans_mat.item(0, 2) * 2,
+                         a_trans_mat.item(0, 3) * 2,
+                         a_trans_mat.item(1, 3) * 2,
+                         a_trans_mat.item(2, 3) * 2,
                          a_trans_mat.item(3, 3)]
         return params_transf
     except np.linalg.LinAlgError as err:

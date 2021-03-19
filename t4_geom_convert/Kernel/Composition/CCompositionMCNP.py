@@ -24,6 +24,8 @@ Created on 7 févr. 2019
 :file : CCompositionMCNP.py
 '''
 import math
+
+
 class CCompositionMCNP:
     '''
     :brief: Class which permit to access precisely to the information
@@ -46,7 +48,7 @@ class CCompositionMCNP:
                 continue
             if "." in isotope:
                 isotope = isotope.split(".")[0]
-            fractionIsotope = l_materialCompositionParameters[i+1]
+            fractionIsotope = l_materialCompositionParameters[i + 1]
             self.materialCompositionParameters.append((isotope,
                                                        fractionIsotope))
             i += 2

@@ -20,6 +20,7 @@
 
 from functools import wraps
 
+
 def debug(wrapped):
     '''Prints input and output values of any function it decorates.'''
     @wraps(wrapped)

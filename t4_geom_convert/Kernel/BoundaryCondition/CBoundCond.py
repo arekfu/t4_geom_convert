@@ -24,11 +24,11 @@ Created on 6 févr. 2019
 :file : CBoundCond..py
 '''
 
+
 class CBoundCond:
     '''
     classdocs
     '''
-
 
     def __init__(self, p_typeOfBound):
         '''

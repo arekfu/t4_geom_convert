@@ -97,16 +97,16 @@ def convert_plane(val):
     tuple_param = val.param_surface
     p_x, p_y, p_z = tuple_param[0]
     u_x, u_y, u_z = tuple_param[1]
-    pos = -(u_x*p_x + u_y*p_y + u_z*p_z)
+    pos = -(u_x * p_x + u_y * p_y + u_z * p_z)
     if u_x == 0. and u_y == 0. and u_z > 0.:
         type_surface = T4S.PLANEZ
-        param = [-pos/u_z]
+        param = [-pos / u_z]
     elif u_y == 0. and u_z == 0. and u_x > 0.:
         type_surface = T4S.PLANEX
-        param = [-pos/u_x]
+        param = [-pos / u_x]
     elif u_z == 0. and u_x == 0. and u_y > 0.:
         type_surface = T4S.PLANEY
-        param = [-pos/u_y]
+        param = [-pos / u_y]
     else:
         type_surface = T4S.PLANE
         param = [u_x, u_y, u_z, pos]
@@ -158,11 +158,11 @@ def convert_special_quadric(val):
     ysq = sq_params[8]
     zsq = sq_params[9]
     gq_params = [asq, bsq, csq, 0.0, 0.0, 0.0,
-                 2.0*dsq - 2.0*asq*xsq,
-                 2.0*esq - 2.0*bsq*ysq,
-                 2.0*fsq - 2.0*csq*zsq,
-                 asq*xsq**2 + bsq*ysq**2 + csq*zsq**2
-                 - 2.0*(dsq*xsq + esq*ysq + fsq*zsq) + gsq]
+                 2.0 * dsq - 2.0 * asq * xsq,
+                 2.0 * esq - 2.0 * bsq * ysq,
+                 2.0 * fsq - 2.0 * csq * zsq,
+                 asq * xsq**2 + bsq * ysq**2 + csq * zsq**2
+                 - 2.0 * (dsq * xsq + esq * ysq + fsq * zsq) + gsq]
     if eval_quadric(gq_params, (xsq, ysq, zsq)) > 0.0:
         gq_params = [-param for param in gq_params]
     return T4S.QUAD, gq_params
@@ -184,9 +184,9 @@ def eval_quadric(params, point):
     True
     '''
     x, y, z = point  # pylint: disable=invalid-name
-    return (params[0]*x**2 + params[1]*y**2 + params[2]*z**2
-            + params[3]*x*y + params[4]*y*z + params[5]*z*x
-            + params[6]*x + params[7]*y + params[8]*z + params[9])
+    return (params[0] * x**2 + params[1] * y**2 + params[2] * z**2
+            + params[3] * x * y + params[4] * y * z + params[5] * z * x
+            + params[6] * x + params[7] * y + params[8] * z + params[9])
 
 
 def convert_quadric(val):
@@ -217,7 +217,7 @@ def convert_cone(key, val):
     '''Convert the parameters for cones.'''
     p_x, p_y, p_z = val.param_surface[0]
     u_x, u_y, u_z = val.param_surface[1]
-    theta = 180.*val.compl_param[1]/pi
+    theta = 180. * val.compl_param[1] / pi
     if u_x == 0. and u_y == 0.:
         type_surface = T4S.CONEZ
         param = [p_x, p_y, p_z, theta]
@@ -236,16 +236,16 @@ def convert_cone(key, val):
     if nappe is None or nappe == 0:
         return SurfaceCollection([(cone, 1)])
 
-    pos = -(u_x*p_x + u_y*p_y + u_z*p_z)
+    pos = -(u_x * p_x + u_y * p_y + u_z * p_z)
     if u_x == 0 and u_y == 0:
         type_surface = T4S.PLANEZ
-        param = [-pos/u_z]
+        param = [-pos / u_z]
     elif u_y == 0 and u_z == 0:
         type_surface = T4S.PLANEX
-        param = [-pos/u_x]
+        param = [-pos / u_x]
     elif u_z == 0 and u_x == 0:
         type_surface = T4S.PLANEY
-        param = [-pos/u_y]
+        param = [-pos / u_y]
     else:
         type_surface = T4S.PLANE
         param = [u_x, u_y, u_z, pos]

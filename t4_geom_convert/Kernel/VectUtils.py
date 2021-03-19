@@ -28,7 +28,7 @@ def scal(v1, v2):
     '''Yields the scalar product of `v1` and `v2`.'''
     a1, b1, c1 = v1
     a2, b2, c2 = v2
-    result = a1*a2 + b1*b2 + c1*c2
+    result = a1 * a2 + b1 * b2 + c1 * c2
     return float(result)
 
 
@@ -36,7 +36,7 @@ def vect(v1, v2):
     '''Yields the vector product of `v1` and `v2`.'''
     x1, y1, z1 = v1
     x2, y2, z2 = v2
-    result = (y1*z2-z1*y2, x2*z1-x1*z2, x1*y2-y1*x2)
+    result = (y1 * z2 - z1 * y2, x2 * z1 - x1 * z2, x1 * y2 - y1 * x2)
     return result
 
 
@@ -53,7 +53,7 @@ def mixed(v1, v2, v3):
 def rescale(a, v1):
     '''Return `v1` multiplied by a scalar `a`, as a new vector.'''
     x1, y1, z1 = v1
-    return (a*x1, a*y1, a*z1)
+    return (a * x1, a * y1, a * z1)
 
 
 def vsum(*args):
@@ -72,12 +72,12 @@ def vdiff(v1, v2):
     '''Return the vector difference of `v1` and `v2` (`v1-v2`).'''
     x1, y1, z1 = v1
     x2, y2, z2 = v2
-    return (x1-x2, y1-y2, z1-z2)
+    return (x1 - x2, y1 - y2, z1 - z2)
 
 
 def renorm(vec, norm=1.):
     '''Return a new vector parallel to `vec` whose norm is equal to `norm`.'''
-    return rescale(norm/mag(vec), vec)
+    return rescale(norm / mag(vec), vec)
 
 
 def mag2(vec):
@@ -122,7 +122,7 @@ def rotate(vec, axis, angle):
     sangle = sin(angle)
     term1 = rescale(cangle, vec)
     term2 = rescale(sangle, vect(axis, vec))
-    term3 = rescale((1 - cangle)*scal(axis, vec), axis)
+    term3 = rescale((1 - cangle) * scal(axis, vec), axis)
     return vsum(term1, term2, term3)
 
 
@@ -185,6 +185,7 @@ def planeParamsFromPoints(pt1, pt2, pt3):
     raise ValueError('Cannot convert plane from three points because the '
                      'points are collinear or almost so: {}, {}, {}'
                      .format(pt1, pt2, pt3))
+
 
 def planeParamsFromNormalAndPoint(normal, point):
     '''Return the MCNP-style parameters of the plane having the given normal
@@ -263,7 +264,7 @@ def projectPointOnPlane(point, plane, direction):
     True
     '''
     pl_pt, normal = plane
-    dist = scal(vdiff(pl_pt, point), normal)/scal(direction, normal)
+    dist = scal(vdiff(pl_pt, point), normal) / scal(direction, normal)
     return vsum(point, rescale(dist, direction))
 
 
@@ -314,4 +315,4 @@ def matrix_rows(matrix):
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     '''
     assert len(matrix) == 9
-    return [matrix[3*i:3*i+3] for i in range(3)]
+    return [matrix[3 * i:3 * i + 3] for i in range(3)]

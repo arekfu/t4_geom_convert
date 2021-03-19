@@ -28,6 +28,7 @@ from .CDictGeomCompT4 import CDictGeomCompT4
 from .CGeomCompT4 import CGeomCompT4
 from collections import defaultdict, OrderedDict
 
+
 def constructGeomCompT4(dicVol, dic_cellMCNP):
     '''
     :brief: method constructing a dictionary with the id of the
@@ -54,5 +55,6 @@ def constructGeomCompT4(dicVol, dic_cellMCNP):
     for key in dic_partialGeomComp.keys():
         numberOfCell = len(dic_partialGeomComp[key])
         listCell = dic_partialGeomComp[key]
-        obj_T4[key] = CGeomCompT4(numberOfCell, " ".join(str(x) for x in listCell))
+        obj_T4[key] = CGeomCompT4(
+            numberOfCell, " ".join(str(x) for x in listCell))
     return obj_T4.geomCompT4

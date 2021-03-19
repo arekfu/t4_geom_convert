@@ -220,7 +220,7 @@ class ParseMCNPCell:
                     msg = 'no --lattice option provided'
                     raise MissingLatticeOptError(msg) from None
                 kws['f_bounds'] = lat_opt
-                kws['f_univs'] = [f_univs_arg]*lat_opt.size()
+                kws['f_univs'] = [f_univs_arg] * lat_opt.size()
             return LatticeSpec(kws['f_bounds'], kws['f_univs'])
 
         # case of FILL=n without LAT=1
