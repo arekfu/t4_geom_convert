@@ -1,116 +1,163 @@
 [build-system]
-requires = ["setuptools >= 40.6.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[tool]
+[tool.poetry]
+name = "t4_geom_convert"
+version = "0.4.1"
+description = "A tool to convert MCNP geometries into the TRIPOLI-4 format"
+authors = [
+  "Davide Mancusi <davide.mancusi@cea.fr>",
+  "Martin Maurey",
+  "Jonathan Faustin"
+]
+maintainers = ["Davide Mancusi <davide.mancusi@cea.fr>"]
+readme = "README.md"
+homepage = "https://www.cea.fr/energies/tripoli-4/tripoli-4/pre_post_tools/t4_geom_convert"
+repository = "https://github.com/arekfu/t4_geom_convert/"
+documentation = "https://t4-geom-convert.readthedocs.io/"
+license = "GPL-3.0-or-later"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Operating System :: POSIX :: Linux",
+  "Topic :: Scientific/Engineering :: Physics"
+]
+exclude = [
+  "doc",
+  "t4_geom_convert.UnitTests",
+  "t4_geom_convert.UnitTests.*",
+  "t4_geom_convert.Debug",
+  "Oracle"
+]
 
-  [tool.pytest]
+[tool.poetry.urls]
+"Bug tracker" = "https://github.com/arekfu/t4_geom_convert/issues"
 
-    [tool.pytest.ini_options]
-    addopts = "-v -s -ra --doctest-modules --doctest-continue-on-failure --hypothesis-show-statistics --durations=50 --strict-markers"
-    norecursedirs = ["data", ".eggs", "doc"]
-    testpaths = ["t4_geom_convert"]
-    markers = [
-        "oracle: needs --mcnp-path and --oracle-path options to run"
-    ]
+[tool.poetry.scripts]
+t4_geom_convert = "t4_geom_convert.main:main"
 
-  [tool.pylint]
+[tool.poetry.dependencies]
+python = "^3.6"
+tatsu = "^4.4"
+numpy = "^1.19"
+importlib-metadata = {version = "^1.0", python = "<3.8"}
 
-    [tool.pylint.master]
-    jobs = 0
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+pytest-cov = "^2.11"
+hypothesis = "^6.8"
+flake8 = "^3.9"
+pylint = "^2.7"
+Sphinx = "^3.5"
+sphinx-rtd-theme = "^0.5"
+recommonmark = "^0.7"
+autopep8 = "^1.5"
 
-    [tool.pylint.message_control]
-    disable = [
-      "print-statement",
-      "parameter-unpacking",
-      "unpacking-in-except",
-      "old-raise-syntax",
-      "backtick",
-      "long-suffix",
-      "old-ne-operator",
-      "old-octal-literal",
-      "import-star-module-level",
-      "non-ascii-bytes-literal",
-      "raw-checker-failed",
-      "bad-inline-option",
-      "locally-disabled",
-      "file-ignored",
-      "suppressed-message",
-      "useless-suppression",
-      "deprecated-pragma",
-      "use-symbolic-message-instead",
-      "apply-builtin",
-      "basestring-builtin",
-      "buffer-builtin",
-      "cmp-builtin",
-      "coerce-builtin",
-      "execfile-builtin",
-      "file-builtin",
-      "long-builtin",
-      "raw_input-builtin",
-      "reduce-builtin",
-      "standarderror-builtin",
-      "unicode-builtin",
-      "xrange-builtin",
-      "coerce-method",
-      "delslice-method",
-      "getslice-method",
-      "setslice-method",
-      "no-absolute-import",
-      "old-division",
-      "dict-iter-method",
-      "dict-view-method",
-      "next-method-called",
-      "metaclass-assignment",
-      "indexing-exception",
-      "raising-string",
-      "reload-builtin",
-      "oct-method",
-      "hex-method",
-      "nonzero-method",
-      "cmp-method",
-      "input-builtin",
-      "round-builtin",
-      "intern-builtin",
-      "unichr-builtin",
-      "map-builtin-not-iterating",
-      "zip-builtin-not-iterating",
-      "range-builtin-not-iterating",
-      "filter-builtin-not-iterating",
-      "using-cmp-argument",
-      "eq-without-hash",
-      "div-method",
-      "idiv-method",
-      "rdiv-method",
-      "exception-message-attribute",
-      "invalid-str-codec",
-      "sys-max-int",
-      "bad-python3-import",
-      "deprecated-string-function",
-      "deprecated-str-translate-call",
-      "deprecated-itertools-function",
-      "deprecated-types-field",
-      "next-method-defined",
-      "dict-items-not-iterating",
-      "dict-keys-not-iterating",
-      "dict-values-not-iterating",
-      "deprecated-operator-function",
-      "deprecated-urllib-function",
-      "xreadlines-attribute",
-      "deprecated-sys-function",
-      "exception-escape",
-      "comprehension-escape",
-      "import-outside-toplevel",
-    ]
+[tool.pytest.ini_options]
+addopts = "-v -s -ra --doctest-modules --doctest-continue-on-failure --hypothesis-show-statistics --durations=50 --strict-markers"
+norecursedirs = ["data", ".eggs", "doc"]
+testpaths = ["t4_geom_convert"]
+markers = [
+    "oracle: needs --mcnp-path and --oracle-path options to run"
+]
 
-    [tool.pylint.basic]
-    argument-naming-style = "snake_case"
-    bad-names = ["foo", "bar", "baz", "toto", "tutu", "tata",]
-    class-attribute-naming-style = "any"
-    class-naming-style = "PascalCase"
-    const-naming-style = "any"
-    docstring-min-length = -1
-    function-naming-style = "any"
-    good-names = ["i", "j", "k", "Run", "_",]
-    method-naming-style = "any"
-    variable-naming-style = "snake_case"
+[tool.pylint.master]
+jobs = 0
+
+[tool.pylint.message_control]
+disable = [
+  "print-statement",
+  "parameter-unpacking",
+  "unpacking-in-except",
+  "old-raise-syntax",
+  "backtick",
+  "long-suffix",
+  "old-ne-operator",
+  "old-octal-literal",
+  "import-star-module-level",
+  "non-ascii-bytes-literal",
+  "raw-checker-failed",
+  "bad-inline-option",
+  "locally-disabled",
+  "file-ignored",
+  "suppressed-message",
+  "useless-suppression",
+  "deprecated-pragma",
+  "use-symbolic-message-instead",
+  "apply-builtin",
+  "basestring-builtin",
+  "buffer-builtin",
+  "cmp-builtin",
+  "coerce-builtin",
+  "execfile-builtin",
+  "file-builtin",
+  "long-builtin",
+  "raw_input-builtin",
+  "reduce-builtin",
+  "standarderror-builtin",
+  "unicode-builtin",
+  "xrange-builtin",
+  "coerce-method",
+  "delslice-method",
+  "getslice-method",
+  "setslice-method",
+  "no-absolute-import",
+  "old-division",
+  "dict-iter-method",
+  "dict-view-method",
+  "next-method-called",
+  "metaclass-assignment",
+  "indexing-exception",
+  "raising-string",
+  "reload-builtin",
+  "oct-method",
+  "hex-method",
+  "nonzero-method",
+  "cmp-method",
+  "input-builtin",
+  "round-builtin",
+  "intern-builtin",
+  "unichr-builtin",
+  "map-builtin-not-iterating",
+  "zip-builtin-not-iterating",
+  "range-builtin-not-iterating",
+  "filter-builtin-not-iterating",
+  "using-cmp-argument",
+  "eq-without-hash",
+  "div-method",
+  "idiv-method",
+  "rdiv-method",
+  "exception-message-attribute",
+  "invalid-str-codec",
+  "sys-max-int",
+  "bad-python3-import",
+  "deprecated-string-function",
+  "deprecated-str-translate-call",
+  "deprecated-itertools-function",
+  "deprecated-types-field",
+  "next-method-defined",
+  "dict-items-not-iterating",
+  "dict-keys-not-iterating",
+  "dict-values-not-iterating",
+  "deprecated-operator-function",
+  "deprecated-urllib-function",
+  "xreadlines-attribute",
+  "deprecated-sys-function",
+  "exception-escape",
+  "comprehension-escape",
+  "import-outside-toplevel",
+]
+
+[tool.pylint.basic]
+argument-naming-style = "snake_case"
+bad-names = ["foo", "bar", "baz", "toto", "tutu", "tata",]
+class-attribute-naming-style = "any"
+class-naming-style = "PascalCase"
+const-naming-style = "any"
+docstring-min-length = -1
+function-naming-style = "any"
+good-names = ["i", "j", "k", "Run", "_",]
+method-naming-style = "any"
+variable-naming-style = "snake_case"

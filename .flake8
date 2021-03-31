@@ -1,0 +1,7 @@
+[flake8]
+exclude = data, .eggs, doc
+ignore =
+        F401  # unused import
+        F811  # redefined from outer scope
+        E226  # whitespace around operators
+        W503  # line break before binary operator
