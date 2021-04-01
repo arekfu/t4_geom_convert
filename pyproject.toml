@@ -13,7 +13,7 @@ authors = [
 ]
 maintainers = ["Davide Mancusi <davide.mancusi@cea.fr>"]
 readme = "README.md"
-homepage = "https://www.cea.fr/energies/tripoli-4/tripoli-4/pre_post_tools/t4_geom_convert"
+homepage = "https://www.cea.fr/energies/tripoli-4/tripoli-4/pre_post_tools/t4_geom_convert/"
 repository = "https://github.com/arekfu/t4_geom_convert/"
 documentation = "https://t4-geom-convert.readthedocs.io/"
 license = "GPL-3.0-or-later"
@@ -33,7 +33,8 @@ exclude = [
 ]
 
 [tool.poetry.urls]
-"Bug tracker" = "https://github.com/arekfu/t4_geom_convert/issues"
+"Bug tracker" = "https://github.com/arekfu/t4_geom_convert/issues/"
+Documentation = "https://t4-geom-convert.readthedocs.io/"
 
 [tool.poetry.scripts]
 t4_geom_convert = "t4_geom_convert.main:main"
