@@ -1,8 +1,21 @@
-# -*- coding: utf-8 -*-
-'''
-:author: Davide Mancusi
-:date: 2019-09-19
-'''
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
 import math
 
@@ -16,6 +29,7 @@ from ..VectUtils import (vect, vsum, vdiff, scal, rescale, renorm, mag, mag2,
 class MacroBodyError(Exception):
     '''Error that is raised if the number of macrobody parameters differs from
     the expected number.'''
+
     def __init__(self, type_, expected, params):
         super().__init__('Wrong number of parameters for {} (expected {}): '
                          '{}'.format(type_, expected, params))
@@ -137,8 +151,8 @@ def rhp(params):
         vec_b = params[9:12]
         vec_c = params[12:]
     else:
-        vec_b = rotate(vec_a, renorm(height), math.pi/3.)
-        vec_c = rotate(vec_a, renorm(height), 2.*math.pi/3.)
+        vec_b = rotate(vec_a, renorm(height), math.pi / 3.)
+        vec_c = rotate(vec_a, renorm(height), 2. * math.pi / 3.)
     base_top = vsum(base_bottom, height)
     pt_a = vsum(base_bottom, vec_a)
     pt_b = vsum(base_bottom, vec_b)
@@ -171,13 +185,13 @@ def rec(params):
     vec_maj = params[6:9]
     if len(params) == 12:
         vec_min = params[9:]
-        ellipse_params = [1./scal(vec_maj, vec_maj),
-                          1./scal(vec_min, vec_min)] + [0.]*7 + [-1.]
+        ellipse_params = [1. / scal(vec_maj, vec_maj),
+                          1. / scal(vec_min, vec_min)] + [0.] * 7 + [-1.]
     else:  # here we have 10 params in the input
         cross_prod = vect(height, vec_maj)
         vec_min = renorm(cross_prod, params[9])
-        ellipse_params = [1./scal(vec_maj, vec_maj),
-                          1./params[9]**2] + [0.]*7 + [-1.]
+        ellipse_params = [1. / scal(vec_maj, vec_maj),
+                          1. / params[9]**2] + [0.] * 7 + [-1.]
     # ellipse_params represents the parameters of the elliptic cylinder in the
     # frame where the major axis is the x axis and the cylinder axis is the z
     # axis. We transform these parameters to the lab frame. Here is the affine
@@ -209,9 +223,9 @@ def trc(params):
     height = params[3:6]
     rad0, rad1 = params[6:]
     base_top = vsum(base_bottom, height)
-    dist_to_apex = rad0/(rad0-rad1)
+    dist_to_apex = rad0 / (rad0 - rad1)
     apex = vsum(base_bottom, rescale(dist_to_apex, height))
-    tan_aperture = math.fabs(rad1-rad0)/mag(height)
+    tan_aperture = math.fabs(rad1 - rad0) / mag(height)
     u_height = renorm(height)
     cone_params = apex + (tan_aperture,) + u_height
     return [
@@ -276,7 +290,8 @@ def ell(params):
     else:
         u_b = renorm(vdiff((0, 0, 1), rescale(u_a[2], u_a)))
     u_c = vect(u_a, u_b)
-    quad_params = [1./mag2(vec_a), 1./min_axis2, 1/min_axis2] + [0]*6 + [-1.]
+    quad_params = [1. / mag2(vec_a), 1. / min_axis2,
+                   1 / min_axis2] + [0] * 6 + [-1.]
     transform = center + u_a + u_b + u_c
     ell_params = transformation_quad(quad_params, transform)
 
@@ -355,7 +370,7 @@ def arb(params):
     :rtype: list((ESurfaceTypeMCNP, list(float), int))
     '''
     check_params_length('ARB', 30, params)
-    vertices = [tuple(params[3*i:3*i+3]) for i in range(8)]
+    vertices = [tuple(params[3 * i:3 * i + 3]) for i in range(8)]
     facets = [tup for tup in (parse_facet(param) for param in params[24:])
               if tup]
     n_vertices = len(set(i for facet in facets for i in facet))
@@ -367,7 +382,7 @@ def arb(params):
     # vertices (which is guaranteed to lie inside the polyhedron because it is
     # convex) and we orient the normal to each plane in such a way that the
     # centroid lies on the negative side.
-    centroid = rescale(1./n_vertices, vsum(*vertices))
+    centroid = rescale(1. / n_vertices, vsum(*vertices))
 
     planes = []
     for facet in facets:

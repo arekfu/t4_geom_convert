@@ -1,9 +1,21 @@
-# -*- coding: utf-8 -*-
-'''
-Created on 6 févr. 2019
-:author: Sogeti
-:data : 06 february 2019
-'''
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
 from math import sqrt
 from collections import OrderedDict
@@ -50,7 +62,7 @@ def normalize_transform(transf):
     return transf[:3] + normalize_matrix(transf[3:12])
 
 
-def normalize_matrix(matrix):
+def normalize_matrix(matrix):  # pylint: disable=too-many-return-statements
     '''Return a normalized version of the given 3x3 rotation matrix.
 
     The input matrix may be missing some elements (3, 5, 6 and 9 elements are
@@ -64,9 +76,9 @@ def normalize_matrix(matrix):
     # normalize the list so that it always contains 9 elements
     matrix9 = matrix + [None] * (9 - len(matrix))
     n_values = sum(1 for elem in matrix9 if elem is not None)
-    if n_values == 9: # easy
+    if n_values == 9:  # easy
         return matrix
-    if n_values == 0: # easy
+    if n_values == 0:  # easy
         return identity
     if n_values == 5:
         return normalize_matrix5(matrix9)
@@ -175,14 +187,14 @@ def normalize_matrix3(matrix):
     i_row2 = (i_row1 + 1) % 3
     i_row3 = (i_row2 + 1) % 3
     row1 = rows[i_row1]
-    ex = (1.0, 0.0, 0.0)
-    ey = (0.0, 1.0, 0.0)
-    e2 = ey if scal(row1, ex) > 0.999 else ex
-    row2 = renorm(vdiff(e2, renorm(row1, norm=scal(e2, row1))))
+    e_x = (1.0, 0.0, 0.0)
+    e_y = (0.0, 1.0, 0.0)
+    e_2 = e_y if scal(row1, e_x) > 0.999 else e_x
+    row2 = renorm(vdiff(e_2, renorm(row1, norm=scal(e_2, row1))))
     row3 = vect(row1, row2)
     norm_matrix = matrix.copy()
-    norm_matrix[3*i_row2:3*i_row2 + 3] = row2
-    norm_matrix[3*i_row3:3*i_row3 + 3] = row3
+    norm_matrix[3 * i_row2:3 * i_row2 + 3] = row2
+    norm_matrix[3 * i_row3:3 * i_row3 + 3] = row3
     return norm_matrix
 
 
@@ -226,10 +238,10 @@ def normalize_matrix5(matrix):
     sin_beta = sqrt(row[1]**2 + row[2]**2)
     cos_beta = row[0]
     if sin_beta != 0.0:
-        cos_gamma = -row[1]/sin_beta
-        sin_gamma = row[2]/sin_beta
-        cos_alpha = col[1]/sin_beta
-        sin_alpha = col[2]/sin_beta
+        cos_gamma = -row[1] / sin_beta
+        sin_gamma = row[2] / sin_beta
+        cos_alpha = col[1] / sin_beta
+        sin_alpha = col[2] / sin_beta
     else:
         cos_gamma = 1.0
         sin_gamma = 0.0
@@ -237,11 +249,11 @@ def normalize_matrix5(matrix):
         sin_alpha = 0.0
     full = np.array([row,
                      [col[1],
-                      cos_alpha*cos_beta*cos_gamma - sin_alpha*sin_gamma,
-                      - cos_gamma*sin_alpha - cos_alpha*cos_beta*sin_gamma],
+                      cos_alpha * cos_beta * cos_gamma - sin_alpha * sin_gamma,
+                      - cos_gamma * sin_alpha - cos_alpha * cos_beta * sin_gamma],
                      [col[2],
-                      cos_alpha*sin_gamma + cos_beta*cos_gamma*sin_alpha,
-                      cos_alpha*cos_gamma - cos_beta*sin_alpha*sin_gamma]])
+                      cos_alpha * sin_gamma + cos_beta * cos_gamma * sin_alpha,
+                      cos_alpha * cos_gamma - cos_beta * sin_alpha * sin_gamma]])
     # reorder the rows and columns
     full = np.roll(full, shift=i_row, axis=0)
     full = np.roll(full, shift=i_col, axis=1)
@@ -255,9 +267,9 @@ def normalize_matrix6(matrix):
     matrix = matrix.copy()
     rows = matrix_rows(matrix)
     i_row = next(i for i, r in enumerate(rows) if r[0] is None)
-    row_0, row_1 = rows[(i_row+1)%3], rows[(i_row+2)%3]
+    row_0, row_1 = rows[(i_row + 1) % 3], rows[(i_row + 2) % 3]
     row_2 = vect(row_0, row_1)
-    matrix[3*i_row:3*i_row+3] = row_2
+    matrix[3 * i_row:3 * i_row + 3] = row_2
     return matrix
 
 
@@ -287,3 +299,44 @@ def transformation(trpl, surface):
                 raise TransformationError(msg)
     return SurfaceMCNP(surface.boundary_cond, surface.type_surface, frame,
                        params, surface.idorigin)
+
+
+def transform_vector(trans, vec):
+    '''Apply the (normalised) transformation `trans` to the vector `vec`.
+
+    If `trans` is ``(b, A)``, then this function returns
+
+        v' = A*v+b
+    '''
+    mat, off = to_numpy(trans)
+    vec = np.array(vec)
+    vec2 = mat @ vec + off
+    return vec2
+
+
+def compose_transform(trans1, trans2):
+    '''Compose `trans1` and `trans2`.
+
+    Returns trans2 o trans1 (i.e. `trans1` is applied first).
+    '''
+    mat1, vec1 = to_numpy(trans1)
+    mat2, vec2 = to_numpy(trans2)
+    mat_c = mat2 @ mat1
+    vec_c = mat2 @ vec1 + vec2
+    return [*vec_c, *mat_c.ravel()]
+
+
+def to_numpy(trans):
+    '''Split a transformation into a `NumPy` 3x3 matrix and a vector.
+
+    >>> to_numpy([1., 2., 3.,
+    ...           1., 0., 0.,
+    ...           0., 1., 0.,
+    ...           0., 0., 1.])
+    (array([[1., 0., 0.],
+           [0., 1., 0.],
+           [0., 0., 1.]]), array([1., 2., 3.]))
+    '''
+    vec = np.array(trans[0:3])
+    mat = np.array(trans[3:12]).reshape(3, 3)
+    return mat, vec

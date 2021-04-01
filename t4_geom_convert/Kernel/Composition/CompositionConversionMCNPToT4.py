@@ -1,8 +1,21 @@
-# -*- coding: utf-8 -*-
-'''
-:author: Sogeti
-:data : 06 February 2019
-'''
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
 from collections import OrderedDict
 
@@ -13,10 +26,8 @@ from .Abundances import Abundances
 
 
 def compositionConversionMCNPToT4(mcnp_parser):
-    '''
-    :brief: method recuperate the dictionary of the composition from MCNP
-    and return a dictionary of the composition for T4
-    '''
+    '''Function that transforms the dictionary of the composition from MCNP
+    into a dictionary of the composition for T4.'''
     d_composition_t4 = OrderedDict()
     dict_compo_mcnp = CDictCompositionMCNP(mcnp_parser).d_compositionMCNP
     for key, val in dict_compo_mcnp.items():

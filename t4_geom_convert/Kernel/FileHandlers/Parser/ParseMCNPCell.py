@@ -1,10 +1,22 @@
-# -*- coding: utf-8 -*-
-'''
-Created on 5 févr. 2019
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
-:author: Sogeti
-:data : 05 february 2019
-'''
 import re
 import pickle
 from collections import OrderedDict, defaultdict
@@ -15,6 +27,7 @@ from MIP.geom.cells import get_cells, get_cell_importances
 from MIP.geom.parsegeom import get_ast
 from MIP.geom.transforms import to_cos
 from MIP.mip.datacard import expand_data_card
+from ...Progress import Progress
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
 from ...Transformation.Transformation import get_mcnp_transforms
@@ -29,9 +42,7 @@ class MissingLatticeOptError(Exception):
 
 
 class ParseMCNPCell:
-    '''
-    :brief: Class which parse the block CELLS.
-    '''
+    '''Class that parses the CELLS block.'''
 
     LIKE_RE = re.compile(r'like\s+(\d+)\s+but')
 
@@ -105,33 +116,27 @@ class ParseMCNPCell:
         dict_cell = OrderedDict()
         skipped_cells = []
         parsed_cells = get_cells(self.mcnp_parser, lim=None)
-        lencell = len(parsed_cells)
-        fmt_string = ('\rparsing MCNP cell {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, '
-                      '{{:3d}}%)'
-                      .format(len(str(max(parsed_cells))),
-                              len(str(lencell))))
-        for rank, (key, parsed_cell) in enumerate(parsed_cells.items()):
-            percent = int(100.0*rank/(lencell-1)) if lencell > 1 else 100
-            print(fmt_string.format(key, rank+1, lencell, percent),
-                  end='', flush=True)
-            lat_opt = self.lattice_params.get(key, None)
-            try:
-                cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
-                                           parsed_cell)
-            except ParseMCNPCellError as err:
-                msg = '{} (in cell {})'.format(err, key)
-                raise ParseMCNPCellError(msg) from None
-            except MissingLatticeOptError as err:
-                msg = '{} for cell {}'.format(err, key)
-                raise MissingLatticeOptError(msg) from None
-            except tatsu.exceptions.ParseException:
-                msg = ('TatSu parsing failed for cell {}. Check the syntax of '
-                       'this cell.'.format(key))
-                raise ParseMCNPCellError(msg)
-            if cell.importance == 0:
-                skipped_cells.append(key)
-            dict_cell[key] = cell
-        print('... done', flush=True)
+        with Progress('parsing MCNP cell',
+                      len(parsed_cells), max(parsed_cells)) as progress:
+            for rank, (key, parsed_cell) in enumerate(parsed_cells.items()):
+                progress.update(rank, key)
+                lat_opt = self.lattice_params.get(key, None)
+                try:
+                    cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
+                                               parsed_cell)
+                except ParseMCNPCellError as err:
+                    msg = '{} (in cell {})'.format(err, key)
+                    raise ParseMCNPCellError(msg) from None
+                except MissingLatticeOptError as err:
+                    msg = '{} for cell {}'.format(err, key)
+                    raise MissingLatticeOptError(msg) from None
+                except tatsu.exceptions.ParseException:
+                    msg = ('TatSu parsing failed for cell {}. Check the '
+                           'syntax of this cell.'.format(key))
+                    raise ParseMCNPCellError(msg)
+                if cell.importance == 0:
+                    skipped_cells.append(key)
+                dict_cell[key] = cell
         return dict_cell, skipped_cells
 
     def parse_one_cell(self, parsed_cells, rank, lat_opt, parsed_cell):
@@ -208,7 +213,7 @@ class ParseMCNPCell:
                     msg = 'no --lattice option provided'
                     raise MissingLatticeOptError(msg) from None
                 kws['f_bounds'] = lat_opt
-                kws['f_univs'] = [f_univs_arg]*lat_opt.size()
+                kws['f_univs'] = [f_univs_arg] * lat_opt.size()
             return LatticeSpec(kws['f_bounds'], kws['f_univs'])
 
         # case of FILL=n without LAT=1
@@ -247,7 +252,7 @@ class ParseMCNPCell:
         return keywords
 
     def parse_fill_kw(self, elt, kw_list):
-        '''Parse the arguments of the FILL/*FILL keywords.'''
+        '''Parse the arguments of the FILL and \*FILL keywords.'''
         fillid_bounds = None
         fillid_u = None
         fill_params = []
@@ -304,7 +309,7 @@ class ParseMCNPCell:
         return lattice
 
     def parse_trcl_kw(self, elt, kw_list):
-        '''Parse the arguments of the TRCL/*TRCL keywords.'''
+        '''Parse the arguments of the TRCL and \*TRCL keywords.'''
         trcl_params = []
         while kw_list and kw_list[-1][0] in '0123456789.+-':
             trcl_params.append(kw_list.pop())

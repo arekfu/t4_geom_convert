@@ -1,11 +1,23 @@
-# -*- coding: utf-8 -*-
-'''
-Created on 6 févr. 2019
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
-:author: Sogeti
-:data : 06 february 2019
-'''
-
+from ..Progress import Progress
 from ..FileHandlers.Parser.ParseMCNPCell import ParseMCNPCell
 from ..Surface.SurfaceT4 import SurfaceT4
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
@@ -13,10 +25,12 @@ from .DictVolumeT4 import DictVolumeT4
 from .CellConversion import CellConversion
 from .CellConversionError import CellConversionError
 from .ByUniverse import by_universe
+from .CellInlining import inline_cells
 
 
 def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
-                        dic_surface_t4, dic_surface_mcnp):
+                        dic_surface_t4, dic_surface_mcnp, inline_filled,
+                        inline_filling, max_inline_score):
     '''A function that orchestrates the conversion steps for TRIPOLI-4
     volumes.'''
     dic_vol_t4 = DictVolumeT4()
@@ -33,82 +47,49 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
     trcl_keys = [key for key, value in mcnp_dict.items()
                  if value.trcl is not None]
     if trcl_keys:
-        n_trcl_keys = len(trcl_keys)
-        fmt_string = ('\rapplying TRCL transformation to cell {{:{0}d}} '
-                      '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                      .format(len(str(max(trcl_keys))),
-                              len(str(n_trcl_keys))))
-        for i, key in enumerate(trcl_keys):
-            percent = int(100.0*i/(n_trcl_keys-1)) if n_trcl_keys > 1 else 100
-            print(fmt_string.format(key, i+1, n_trcl_keys, percent),
-                  end='', flush=True)
-            cell = mcnp_dict[key]
-            cell.geometry = conv.apply_trcl(cell.trcl, cell.geometry)
-            mcnp_dict[key] = cell
-        print('... done', flush=True)
+        with Progress('applying TRCL transformation to cell',
+                      len(trcl_keys), max(trcl_keys)) as progress:
+            for i, key in enumerate(trcl_keys):
+                progress.update(i, key)
+                cell = mcnp_dict[key]
+                cell.geometry = conv.apply_trcl(cell.trcl, cell.geometry)
+                mcnp_dict[key] = cell
 
     # treat complements
-    n_compl = len(mcnp_dict)
-    fmt_string = ('\rconverting complement for cell {{:{0}d}} '
-                  '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                  .format(len(str(max(mcnp_dict))), len(str(n_compl))))
-    for i, key in enumerate(mcnp_dict):
-        percent = int(100.0*i/(n_compl-1)) if n_compl > 1 else 100
-        print(fmt_string.format(key, i+1, n_compl, percent),
-              end='', flush=True)
-        new_geom = conv.pot_complement(mcnp_dict[key].geometry)
-        mcnp_dict[key].geometry = new_geom
-    print('... done', flush=True)
+    with Progress('converting complement for cell',
+                  len(mcnp_dict), max(mcnp_dict)) as progress:
+        for i, key in enumerate(mcnp_dict):
+            progress.update(i, key)
+            new_geom = conv.pot_complement(mcnp_dict[key].geometry)
+            mcnp_dict[key].geometry = new_geom
 
     # treat LAT
     lat_cells = [key for key, value in mcnp_dict.items() if value.lattice]
     if lat_cells:
-        n_lat_cells = len(lat_cells)
-        fmt_string = ('\rdeveloping lattice in cell {{:{0}d}} '
-                      '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                      .format(len(str(max(lat_cells))),
-                              len(str(n_lat_cells))))
-        for i, key in enumerate(lat_cells):
-            percent = int(100.0*i/(n_lat_cells-1)) if n_lat_cells > 1 else 100
-            print(fmt_string.format(key, i+1, n_lat_cells, percent),
-                  end='', flush=True)
-            conv.develop_lattice(key)
-        print('... done', flush=True)
-
-    # update volume and surface free keys
-    conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
-    conv.new_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
-                            max(int(k) for k in dic_surface_t4) + 1)
+        with Progress('developing lattice in cell',
+                      len(lat_cells), max(lat_cells)) as progress:
+            for i, key in enumerate(lat_cells):
+                progress.update(i, key)
+                conv.develop_lattice(key)
 
     # treat FILL
     dict_universe = by_universe(mcnp_dict)
     fill_keys = [key for key, value in mcnp_dict.items()
-                 if value.fillid is not None]
+                 if value.fillid is not None and value.universe == 0]
     if fill_keys:
-        n_fill_keys = len(fill_keys)
-        fmt_string = ('\rdeveloping fill in cell {{:{0}d}} '
-                      '({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                      .format(len(str(max(fill_keys))),
-                              len(str(n_fill_keys))))
-        for i, key in enumerate(fill_keys):
-            percent = int(100.0*i/(n_fill_keys-1)) if n_fill_keys > 1 else 100
-            print(fmt_string.format(key, i+1, n_fill_keys, percent),
-                  end='', flush=True)
-            conv.pot_fill(key, dict_universe)
-        print('... done', flush=True)
+        with Progress('developing fill in cell',
+                      len(fill_keys), max(fill_keys)) as progress:
+            for i, key in enumerate(fill_keys):
+                progress.update(i, key)
+                conv.pot_fill(key, dict_universe, inline_filled,
+                              inline_filling)
 
-    # update volume and surface free keys
-    conv.new_cell_key = max(int(k) for k in mcnp_dict) + 1
-    conv.new_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
-                            max(int(k) for k in dic_surface_t4) + 1)
+    # consider inlining cells
+    inline_cells(mcnp_dict, max_inline_score)
 
     conv_keys = [(key, value) for key, value in mcnp_dict.items()
                  if value.importance != 0 and value.universe == 0
                  and value.fillid is None]
-    n_conv_keys = len(conv_keys)
-    fmt_string = ('\rconverting cell {{:{0}d}} ({{:{1}d}}/{{:{1}d}}, {{:3d}}%)'
-                  .format(len(str(max(key for key, _ in conv_keys))),
-                          len(str(n_conv_keys))))
 
     t4_surf_numbering, matching = dic_surface_t4.number_items()
     # insert union planes into the T4 surface dictionary
@@ -121,32 +102,25 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
                                                 [-1],
                                                 ['aux plane for unions'])
 
-    for i, (key, val) in enumerate(conv_keys):
-        percent = int(100.0*i/(n_conv_keys-1)) if n_conv_keys > 1 else 100
-        print(fmt_string.format(key, i+1, n_conv_keys, percent),
-              end='', flush=True)
-        root = val.geometry
-        tup = conv.pot_flag(root)
-        try:
-            replace = conv.pot_replace(tup, matching)
-        except CellConversionError as err:
-            raise CellConversionError('{} (while converting cell {})'
-                                      .format(err, key)) from None
-        opt_tree = conv.pot_optimise(replace)
-        if opt_tree is None:
-            # the cell is empty, do not emit a converted cell
-            continue
-        j = conv.pot_convert(opt_tree, val.idorigin, union_ids)
-        dic_vol_t4[j].fictive = False
-        if j == key:
-            continue
-        dic_vol_t4.replace_key(j, key)
-    print('... done', flush=True)
+    with Progress('converting cell', len(conv_keys),
+                  max(key for key, _ in conv_keys)) as progress:
+        for i, (key, val) in enumerate(conv_keys):
+            progress.update(i, key)
+            try:
+                j = conv.pot_convert(val, matching, union_ids)
+            except CellConversionError as err:
+                raise CellConversionError('{} (while converting cell {})'
+                                          .format(err, key)) from None
+            if j is None:
+                # the converted cell is empty
+                continue
+            dic_vol_t4[key] = dic_vol_t4[j].copy()
+            dic_vol_t4[key].fictive = False
 
     return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells
 
 
-def remove_empty_cells(dic_volume):
+def remove_empty_volumes(dic_volume):
     '''Remove cells that are patently empty.'''
     removed = set()
     to_remove = [key for key, val in dic_volume.items()
@@ -175,3 +149,28 @@ def remove_empty_cells(dic_volume):
 def extract_used_surfaces(volumes):
     '''Return the IDs of the surfaces used in the given volumes, as a set.'''
     return set(surf for volume in volumes for surf in volume.surface_ids())
+
+
+def remove_unused_volumes(dic):
+    '''Remove unused virtual (``FICTIVE``) volumes from the given dictionary.
+    This function modifies the given dictionary in place.
+
+    :param DictVolumeT4 dic: a dictionary of :class:`~.VolumeT4` objects.
+
+    >>> from .VolumeT4 import VolumeT4
+    >>> dic = DictVolumeT4()
+    >>> dic[1] = VolumeT4([], [], ops=['UNION', (2, 3)], fictive=False)
+    >>> dic[2] = VolumeT4([], [], ops=None, fictive=True)
+    >>> dic[3] = VolumeT4([], [], ops=None, fictive=True)
+    >>> dic[4] = VolumeT4([], [], ops=None, fictive=True)
+    >>> dic[5] = VolumeT4([], [], ops=None, fictive=False)
+    >>> remove_unused_volumes(dic)
+    >>> sorted(list(dic.keys()))
+    [1, 2, 3, 5]
+    '''
+    fictives = set(key for key, volume in dic.items() if volume.fictive)
+    used = set(key for volume in dic.values() if volume.ops is not None
+               for args in volume.ops[1:] for key in args)
+    unused = fictives - used
+    for key in unused:
+        del dic[key]

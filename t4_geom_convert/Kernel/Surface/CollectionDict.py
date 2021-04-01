@@ -1,3 +1,21 @@
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 '''Module containing the definition of the :class:`CollectionDict` class.'''
 
 from collections.abc import MutableMapping
@@ -6,8 +24,8 @@ from MIP.geom.semantics import Surface
 
 
 class CollectionDict(MutableMapping):
-    '''This class represents a dictionary mapping MCNP surfaces (type
-    :class:`~MIP.geom.semantics.Surface`) to lists of objects.
+    '''This class represents a dictionary mapping MCNP surfaces to lists of
+    objects.
 
     For example, here we fill a dictionary with a couple of surfaces:
 
@@ -56,12 +74,14 @@ class CollectionDict(MutableMapping):
 1)]
 
     Out-of-range subsurface indices are not allowed:
+
     >>> dic[Surface(2, sub=-1)]
     Traceback (most recent call last):
         ...
     IndexError: out of range subsurface (allowed range: [1, 2])
 
     You can also use two integers to query subsurfaces:
+
     >>> dic[2, 2] == dic[Surface(2, sub=2)]
     True
 
@@ -120,7 +140,7 @@ class CollectionDict(MutableMapping):
         if key[1] <= 0 or key[1] > len(item):
             raise IndexError('out of range subsurface (allowed range: [1, {}])'
                              .format(len(item)))
-        return [item[key[1]-1]]
+        return [item[key[1] - 1]]
 
     def __setitem__(self, key, value):
         key = self._normalize_key(key)
@@ -141,7 +161,7 @@ class CollectionDict(MutableMapping):
         if key[1] <= 0 or key[1] > len(item):
             raise IndexError('out of range subsurface (allowed range: [1, {}])'
                              .format(len(item)))
-        item[key[1]-1:key[1]] = value
+        item[key[1] - 1:key[1]] = value
 
     def __delitem__(self, item):
         del self.dic[item]
@@ -171,10 +191,10 @@ class CollectionDict(MutableMapping):
         for key, value in self.dic.items():
             first_surf, first_side = value[0]
             numbering[key] = first_surf
-            ids = [first_side*key]
+            ids = [first_side * key]
             for surf, side in value[1:]:
                 numbering[free_id] = surf
-                ids.append(side*free_id)
+                ids.append(side * free_id)
                 free_id += 1
             matching[key] = ids
         return numbering, matching

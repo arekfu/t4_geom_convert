@@ -1,5 +1,5 @@
 A trcl example
-c converter-flags: --lattice 2,-2:2,-1:2,-2:2
+c converter-flags: --lattice 2,1:7,-4:0,-3:2
 c cells
 2 0 -12 11 -14 13 -16 15 lat=1 fill=3 u=2 imp:n=1 trcl=148
 3 1 -1.  -31 u=3 imp:n=1

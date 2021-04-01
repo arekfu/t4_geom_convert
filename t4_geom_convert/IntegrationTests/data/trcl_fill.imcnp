@@ -1,0 +1,34 @@
+A trcl example
+c cells
+31 1 -1.  -31 -32 u=3 imp:n=1 trcl=2
+32 2 -2.  -31  32 u=3 imp:n=1 trcl=2
+33 3 -3.   31 -32 u=3 imp:n=1 trcl=2
+34 4 -4.   31  32 u=3 imp:n=1 trcl=2
+10 0  -2 1 3 -4 -6 5 IMP:N=1 FILL=3 trcl=1
+100 5 -1. -1000 #10 IMP:N=1
+1000 0 1000 IMP:N=0
+
+c surfaces
+1 PX -50
+2 PX 50
+3 PY -50
+4 PY 50
+5 PZ -50
+6 PZ 50
+1000 SO 100
+31 PX 0
+32 PY 0
+
+m1 13027 1.
+m2 13027 1.
+m3 13027 1.
+m4 13027 1.
+m5 13027 1.
+*TR1 2 -3 1 40 50 90  130 40 90   90 90 0
+*TR2 4 -1 0 7 83 90   97 7 90   90 90 0
+sdef pos=0 0 0 rad=d1 erg=14
+si1 0 100
+sp1 0 1
+cut:n j 13.99999
+ptrac file=bin event=src max=-10000
+nps 10000

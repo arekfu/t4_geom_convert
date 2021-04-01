@@ -1,16 +1,29 @@
-# -*- coding: utf-8 -*-
-'''
-Created on 7 févr. 2019
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
-:author: Sogeti
-:data : 07 february 2019
-:file : CCompositionMCNP.py
-'''
 import math
+
+
 class CCompositionMCNP:
     '''
-    :brief: Class which permit to access precisely to the information
-    of the part material of the block DATA
+    Class which permit to access precisely to the information of the part
+    material of the block DATA
     '''
 
     def __init__(self, l_materialCompositionParameters):
@@ -29,7 +42,7 @@ class CCompositionMCNP:
                 continue
             if "." in isotope:
                 isotope = isotope.split(".")[0]
-            fractionIsotope = l_materialCompositionParameters[i+1]
+            fractionIsotope = l_materialCompositionParameters[i + 1]
             self.materialCompositionParameters.append((isotope,
                                                        fractionIsotope))
             i += 2

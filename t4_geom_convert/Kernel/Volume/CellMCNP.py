@@ -1,18 +1,25 @@
-# -*- coding: utf-8 -*-
-'''
-Created on 5 févr. 2019
-
-:author: Sogeti
-:data : 05 february 2019
-:file : CellMCNP.py
-'''
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
 class CellMCNP:
-    '''
-    :brief: Class which permit to access precisely to the
-    information of the block CELLS
-    '''
-
+    '''Class which permit to access precisely to the information of the block
+    CELLS.'''
 
     def __init__(self, p_materialID, p_density, syntaxTreeMCNP, p_importance,
                  p_universe, fillid, filltr, lattice, trcl, idorigin=None):
@@ -38,21 +45,23 @@ class CellMCNP:
         self.idorigin = [] if idorigin is None else idorigin.copy()
 
     def evaluateASTMCNP(self):
-        '''
-        :brief: method evaluating the syntax tree of the geometry of a cell of MCNP.
+        '''Method evaluating the syntax tree of the geometry of a cell of MCNP.
         '''
         return self.geometry.evaluate()
 
     def inverseASTMCNP(self):
-        '''
-        :brief: method applying the De Morgan law on a syntax tree
-        '''
+        '''Method applying the De Morgan law on a syntax tree.'''
         self.geometry = self.geometry.inverse()
 
     def copy(self):
-        if hasattr(self.geometry , 'copy'):
-            return CellMCNP(self.materialID, self.density, self.geometry.copy(), self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
-        return CellMCNP(self.materialID, self.density, self.geometry, self.importance,self.universe,self.fillid, self.filltr, self.lattice, self.trcl.copy(), self.idorigin.copy())
+        if hasattr(self.geometry, 'copy'):
+            geom_copy = self.geometry.copy() 
+        else:
+            geom_copy = self.geometry
+        return CellMCNP(self.materialID, self.density, geom_copy,
+                        self.importance, self.universe, self.fillid,
+                        self.filltr, self.lattice, self.trcl.copy(),
+                        self.idorigin.copy())
 
     def __repr__(self):
         return ('CellMCNP({!r}, {!r}, {!r},\n'
@@ -63,3 +72,14 @@ class CellMCNP:
                         self.importance, self.universe, self.fillid,
                         self.filltr, self.lattice, self.trcl,
                         self.idorigin))
+
+
+class CellRef:
+    def __init__(self, cell):
+        self.cell = cell
+
+    def __str__(self):
+        return 'CellRef({})'.format(self.cell)
+
+    def __repr__(self):
+        return 'CellRef({!r})'.format(self.cell)

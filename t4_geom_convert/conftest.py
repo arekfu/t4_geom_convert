@@ -1,9 +1,28 @@
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 '''.. _pytest: https://docs.pytest.org/en/latest
 
 `pytest`_ configuration file.
 '''
 import pathlib
 import subprocess as sub
+import re
 
 import pytest
 
@@ -34,14 +53,20 @@ def datadir(tmp_path, request):
 def mcnp_path(request):
     '''Fixture yielding the path to the MCNP executable specified on the
     command line.'''
-    return request.config.getoption('--mcnp-path')
+    path = request.config.getoption('--mcnp-path')
+    if path is not None:
+        path = path.expanduser()
+    return path
 
 
 @pytest.fixture
 def oracle_path(request):
     '''Fixture yielding the path to the oracle executable specified on the
     command line.'''
-    return request.config.getoption('--oracle-path')
+    path = request.config.getoption('--oracle-path')
+    if path is not None:
+        path = path.expanduser()
+    return path
 
 
 def foreach_data(*args, **kwargs):
@@ -69,9 +94,8 @@ def foreach_data(*args, **kwargs):
     Here the argument to the `datafile` keyword argument is a predicate that
     must return `True` if `path` is to be parametrized over, and `False`
     otherwise. Note that the `path` argument to the lambda is a
-    :class:`py._path.local.LocalPath` object.  In this example, `pytest` will
-    parametrize :func:`!test_something` only over files whose name ends in
-    ``'.txt'``.
+    :class:`pathlib.Path` object.  In this example, `pytest` will parametrize
+    :func:`!test_something` only over files whose name ends in ``'.txt'``.
     '''
 
     if args:
@@ -108,9 +132,9 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
         '''Create an instance of :class:`MCNPRunner`.
 
         :param path: path to the MCNP executable
-        :type path: str or path-like object
+        :type path: pathlib.Path
         :param work_path: path to the working directory
-        :type work_path: str or path-like object
+        :type work_path: pathlib.Path
         '''
         self.path = path
         self.work_path = work_path
@@ -119,8 +143,8 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
         '''Run MCNP on the given input file.
 
         :param str input_file: absolute path to the input file
-        :returns: the path to the generated PTRAC file
-        :rtype: str or path-like object
+        :returns: the paths to the generated output and PTRAC files
+        :rtype: (pathlib.Path, pathlib.Path)
         '''
         run_name = 'run_' + input_file.name
         cli = [str(self.path),
@@ -140,6 +164,31 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
 def mcnp(mcnp_path, tmp_path):
     '''Return an instance of the :class:`MCNPRunner` class.'''
     return MCNPRunner(mcnp_path, tmp_path)
+
+
+def check_failed_points(failed_path):
+    '''Read the `failed_path` file and return the number of failed points
+    and the maximum distance for them.'''
+    n_points, dist = 0, 0
+    with failed_path.open() as failed_path_file:
+        for line in failed_path_file:
+            n_points += 1
+            fields = line.strip().split()
+            assert len(fields) == 8
+            dist = max(dist, float(fields[6]))
+    return n_points, dist
+
+
+def parse_outside_points(stdout_path):
+    '''Parse the file at `stdout_path` and return the number of points that
+    fall outside the geometry.'''
+    outside_re = re.compile(r'Number of OUTSIDE {8}: (\d+)')
+    with stdout_path.open() as stdout:
+        for line in stdout:
+            match = outside_re.match(line)
+            if match:
+                return int(match.group(1))
+    return None
 
 
 class OracleRunner:  # pylint: disable=too-few-public-methods
@@ -168,7 +217,7 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
         if oracle_opts is not None:
             cli += oracle_opts
         stdout_fname = self.work_path / 'stdout'
-        print('Running oracle...\n' + '---8<---'*9)
+        print('Running oracle...\n' + '---8<---' * 9)
         try:
             with stdout_fname.open('w') as stdout:
                 sub.check_call(cli, cwd=str(self.work_path), stdout=stdout,
@@ -177,23 +226,11 @@ class OracleRunner:  # pylint: disable=too-few-public-methods
             msg = ('Oracle run failed. The output is:\n'
                    + stdout_fname.read_text())
             raise ValueError(msg)
-        print(stdout_fname.read_text() + '---8<---'*9)
+        print(stdout_fname.read_text() + '---8<---' * 9)
         failed_path = self.work_path / (t4_o.stem + '.failedpoints.dat')
-        n_points, dist = self.check_failed_points(failed_path)
-        return n_points, dist, stdout_fname
-
-    @staticmethod
-    def check_failed_points(failed_path):
-        '''Read the `failed_path` file and return the number of failed points
-        and the maximum distance for them.'''
-        n_points, dist = 0, 0
-        with failed_path.open() as failed_path_file:
-            for line in failed_path_file:
-                n_points += 1
-                fields = line.strip().split()
-                assert len(fields) == 8
-                dist = max(dist, float(fields[6]))
-        return n_points, dist
+        n_points, dist = check_failed_points(failed_path)
+        n_outside = parse_outside_points(stdout_fname)
+        return n_points, n_outside, dist, stdout_fname
 
 
 @pytest.fixture

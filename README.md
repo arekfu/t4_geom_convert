@@ -254,7 +254,7 @@ may be able to do in the future (in roughly decreasing order of likelihood):
 Your help is welcome! Feel free to open an issue if you would like to implement
 a new feature or contribute to the project in any way.
 
-The full changelog is [here](CHANGELOG.md).
+The full changelog is [here](changelog.rst).
 
 
 Testing
@@ -288,5 +288,5 @@ Public Licence, version 3](COPYING).
 [pip]: https://packaging.python.org/tutorials/installing-packages/
 [pypi]: https://pypi.org/project/t4-geom-convert/
 [TatSu]: https://tatsu.readthedocs.io/en/stable/
-[TRIPOLI-4®]: http://www.cea.fr/nucleaire/tripoli-4
+[TRIPOLI-4®]: https://www.cea.fr/nucleaire/tripoli-4
 [venv]: https://docs.python.org/3/tutorial/venv.html

@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-'''
-:author: Sogeti
-:date: 07 february 2019
-:file: composition.py
-'''
 from collections import OrderedDict
 
 

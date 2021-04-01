@@ -1,10 +1,22 @@
-# -*- coding: utf-8 -*-
-'''
-Created on 6 févr. 2019
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 
-:author: Sogeti
-:data : 06 february 2019
-'''
 from collections import OrderedDict
 from math import fsum
 
@@ -13,10 +25,8 @@ from .CompositionConversionMCNPToT4 import compositionConversionMCNPToT4
 
 
 def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
-    '''
-    :brief: method changing the tuple from compositionConversionMCNPToT4
-    in instance of the VolumeT4 Class
-    '''
+    '''Function changing the tuple from compositionConversionMCNPToT4 in
+    instance of the VolumeT4 class.'''
     dic_new_composition = OrderedDict()
     for key, val in compositionConversionMCNPToT4(mcnp_parser).items():
         fractions = extract_isotopes_fractions(val.isotopes)
@@ -51,7 +61,7 @@ def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
 
             if key not in dic_new_composition:
                 dic_new_composition[key] = []
-            new_compo = CCompositionT4(type_density_t4, 'm'+str(key),
+            new_compo = CCompositionT4(type_density_t4, 'm' + str(key),
                                        density, compo, val.atom_fracs)
             dic_new_composition[key].append(new_compo)
     return dic_new_composition
@@ -84,6 +94,7 @@ def rescale_fractions(fractions, concentration):
     concs = []
     total_fractions = fsum(float(frac) for _, frac in fractions)
     for isotope, frac in fractions:
-        conc_str = conc_fmt.format(float(frac)*concentration/total_fractions)
+        conc_str = conc_fmt.format(
+            float(frac) * concentration / total_fractions)
         concs.append((isotope, conc_str))
     return concs

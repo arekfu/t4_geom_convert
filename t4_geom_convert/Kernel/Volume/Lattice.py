@@ -1,3 +1,21 @@
+# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+#
+# This file is part of t4_geom_convert.
+#
+# t4_geom_convert is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# t4_geom_convert is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
+#
+# vim: set fileencoding=utf-8 :
 '''Utilities for handling lattices.'''
 
 from functools import reduce
@@ -61,16 +79,18 @@ def latticeReciprocal(base_vecs):
     '''
 
     if len(base_vecs) == 1:
-        unit = rescale(1./scal(base_vecs[0], base_vecs[0]), base_vecs[0])
+        unit = rescale(1. / scal(base_vecs[0], base_vecs[0]), base_vecs[0])
         return [unit]
     if len(base_vecs) == 2:
         vec1, vec2 = base_vecs
         vec12 = mag2(vec1)
         vec22 = mag2(vec2)
         vec1_vec2 = scal(vec1, vec2)
-        den = vec12*vec22 - vec1_vec2**2
-        rec1 = vsum(rescale(vec22/den, vec1), rescale(-vec1_vec2/den, vec2))
-        rec2 = vsum(rescale(vec12/den, vec2), rescale(-vec1_vec2/den, vec1))
+        den = vec12 * vec22 - vec1_vec2**2
+        rec1 = vsum(rescale(vec22 / den, vec1),
+                    rescale(-vec1_vec2 / den, vec2))
+        rec2 = vsum(rescale(vec12 / den, vec2),
+                    rescale(-vec1_vec2 / den, vec1))
         return [rec1, rec2]
     vec1, vec2, vec3 = base_vecs
     vec12 = vect(vec1, vec2)
@@ -103,6 +123,7 @@ class LatticeBounds:
     '''A simple class to hold a list of range bounds. It provides some useful
     services such as the :meth:`~.size` method.
     '''
+
     def __init__(self, bounds):
         if not isinstance(bounds, list):
             raise TypeError('Expected a list of pairs of integers')
@@ -233,6 +254,7 @@ class LatticeSpec:
     '''A simple class that holds a list of `n*m*l` integers and provides
     n-dimensional indexing into the list.
     '''
+
     def __init__(self, bounds, spec):
         if not isinstance(bounds, LatticeBounds):
             raise TypeError('Expected a LatticeBounds object for the `bounds` '
@@ -324,7 +346,7 @@ def squareLatticeReciprocalVecs(surfaces):
         point2, _normal2 = surf_2
         point_diff = vdiff(point, point2)
         distance = scal(point_diff, normal)
-        base_vecs.append(rescale(1./distance, normal))
+        base_vecs.append(rescale(1. / distance, normal))
         surfaces = surfaces[2:]
     return base_vecs
 
@@ -483,16 +505,16 @@ def hexSortSides(surfs):
 
     The hexagon looks like this:
 
-                      2
-                  ---------
-                 /         \
-             4  /           \ 0
-               /             \
-               \             /
-             1  \           / 5
-                 \         /
-                  ---------
-                      3
+    |                  2
+    |              ---------
+    |             /         \
+    |         4  /           \ 0
+    |           /             \
+    |           \             /
+    |         1  \           / 5
+    |             \         /
+    |              ---------
+    |                  3
 
     The numbers indicate the way we have chosen to order the planes. We
     construct the list of surfaces to respect this constraint:
@@ -512,16 +534,16 @@ def hexSortSides(surfs):
 
     We can also modify the plane numbering. For instance:
 
-                      5
-                  ---------
-                 /         \
-             2  /           \ 0
-               /             \
-               \             /
-             1  \           / 3
-                 \         /
-                  ---------
-                      4
+    |                  5
+    |              ---------
+    |             /         \
+    |         2  /           \ 0
+    |           /             \
+    |           \             /
+    |         1  \           / 3
+    |             \         /
+    |              ---------
+    |                  4
 
     >>> planes = [((vertices[i], normals[i]), -1)  # -1 is the side
     ...           for i in (0, 3, 2, 5, 4, 1)]
@@ -550,16 +572,16 @@ def hexSortSides(surfs):
 
     It looks approximately like this:
 
-                0
-           /---------+
-        3 /          |
-         /           | 4
-        |           /
-      5 |          / 2
-        *---------/
-             1
+    |            0
+    |       /---------+
+    |    3 /          |
+    |     /           | 4
+    |    |           /
+    |  5 |          / 2
+    |    x---------/
+    |         1
 
-    The star represents the first vertex and the sides unfold counterclockwise.
+    The `x` represents the first vertex and the sides unfold counterclockwise.
     We impose the numbering given in the figure:
 
     >>> planes = [((vertices[i], normals[i]), -1)  # -1 is the side
@@ -583,12 +605,12 @@ def hexSortSides(surfs):
 
     adjacency = {}
     for i in range(6):
-        for j in range(i+1, 6):
+        for j in range(i + 1, 6):
             if i // 2 == j // 2:
                 adjacency[(i, j)] = None
                 continue
             other_group = (i // 2 + j // 2) * 2 % 3
-            k1 = 2*other_group  # pylint: disable=invalid-name
+            k1 = 2 * other_group  # pylint: disable=invalid-name
             k2 = k1 + 1         # pylint: disable=invalid-name
             inters = areHexSidesAdjacent(surfs[i][0], surfs[j][0],
                                          surfs[k1], surfs[k2])
