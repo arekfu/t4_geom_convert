@@ -21,6 +21,7 @@ from ..Progress import Progress
 from ..FileHandlers.Parser.ParseMCNPCell import ParseMCNPCell
 from ..Surface.SurfaceT4 import SurfaceT4
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
+from ..Surface.SurfaceConversionError import SurfaceConversionError
 from .DictVolumeT4 import DictVolumeT4
 from .CellConversion import CellConversion
 from .CellConversionError import CellConversionError
@@ -81,8 +82,13 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
                       len(fill_keys), max(fill_keys)) as progress:
             for i, key in enumerate(fill_keys):
                 progress.update(i, key)
-                conv.pot_fill(key, dict_universe, inline_filled,
-                              inline_filling)
+                try:
+                    conv.pot_fill(key, dict_universe, inline_filled,
+                                  inline_filling)
+                except SurfaceConversionError as err:
+                    raise SurfaceConversionError('{} (while converting cell '
+                                                 '{})'
+                                                 .format(err, key)) from None
 
     # consider inlining cells
     inline_cells(mcnp_dict, max_inline_score)
