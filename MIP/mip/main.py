@@ -88,7 +88,8 @@ class Card:
             return name, tr, typ, params
 
         if self.type == 'd':
-            typ, name, params = datacard.split(self.content())
+            typ, name, star, params = datacard.split(self.content())
+            typ = star + typ
             return name, typ, params
         else:
             raise NotImplementedError
