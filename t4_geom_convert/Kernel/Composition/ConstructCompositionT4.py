@@ -20,6 +20,7 @@
 from collections import OrderedDict
 from math import fsum
 
+from ..Utils import normalize_float
 from .CCompositionT4 import CCompositionT4
 from .CompositionConversionMCNPToT4 import compositionConversionMCNPToT4
 
@@ -41,7 +42,8 @@ def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
             if density in densities:
                 continue
             densities.add(density)
-            if float(density) < 0:
+            fdensity = float(normalize_float(density))
+            if fdensity < 0.0:
                 type_density_t4 = 'DENSITY'
                 compo = fractions.copy()
             else:
@@ -57,12 +59,13 @@ def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
                           .format(key, cell_id, density))
                     compo = []
                 else:
-                    compo = rescale_fractions(fractions, float(density))
+                    compo = rescale_fractions(fractions, fdensity)
 
             if key not in dic_new_composition:
                 dic_new_composition[key] = []
             new_compo = CCompositionT4(type_density_t4, 'm' + str(key),
-                                       density, compo, val.atom_fracs)
+                                       normalize_float(density),
+                                       compo, val.atom_fracs)
             dic_new_composition[key].append(new_compo)
     return dic_new_composition
 
@@ -92,9 +95,10 @@ def rescale_fractions(fractions, concentration):
     '''
     conc_fmt = '{:.15e}'
     concs = []
-    total_fractions = fsum(float(frac) for _, frac in fractions)
+    total_fractions = fsum(float(normalize_float(frac))
+                           for _, frac in fractions)
     for isotope, frac in fractions:
         conc_str = conc_fmt.format(
-            float(frac) * concentration / total_fractions)
+            float(normalize_float(frac)) * concentration / total_fractions)
         concs.append((isotope, conc_str))
     return concs
