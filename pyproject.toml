@@ -154,12 +154,14 @@ disable = [
   "exception-escape",
   "comprehension-escape",
   "import-outside-toplevel",
+  "missing-module-docstring",
 ]
 
 [tool.pylint.basic]
 argument-naming-style = "snake_case"
 bad-names = ["foo", "bar", "baz", "toto", "tutu", "tata",]
 class-attribute-naming-style = "any"
+module-naming-style = "PascalCase"
 class-naming-style = "PascalCase"
 const-naming-style = "any"
 docstring-min-length = -1

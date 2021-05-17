@@ -130,10 +130,10 @@ class ParseMCNPCell:
                 except MissingLatticeOptError as err:
                     msg = '{} for cell {}'.format(err, key)
                     raise MissingLatticeOptError(msg) from None
-                except tatsu.exceptions.ParseException:
+                except tatsu.exceptions.ParseException as err:
                     msg = ('TatSu parsing failed for cell {}. Check the '
                            'syntax of this cell.'.format(key))
-                    raise ParseMCNPCellError(msg)
+                    raise ParseMCNPCellError(msg) from err
                 if cell.importance == 0:
                     skipped_cells.append(key)
                 dict_cell[key] = cell
@@ -252,7 +252,7 @@ class ParseMCNPCell:
         return keywords
 
     def parse_fill_kw(self, elt, kw_list):
-        '''Parse the arguments of the FILL and \*FILL keywords.'''
+        '''Parse the arguments of the FILL and *FILL keywords.'''
         fillid_bounds = None
         fillid_u = None
         fill_params = []
@@ -309,7 +309,7 @@ class ParseMCNPCell:
         return lattice
 
     def parse_trcl_kw(self, elt, kw_list):
-        '''Parse the arguments of the TRCL and \*TRCL keywords.'''
+        '''Parse the arguments of the TRCL and *TRCL keywords.'''
         trcl_params = []
         while kw_list and kw_list[-1][0] in '0123456789.+-':
             trcl_params.append(kw_list.pop())
