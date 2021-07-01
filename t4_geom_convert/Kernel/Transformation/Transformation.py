@@ -287,16 +287,6 @@ def transformation(trpl, surface):
     else:
         frame = transform_frame(surface.param_surface, trpl)
         params = list(surface.compl_param)
-        if surface.type_surface in (MS.K, MS.K_X, MS.K_Y, MS.K_Z, MS.KX, MS.KY,
-                                    MS.KZ):
-            if len(params) == 2 or len(params) == 4:
-                params.append(None)
-            elif len(params) == 3 or len(params) == 5:
-                params.append(params[-1])
-            else:
-                msg = ('Unexpected number of parameters for cone: {}'
-                       .format(params))
-                raise TransformationError(msg)
     return SurfaceMCNP(surface.boundary_cond, surface.type_surface, frame,
                        params, surface.idorigin)
 

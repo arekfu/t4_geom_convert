@@ -64,7 +64,7 @@ def convert_mcnp_surface(key, val):
 def conversion_surface_params(key, val):
     '''Convert the MCNP surface described by `val` into a TRIPOLI-4 surface.'''
     if val.type_surface in (MS.K_X, MS.K_Y, MS.K_Z, MS.KX, MS.KY, MS.KZ, MS.K):
-        return convert_cone(key, val)
+        return convert_cone(int(key), val)
 
     if val.type_surface in (MS.P, MS.PX, MS.PY, MS.PZ):
         type_surface, param = convert_plane(val)

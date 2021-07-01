@@ -74,6 +74,13 @@ def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
     typ, params, compl_params, _ = mip_transf(params)
     enum_surface = string_to_enum(typ)
     idorigin = [key]
+    if enum_surface in (MS.K, MS.K_X, MS.K_Y, MS.K_Z, MS.KX, MS.KY, MS.KZ):
+        if len(compl_params) == 2 or len(compl_params) == 4:
+            compl_params = (*compl_params, None)
+        elif len(compl_params) != 3 and len(compl_params) != 5:
+            msg = ('Unexpected number of parameters for cone: {}'
+                    .format(compl_params))
+            raise ValueError(msg)
     surf = SurfaceMCNP(bound_cond, enum_surface, params,
                        compl_params, idorigin)
     if transform_id:

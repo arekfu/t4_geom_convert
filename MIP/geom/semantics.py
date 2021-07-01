@@ -37,24 +37,16 @@ class Surface:
         return not (self == other)
 
     def __gt__(self, other):
-        if isinstance(other, int):
-            return self.surface > other
-        return self.surface > other.surface
+        return int(self) > int(other)
 
     def __ge__(self, other):
-        if isinstance(other, int):
-            return self.surface >= other
-        return self.surface >= other.surface
+        return int(self) >= int(other)
 
     def __lt__(self, other):
-        if isinstance(other, int):
-            return self.surface < other
-        return self.surface < other.surface
+        return int(self) < int(other)
 
     def __le__(self, other):
-        if isinstance(other, int):
-            return self.surface <= other
-        return self.surface <= other.surface
+        return int(self) <= int(other)
 
     def __neg__(self):
         return Surface(-self.surface, self.sub)
@@ -62,6 +54,9 @@ class Surface:
     def __hash__(self):
         # required to use Surfaces as dictionary keys or set elements
         return hash((self.surface, self.sub))
+
+    def __int__(self):
+        return self.surface
 
 class GeomExpression(tuple):
     """
