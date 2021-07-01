@@ -31,6 +31,7 @@ from ...Progress import Progress
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
 from ...Transformation.Transformation import get_mcnp_transforms
+from ...Utils import normalize_float
 
 
 class ParseMCNPCellError(Exception):
@@ -173,7 +174,7 @@ class ParseMCNPCell:
         if kws['material'] is not None:
             material_id = kws['material']
         if kws['density'] is not None:
-            density = kws['density']
+            density = normalize_float(kws['density'])
         fillid = self.to_fillid(kws, lat_opt)
         kws['trcl'] = [] if not kws['trcl'] else [kws['trcl']]
 
@@ -188,7 +189,7 @@ class ParseMCNPCell:
         if int(material_id) == 0:
             density = None
         else:
-            density = material.split()[1]
+            density = normalize_float(material.split()[1])
         return material_id, density
 
     @staticmethod

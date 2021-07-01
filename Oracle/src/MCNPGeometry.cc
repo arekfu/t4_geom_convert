@@ -30,7 +30,7 @@ void MCNPGeometry::associateCell2Density()
   std::string lineLower;
   std::transform(std::begin(currentLine), std::end(currentLine),
                  std::back_inserter(lineLower),
-                 [](char c) { return std::tolower(c); });
+                 [](unsigned char c) { return std::tolower(c); });
   std::string::size_type const pos = lineLower.find("like");
 
   std::istringstream iss(currentLine);
@@ -52,6 +52,10 @@ void MCNPGeometry::associateCell2Density()
       iss >> density;
       // remove trailing brackets
       density = density.substr(0, density.find('('));
+      // convert to lowercase
+      std::transform(std::begin(density), std::end(density),
+                     std::begin(density),
+                     [](unsigned char c){ return std::tolower(c); });
       std::istringstream istest(density);
       double fdensity;
       istest >> fdensity;
@@ -89,7 +93,7 @@ void MCNPGeometry::handleLikeNBut(unsigned long cellNum, std::string::size_type 
     std::string tokenLower;
     std::transform(std::begin(token), std::end(token),
                    std::back_inserter(tokenLower),
-                   [](char c) { return std::tolower(c); });
+                   [](unsigned char c) { return std::tolower(c); });
     if(tokenLower.substr(0, 4) == "rho=") {
       newValue.second = token.substr(4);
     } else if(tokenLower.substr(0, 4) == "mat=") {
