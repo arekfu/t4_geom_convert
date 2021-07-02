@@ -52,6 +52,23 @@ void MCNPGeometry::associateCell2Density()
       iss >> density;
       // remove trailing brackets
       density = density.substr(0, density.find('('));
+
+      auto after_e = density.find_last_of("+-");
+      if(after_e != std::string::npos && after_e > 0) {
+        auto maybe_e = density[after_e - 1];
+        switch(maybe_e) {
+          case 'e':
+          case 'E':
+          case 'd':
+          case 'D':
+            density[after_e - 1] = 'e';
+            break;
+          default:
+            // here the density is given in Fortran format: 1.234-5 for 1.234e-5
+            density = density.substr(0, after_e) + "e" + density.substr(after_e);
+            break;
+        }
+      }
       // convert to lowercase
       std::transform(std::begin(density), std::end(density),
                      std::begin(density),
