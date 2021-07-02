@@ -8,8 +8,8 @@ from . import cellcard
 from . import surfacecard
 from . import datacard
 
-re_comment = re.compile('[$&].*$', re.MULTILINE)
-re_spaces = re.compile('\s+')
+re_comment = re.compile(r'[$&].*$', re.MULTILINE)
+re_spaces = re.compile(r'\s+')
 
 
 def card_debugger(meth):

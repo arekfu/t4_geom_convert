@@ -2,7 +2,7 @@
 from collections import OrderedDict
 
 import re
-re_name = re.compile('^([+*]*)(.*)')
+re_name = re.compile(r'^([+*]*)(.*)')
 
 
 def get_surfaces(input, lim=None):

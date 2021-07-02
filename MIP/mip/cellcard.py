@@ -37,7 +37,7 @@
 import re
 
 # RE to find where options start, not for like-but syntax.
-re_options = re.compile('([\)\s])([\*a-zA-Z].*)$')
+re_options = re.compile(r'([\)\s])([\*a-zA-Z].*)$')
 
 re_likebut = re.compile(r"""^(\s*[0-9]+)     # name
                              (\s+like.*but)  # like-but geometry

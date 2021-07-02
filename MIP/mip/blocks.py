@@ -67,7 +67,7 @@ def get_block_positions(text, firstblock=None):
     dres = {}
 
     # Regular expresison for blank line delimiter
-    bld = re.compile('^\s*$', re.MULTILINE)
+    bld = re.compile(r'^\s*$', re.MULTILINE)
 
     # Re.split() does not split on empty matches. Therefore, match positions
     # are searched and blocks are build manually.

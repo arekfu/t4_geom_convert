@@ -37,12 +37,12 @@ def parse_cell_geom(geom):
 
 
 # patterns to replace space denoting intersection with '*'
-re_union = re.compile('\s*:\s*')
-re_pareno = re.compile('\(\s*')
-re_parenc = re.compile('\s*\)')
-re_spaces = re.compile('\s+')
-re_compc = re.compile('#(\d*)')
-re_comps = re.compile('#(\([^)(]*\))')
+re_union = re.compile(r'\s*:\s*')
+re_pareno = re.compile(r'\(\s*')
+re_parenc = re.compile(r'\s*\)')
+re_spaces = re.compile(r'\s+')
+re_compc = re.compile(r'#(\d*)')
+re_comps = re.compile(r'#(\([^)(]*\))')
 
 
 def normalize(geom):
