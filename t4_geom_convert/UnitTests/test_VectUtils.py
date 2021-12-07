@@ -24,8 +24,12 @@ from math import isclose, fabs
 from hypothesis import given, assume, note
 from hypothesis.strategies import floats, tuples, composite
 
-from t4_geom_convert.Kernel.VectUtils import (scal, vdiff, renorm, mag2,
-                                              pointInPlaneIntersection)
+import numpy as np
+
+from t4_geom_convert.Kernel.VectUtils import (scal, rescale, vdiff, renorm,
+                                              mag, mag2,
+                                              pointInPlaneIntersection,
+                                              rotation_from_vectors)
 
 
 def is_in_plane(point, plane):
@@ -34,6 +38,15 @@ def is_in_plane(point, plane):
     dist = scal(vdiff(point, pl_pt), norm)
     note('dist: {}'.format(dist))
     return isclose(dist, 0., abs_tol=1e-8)
+
+
+def is_parallel(vector1, vector2):
+    '''Returns `True` if the vectors are parallel'''
+    scal_prod = scal(vector1, vector2)
+    mag_prod = mag(vector1)*mag(vector2)
+    note('scal_prod: {}'.format(scal_prod))
+    note('mag_prod: {}'.format(mag_prod))
+    return isclose(scal_prod, mag_prod)
 
 
 @composite
@@ -61,3 +74,29 @@ def test_intersection(point1, point2, normal1, normal2):
     assert is_in_plane(int_p, plane2)
     assert isclose(scal(line_vec, normal1), 0., abs_tol=1e-10)
     assert isclose(scal(line_vec, normal2), 0., abs_tol=1e-10)
+
+
+@given(vector1=vectors(), vector2=vectors())
+def test_rotation_from_vectors(vector1, vector2):
+    '''Test that :func:`~.rotation_from_vectors` actually rotates `vector1` on
+    top of `vector2`.
+    '''
+    assume(mag2(vector1) > 1e-5)
+    assume(mag2(vector2) > 1e-5)
+    assume(not is_parallel(rescale(-1.0, vector1), vector2))
+    mat = rotation_from_vectors(vector1, vector2)
+    new_vector2 = np.dot(mat, np.array(vector1))
+    assert is_parallel(vector2, new_vector2)
+
+
+@given(vector1=vectors(), vector2=vectors())
+def test_rotation_unitary(vector1, vector2):
+    '''Test that the matrix given by :func:`~.rotation_from_vectors` is
+    unitary.
+    '''
+    assume(mag2(vector1) > 1e-5)
+    assume(mag2(vector2) > 1e-5)
+    assume(not is_parallel(rescale(-1.0, vector1), vector2))
+    mat = rotation_from_vectors(vector1, vector2)
+    assert np.allclose(mat.dot(mat.T), np.identity(3))
+    assert np.allclose(mat.T.dot(mat), np.identity(3))

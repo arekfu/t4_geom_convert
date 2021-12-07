@@ -111,7 +111,14 @@ def writeT4Geometry(dic_surface_t4, dic_volume, skipped_cells, ofile):
         for i, key in enumerate(sorted(surf_used)):
             progress.update(i, key)
             surf = dic_surface_t4[key]
-            ofile.write("SURF {} {}{}\n".format(key, surf, surf.comment()))
+            transform = surf.transform_block()
+            transform_kw = ''
+            if transform is not None:
+                ofile.write("TRANSFORM {} MATRIX {}\n"
+                            .format(key, transform))
+                transform_kw = 'TRANSFORM {} '.format(key)
+            ofile.write("SURF {} {}{}{}\n".format(key, transform_kw, surf,
+                                                  surf.comment()))
         ofile.write("\n")
 
     with Progress('writing out volume',

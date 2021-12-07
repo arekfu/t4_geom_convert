@@ -18,6 +18,7 @@
 # vim: set fileencoding=utf-8 :
 
 from math import pi, fabs
+import numpy as np
 
 from ..Progress import Progress
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
@@ -26,6 +27,7 @@ from .ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
 from .SurfaceT4 import SurfaceT4
 from .SurfaceCollection import SurfaceCollection
 from .SurfaceConversionError import SurfaceConversionError
+from ..VectUtils import rotation_from_vectors
 
 
 def convert_mcnp_surfaces(dic_surface_mcnp):
@@ -66,6 +68,8 @@ def conversion_surface_params(key, val):
     if val.type_surface in (MS.K_X, MS.K_Y, MS.K_Z, MS.KX, MS.KY, MS.KZ, MS.K):
         return convert_cone(int(key), val)
 
+    transform = None
+
     if val.type_surface in (MS.P, MS.PX, MS.PY, MS.PZ):
         type_surface, param = convert_plane(val)
     elif val.type_surface in (MS.C_X, MS.C_Y, MS.C_Z, MS.CX, MS.CY, MS.CZ,
@@ -78,12 +82,12 @@ def conversion_surface_params(key, val):
     elif val.type_surface == MS.GQ:
         type_surface, param = convert_quadric(val)
     elif val.type_surface in (MS.TX, MS.TY, MS.TZ, MS.T):
-        type_surface, param = convert_torus(val)
+        type_surface, param, transform = convert_torus(val)
     else:
         msg = 'Unrecognized surface type: {}'.format(val.type_surface)
         raise SurfaceConversionError(msg)
 
-    surf = SurfaceT4(type_surface, param)
+    surf = SurfaceT4(type_surface, param, transform=transform)
     return SurfaceCollection([(surf, 1)])
 
 
@@ -191,21 +195,22 @@ def convert_quadric(val):
 
 def convert_torus(val):
     '''Convert the parameters for tori.'''
-    tuple_param = val.param_surface
-    p_x, p_y, p_z = tuple_param[0]
-    u_x, u_y, u_z = tuple_param[1]
-    if fabs(u_x) > 0.99:
+    center, axis = val.param_surface
+    abs_axis = np.abs(axis)
+    param = list(center) + list(val.compl_param)
+    transform = None
+    if np.allclose(abs_axis, [1.0, 0.0, 0.0]):
         type_surface = T4S.TORUSX
-    elif fabs(u_y) > 0.99:
+    elif np.allclose(abs_axis, [0.0, 1.0, 0.0]):
         type_surface = T4S.TORUSY
-    elif fabs(u_z) > 0.99:
+    elif np.allclose(abs_axis, [0.0, 0.0, 1.0]):
         type_surface = T4S.TORUSZ
     else:
-        msg = ('Cannot convert TORUS with generic axis: ({}, {}, {})'
-               .format(u_x, u_y, u_z))
-        raise SurfaceConversionError(msg)
-    param = [p_x, p_y, p_z] + list(val.compl_param)
-    return type_surface, param
+        type_surface = T4S.TORUSZ
+        transform_tr = np.array(center)
+        transform_mat = rotation_from_vectors((0.0, 0.0, 1.0), axis)
+        transform = (transform_tr, transform_mat)
+    return type_surface, param, transform
 
 
 def convert_cone(key, val):

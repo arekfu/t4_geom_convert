@@ -307,7 +307,7 @@ def transform_vector(trans, vec):
 def compose_transform(trans1, trans2):
     '''Compose `trans1` and `trans2`.
 
-    Returns trans2 o trans1 (i.e. `trans1` is applied first).
+    Returns `trans2 o trans1` (i.e. `trans1` is applied first).
     '''
     mat1, vec1 = to_numpy(trans1)
     mat2, vec2 = to_numpy(trans2)

@@ -8,6 +8,7 @@ version = "0.6.0-alpha.0"
 description = "A tool to convert MCNP geometries into the TRIPOLI-4 format"
 authors = [
   "Davide Mancusi <davide.mancusi@cea.fr>",
+  "François-Xavier Hugot <francois-xavier.hugot@cea.fr>",
   "Martin Maurey",
   "Jonathan Faustin"
 ]

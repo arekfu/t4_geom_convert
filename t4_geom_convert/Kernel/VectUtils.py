@@ -17,7 +17,9 @@
 #
 # vim: set fileencoding=utf-8 :
 
-from math import sqrt, cos, sin, isclose
+from math import sqrt, cos, sin, isclose, acos
+
+import numpy as np
 
 
 def scal(v1, v2):
@@ -312,3 +314,32 @@ def matrix_rows(matrix):
     '''
     assert len(matrix) == 9
     return [matrix[3 * i:3 * i + 3] for i in range(3)]
+
+
+def rotation_from_vectors(vector_from, vector_to):
+    '''Return a rotation matrix transforming `vector_from` into a vector
+    parallel to `vector_to`.
+
+    >>> rotation_from_vectors((0.0, 0.0, 1.0), (0.0, 0.0, 1.0))
+    array([[1., 0., 0.],
+           [0., 1., 0.],
+           [0., 0., 1.]])
+    >>> rotation_from_vectors((0.0, 0.0, 3.0), (0.0, 0.0, 5.0))
+    array([[1., 0., 0.],
+           [0., 1., 0.],
+           [0., 0., 1.]])
+    >>> rotation_from_vectors((0.0, 0.0, 1.0), (0.0, 1.0, 0.0))
+    array([[ 1.,  0.,  0.],
+           [ 0.,  0.,  1.],
+           [ 0., -1.,  0.]])
+    '''
+    dir_from = renorm(vector_from)
+    dir_to = renorm(vector_to)
+    axis = vect(dir_from, dir_to)
+    cos_angle = scal(dir_from, dir_to)
+    skew_mat = np.array([[0.0, -axis[2], axis[1]],
+                         [axis[2], 0.0, -axis[0]],
+                         [-axis[1], axis[0], 0]])
+    rot_mat = (np.identity(3) + skew_mat +
+               np.dot(skew_mat, skew_mat) / (1.0 + cos_angle))
+    return rot_mat
