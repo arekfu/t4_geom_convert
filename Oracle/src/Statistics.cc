@@ -142,6 +142,10 @@ string Statistics::getRawFileName(string &fname)
 {
   size_t lastindex = fname.find_last_of(".");
   string rawname = fname.substr(0, lastindex);
+  lastindex = fname.find_last_of("/");
+  if(lastindex != std::string::npos) {
+    rawname = rawname.substr(lastindex+1, std::string::npos);
+  }
   return rawname;
 }
 
