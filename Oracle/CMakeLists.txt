@@ -7,25 +7,8 @@ message(STATUS "********** OracleMCNPT4 ********** ")
 # option to build the oracle tests
 option(BUILD_UNIT_TESTS "Build the unit tests for the oracle tool" ON)
 
-# Path for cmake files shipped with the project
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-
-include(LibUtils)
-include(FindMEDFile)
-include(DetectOS)
-
 set(CMAKE_CXX_STANDARD 14)
 find_package(T4 REQUIRED)
-
-# LAPACK/BLAS
-import_LAPACK_library(LAPACK_FOUND REQUIRED)
-# MEDFile
-set(HDF5_VERSION_REQUIRED 1.8.14)
-set(MEDFile_VERSION_REQUIRED 3.2.0)
-import_MEDFile23_library(MEDFile23_FOUND REQUIRED)
-# Boost
-import_Boost_library(Boost_FOUND REQUIRED)
-
 
 function(compilation_info TARGET)
   message(STATUS "compilation info for target: " ${TARGET})
@@ -60,11 +43,6 @@ function(compilation_info TARGET)
     message(STATUS " ... link libraries: ${TARGET_LINK_LIBRARIES}")
   endif()
 endfunction()
-
-# ROOT
-import_ROOT_library(ROOT_FOUND COMPONENTS Geom)
-# DL
-import_dl_library(DL_FOUND REQUIRED)
 
 ###############
 #    gtest    #
