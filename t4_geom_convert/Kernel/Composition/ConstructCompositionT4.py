@@ -17,6 +17,7 @@
 #
 # vim: set fileencoding=utf-8 :
 
+from warnings import warn
 from collections import OrderedDict
 from math import fsum
 
@@ -52,11 +53,10 @@ def constructCompositionT4(mcnp_parser, dic_cell_mcnp):
                 # the cell are not supported for the moment
                 type_density_t4 = 'POINT_WISE'
                 if not val.atom_fracs:
-                    print('\nWARNING: composition {} cannot be '
-                          'correctly converted in cell {} because '
-                          'total concentrations ({}) with mass '
-                          'fractions are not supported at the moment'
-                          .format(key, cell_id, density))
+                    warn(f'\ncomposition {key} cannot be '
+                         f'correctly converted in cell {cell_id} because '
+                         f'total concentrations ({density}) with mass '
+                         'fractions are not supported at the moment')
                     compo = []
                 else:
                     compo = rescale_fractions(fractions, fdensity)
