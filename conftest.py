@@ -37,6 +37,10 @@ def pytest_addoption(parser):
                      help='Path to a file containing a list of additional '
                      'MCNP input files to test conversion',
                      default=None, type=pathlib.Path)
+    parser.addoption('--oracle-zero-tolerance', action='store_true',
+                     help='Do not tolerate any failed point in the oracle '
+                     'test, regardless of what the ``oracle-tolerance`` magic '
+                     'comment says')
 
 
 def pytest_collection_modifyitems(config, items):
@@ -50,6 +54,12 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if 'oracle' in item.keywords:
                 item.add_marker(skip_or)
+
+
+@pytest.fixture
+def oracle_zero_tolerance(request):
+    '''Returns the value of the ``--oracle-zero-tolerance`` CLI option.'''
+    return request.config.getoption('--oracle-zero-tolerance')
 
 
 def pytest_generate_tests(metafunc):
