@@ -46,9 +46,9 @@ def get_mcnp_transforms(parser):
         try:
             transf = normalize_transform(transf)
         except TransformationError as err:
-            raise TransformationError('{}\nThe problematic transformation '
-                                      'was TR{}={}'
-                                      .format(err, transf_id, transf))
+            msg = (f'{err}\nThe problematic transformation was '
+                   f'TR{transf_id}={transf}')
+            raise TransformationError(msg) from None
         transforms[transf_id] = transf
     return transforms
 
