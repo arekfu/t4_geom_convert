@@ -206,10 +206,15 @@ def convert_torus(val):
     elif np.allclose(abs_axis, [0.0, 0.0, 1.0]):
         type_surface = T4S.TORUSZ
     else:
+        # type_surface = T4S.TORUSZ
+        # transform_tr = np.array(center)
+        # transform_mat = rotation_from_vectors((0.0, 0.0, 1.0), axis)
+        # transform = (transform_tr, transform_mat)
         type_surface = T4S.TORUSZ
-        transform_tr = np.array(center)
         transform_mat = rotation_from_vectors((0.0, 0.0, 1.0), axis)
-        transform = (transform_tr, transform_mat)
+        center = transform_mat.T.dot(center)
+        param[:3] = list(center.flat)
+        transform = (np.zeros(3), transform_mat)
     return type_surface, param, transform
 
 

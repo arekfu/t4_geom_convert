@@ -17,6 +17,7 @@
 #
 # vim: set fileencoding=utf-8 :
 
+from warnings import warn
 from math import sqrt
 from collections import OrderedDict
 import numpy as np
@@ -29,7 +30,8 @@ from .TransformationQuad import transformation_quad
 from .TransformationError import TransformationError
 
 from ..Surface.ESurfaceTypeMCNP import ESurfaceTypeMCNP as MS
-from ..VectUtils import transpose, matrix_rows, scal, renorm, vdiff, vect
+from ..VectUtils import (transpose, matrix_rows, scal, renorm, vdiff, vect,
+                         mag2, mag, rescale)
 
 
 def get_mcnp_transforms(parser):
@@ -59,7 +61,26 @@ def normalize_transform(transf):
     if len(transf) == 13 and transf[-1] != 1:
         raise TransformationError('Transformations with m=-1 are not supported'
                                   ' yet.')
-    return transf[:3] + normalize_matrix(transf[3:12])
+    if not transf:
+        return [0.0, 0.0, 0.0,
+                1.0, 0.0, 0.0,
+                0.0, 1.0, 0.0,
+                0.0, 0.0, 1.0]
+
+    if len(transf) == 3:
+        return list(transf) + [1.0, 0.0, 0.0,
+                               0.0, 1.0, 0.0,
+                               0.0, 0.0, 1.0]
+
+    matrix = normalize_matrix(transf[3:12])
+    npmat = np.array(matrix).reshape(3,3)
+    adjusted_matrix = adjust_matrix(matrix)
+    adjusted_npmat = np.array(adjusted_matrix).reshape(3,3)
+    adjusted_tr = np.array(transf[:3])
+    # adjusted_tr = adjusted_npmat.T.dot(npmat.dot(transf[:3]))
+    diff = adjusted_tr - np.array(transf[:3])
+    dist = mag(diff)
+    return list(adjusted_tr.flat) + adjusted_matrix
 
 
 def normalize_matrix(matrix):  # pylint: disable=too-many-return-statements
@@ -99,6 +120,61 @@ def normalize_matrix(matrix):  # pylint: disable=too-many-return-statements
     raise TransformationError('Malformed matrix {} has {} non-None elements; '
                               '0, 3, 5, 6 or 9 elements are expected'
                               .format(matrix, n_values))
+
+
+def adjust_matrix(matrix):
+    '''Perform a certain number of magical tweaks to the matrix that make sure
+    that it is orthogonal.
+
+    MCNP tolerates some skewness but internally adjusts the matrix. We need to
+    do the same thing, or we will not generate the same geometry.
+
+    >>> adjust_matrix([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0])
+    [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+
+    >>> from math import cos, sin, isclose
+    >>> cos_a, sin_a = cos(1.23), sin(1.23)
+    >>> rot = [1.0, 0.0, 0.0, 0.0, cos_a, sin_a, 0.0, -sin_a, cos_a]
+    >>> rot2 = adjust_matrix(rot)
+    >>> all(isclose(x, y) for x, y in zip(rot, rot2))
+    True
+
+    The following matrix has too few significant digits, so
+    :func:`adjust_matrix` raises a warning:
+
+    >>> import pytest
+    >>> mat = [ 0.8021,  0.1056, -0.5878,
+    ...        -0.1305,  0.9914,  0.0000,
+    ...         0.5828,  0.0767,  0.8090]
+    >>> with pytest.warns(UserWarning, match='is not orthogonal'):
+    ...     mat2 = adjust_matrix(mat)
+
+    The new matrix is close to the original one, with a tolerance of 1e-4:
+
+    >>> all(isclose(x, y, abs_tol=1e-4) for x, y in zip(mat, mat2))
+    True
+
+    :param matrix: a list of 9 floats, representing the entries of a rotation
+        matrix.
+    :type matrix: list(float)
+    '''
+    rows = matrix_rows(matrix)
+    should_be_zeros = [abs(mag2(r) - 1.0) for r in rows]
+    scal_prods = [abs(scal(rows[0], rows[1])),
+                  abs(scal(rows[1], rows[2])),
+                  abs(scal(rows[2], rows[0]))]
+    tolerance = max(*should_be_zeros, *scal_prods)
+    if tolerance > 2.e-6:
+        warn(f'transformation {matrix} is not orthogonal')
+    v0_mag2 = mag2(rows[0])
+    v0_v1 = scal(rows[0], rows[1])
+    rows[1] = renorm(vdiff(rescale(v0_mag2, rows[1]), rescale(v0_v1, rows[0])))
+    rows[0] = renorm(rows[0])
+    vprod = vect(rows[0], rows[1])
+    rows[2] = vprod if scal(vprod, rows[2]) > 0.0 else rescale(-1.0, vprod)
+    new_matrix = [value if abs(value) >= 1e-10 else 0.0
+                  for row in rows for value in row]
+    return new_matrix
 
 
 def is_matrix_rowwise(matrix):

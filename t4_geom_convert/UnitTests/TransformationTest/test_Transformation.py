@@ -16,20 +16,22 @@
 # t4_geom_convert.  If not, see <https://www.gnu.org/licenses/>.
 #
 # vim: set fileencoding=utf-8 :
-'''Unit tests for the :mod:`~.Lattice module.'''
+'''Unit tests for the :mod:`~.Transformation module.'''
 # pylint: disable=no-value-for-parameter
 
-from math import cos, sin
+from math import cos, sin, isclose
 
 import pytest
 import numpy as np
-from hypothesis import given, settings, note
+from hypothesis import given, settings, note, assume
 from hypothesis.strategies import floats, integers, booleans, composite, one_of
 
 from t4_geom_convert.Kernel.Transformation.TransformationError import (
     TransformationError)
 from t4_geom_convert.Kernel.Transformation.Transformation import (
-    normalize_matrix, compose_transform, transform_vector)
+    normalize_matrix, compose_transform, transform_vector, adjust_matrix)
+from t4_geom_convert.Kernel.VectUtils import (matrix_rows, mag, scal, rescale,
+                                              vsum)
 
 
 @composite
@@ -57,6 +59,16 @@ def rotations(draw):
     component = floats(-1e5, 1e5, allow_nan=False, allow_infinity=False)
     alpha, beta, gamma = draw(component), draw(component), draw(component)
     return make_euler(alpha, beta, gamma)
+
+
+@composite
+def matrices(draw):
+    '''Generate a random three-dimensional matrix.'''
+    component = floats(-1e5, 1e5, allow_nan=False, allow_infinity=False)
+    matrix = [draw(component), draw(component), draw(component),
+              draw(component), draw(component), draw(component),
+              draw(component), draw(component), draw(component)]
+    return matrix
 
 
 @composite
@@ -188,3 +200,25 @@ def test_trans_composition(trans1, trans2, vec):
     vec2 = transform_vector(trans2, vec1)
     vec12 = transform_vector(trans, vec)
     assert np.allclose(vec2, vec12)
+
+
+@given(matrix=matrices())
+def test_adjust_matrix(matrix):
+    '''Test that :func:`adjust_matrix` always returns orthogonal matrices'''
+    rows = matrix_rows(matrix)
+    assume(mag(rows[0]) > 1e-10)
+    assume(mag(rows[1]) > 1e-10)
+    assume(mag(rows[2]) > 1e-10)
+    assume(abs(scal(rows[0], rows[1]) - mag(rows[0])*mag(rows[1])) > 1e-10)
+    assume(abs(scal(rows[1], rows[2]) - mag(rows[1])*mag(rows[2])) > 1e-10)
+    assume(abs(scal(rows[2], rows[0]) - mag(rows[2])*mag(rows[0])) > 1e-10)
+    with pytest.warns(UserWarning, match='is not orthogonal'):
+        orth = adjust_matrix(matrix)
+    orows = matrix_rows(orth)
+    note(f'orows = {orows}')
+    assert isclose(mag(orows[0]), 1.0)
+    assert isclose(mag(orows[1]), 1.0)
+    assert isclose(mag(orows[2]), 1.0)
+    assert isclose(scal(orows[0], orows[1]), 0.0, abs_tol=1e-8)
+    assert isclose(scal(orows[1], orows[2]), 0.0, abs_tol=1e-8)
+    assert isclose(scal(orows[2], orows[0]), 0.0, abs_tol=1e-8)
