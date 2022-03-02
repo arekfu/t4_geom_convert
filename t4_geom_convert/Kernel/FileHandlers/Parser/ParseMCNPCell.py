@@ -30,7 +30,8 @@ from MIP.mip.datacard import expand_data_card
 from ...Progress import Progress
 from ...Volume.CellMCNP import CellMCNP
 from ...Volume.Lattice import parse_ranges, LatticeSpec
-from ...Transformation.Transformation import get_mcnp_transforms
+from ...Transformation.Transformation import (get_mcnp_transforms,
+                                              normalize_transform)
 from ...Utils import normalize_float
 
 
@@ -291,6 +292,11 @@ class ParseMCNPCell:
                             0., 0., 1.]
         elif '*' in elt:
             fill_params[3:] = list(map(to_cos, fill_params[3:12]))
+            fill_params = normalize_transform(fill_params)
+        elif fill_params:
+            # this is the case where the transform parameters were given inline
+            fill_params = normalize_transform(fill_params)
+
 
         return fillid_bounds, fillid_u, tuple(fill_params)
 
