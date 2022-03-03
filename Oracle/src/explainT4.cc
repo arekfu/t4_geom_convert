@@ -70,6 +70,8 @@ bool explainVolume(Ge_float const x, Ge_float const y, Ge_float const z, int con
         success = success && thisSurfSuccess;
         std::cout << moreprefix << "+ surf: num  = " << surf->numsurf
           << '\n' << moreprefix << "+       rank = " << surf->ranksurf
+          << '\n' << moreprefix << "+       type = " << surf->surf_type
+          << '\n' << moreprefix << "+       transform = " << surf->transform
           << '\n' << moreprefix << "+       sign = " << ((surf_sign == GE_SURF_PLUS) ? '+' : '-')
           << '\n' << moreprefix << "+       satisfied? " << (thisSurfSuccess ? "OK" : "FAILED")
           << '\n';
@@ -81,6 +83,8 @@ bool explainVolume(Ge_float const x, Ge_float const y, Ge_float const z, int con
         success = success && thisSurfSuccess;
         std::cout << moreprefix << "- surf: num  = " << surf->numsurf
           << '\n' << moreprefix << "-       rank = " << surf->ranksurf
+          << '\n' << moreprefix << "-       type = " << surf->surf_type
+          << '\n' << moreprefix << "-       transform = " << surf->transform
           << '\n' << moreprefix << "-       sign = " << ((surf_sign == GE_SURF_PLUS) ? '+' : '-')
           << '\n' << moreprefix << "-       satisfied? " << (thisSurfSuccess ? "OK" : "FAILED")
           << '\n';
