@@ -34,7 +34,7 @@ class Abundances:  # pylint: disable=too-few-public-methods
                                 fractions.
         '''
         if not isinstance(isotopes, list):
-            raise ValueError('Expecting a list in Abundances, got a {}: {}'
-                             .format(type(isotopes), isotopes))
+            raise ValueError('Expecting a list in Abundances, got a '
+                             f'{type(isotopes)}: {isotopes}')
         self.isotopes = isotopes.copy()
         self.atom_fracs = atom_fracs

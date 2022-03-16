@@ -234,18 +234,17 @@ def parse_ranges(intervals):
         bounds = rang.split(':')
         if len(bounds) != 2:
             raise ValueError('needs exactly 2 colon-separated range '
-                             'bounds in argument {!r}'
-                             .format(rang))
+                             f'bounds in argument {rang!r}')
         try:
             start = int(bounds[0])
         except ValueError:
-            raise ValueError('range bound {!r} is not an integer'
-                             .format(bounds[0])) from None
+            raise ValueError(f'range bound {bounds[0]!r} is not an '
+                             'integer') from None
         try:
             end = int(bounds[1])
         except ValueError:
-            raise ValueError('range bound {!r} is not an integer'
-                             .format(bounds[1])) from None
+            raise ValueError(f'range bound {bounds[1]!r} is not an '
+                             'integer') from None
         bounds_list.append((start, end))
     return LatticeBounds(bounds_list)
 
@@ -258,13 +257,13 @@ class LatticeSpec:
     def __init__(self, bounds, spec):
         if not isinstance(bounds, LatticeBounds):
             raise TypeError('Expected a LatticeBounds object for the `bounds` '
-                            'argument, got a {}'.format(type(bounds)))
+                            f'argument, got a {type(bounds)}')
         if not isinstance(spec, (list, tuple)):
             raise TypeError('Expected a list or a tuple for the `spec` '
-                            'argument, got a {}'.format(type(spec)))
+                            f'argument, got a {type(spec)}')
         if bounds.size() != len(spec):
-            raise ValueError('The `spec` argument must have exactly {} '
-                             'elements'.format(bounds.size()))
+            raise ValueError('The `spec` argument must have exactly '
+                             f'{bounds.size()} elements')
         self.bounds = bounds.copy()
         self.spec = spec
 
@@ -298,13 +297,13 @@ class LatticeSpec:
         '''
         if isinstance(arg, tuple):
             if len(arg) != len(self.bounds):
-                raise ValueError('Expected a tuple of {} elements'
-                                 .format(len(self.bounds)))
+                raise ValueError(f'Expected a tuple of {len(self.bounds)} '
+                                 'elements')
             index = 0
             for bound, subind in zip(self.bounds, arg):
                 if subind < bound[0] or subind > bound[1]:
-                    raise ValueError('index {} out of bounds ({}, {})'
-                                     .format(subind, bound[0], bound[1]))
+                    raise ValueError(f'index {subind} out of bounds '
+                                     f'({bound[0]}, {bound[1]})')
                 index = index * (bound[1] - bound[0] + 1) + subind - bound[0]
         elif isinstance(arg, int):
             index = arg
@@ -314,7 +313,7 @@ class LatticeSpec:
         return self.spec[index]
 
     def __repr__(self):
-        return 'LatticeSpec({}, {})'.format(self.bounds, self.spec)
+        return f'LatticeSpec({self.bounds}, {self.spec})'
 
     def __iter__(self):
         yield from self.spec
@@ -334,8 +333,8 @@ class LatticeSpec:
 def squareLatticeReciprocalVecs(surfaces):
     '''Compute the reciprocal vectors of a square lattice.'''
     if len(surfaces) not in (2, 4, 6):
-        raise LatticeError('Lattice base cell has {} surfaces; 2, 4 or 6 '
-                           'were expected'.format(len(surfaces)))
+        raise LatticeError(f'Lattice base cell has {len(surfaces)} surfaces; '
+                           '2, 4 or 6 were expected')
 
     base_vecs = []
     while surfaces:
@@ -617,8 +616,8 @@ def hexSortSides(surfs):
             adjacency[(i, j)] = inters
     n_inters = sum(1 for inters in adjacency.values() if inters is not None)
     if n_inters != 6:
-        msg = ('not enough intersections ({}) between the planes of the '
-               'hexagonal base cell:\nadj: {}'.format(n_inters, adjacency))
+        msg = (f'not enough intersections ({n_inters}) between the planes of '
+               f'the hexagonal base cell:\nadj: {adjacency}')
         raise LatticeError(msg)
     return adjacency
 

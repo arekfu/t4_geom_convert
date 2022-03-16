@@ -39,6 +39,6 @@ def string_to_enum(type_surface):
     try:
         enumSurface = getattr(ESurfaceTypeMCNP, type_surf)
     except AttributeError:
-        raise ValueError('{}: The type of this surface does not exist'
-                         .format(type_surface.upper()))
+        raise ValueError(f'{type_surface.upper()}: The type of this surface '
+                         'does not exist')
     return enumSurface

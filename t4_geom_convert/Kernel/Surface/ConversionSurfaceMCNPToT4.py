@@ -52,13 +52,13 @@ def convert_mcnp_surface(key, val):
         try:
             surf_coll = conversion_surface_params(key, surf)
         except SurfaceConversionError as err:
-            msg = '{} (while converting surface {})'.format(err, key)
+            msg = f'{err} (while converting surface {key})'
             raise SurfaceConversionError(msg) from None
         surf_colls.append((surf_coll, side))
     try:
         t4_surfs = SurfaceCollection.join(surf_colls)
     except SurfaceConversionError as err:
-        msg = '{} (while converting surface {})'.format(err, key)
+        msg = f'{err} (while converting surface {key})'
         raise SurfaceConversionError(msg) from None
     return t4_surfs
 
@@ -84,7 +84,7 @@ def conversion_surface_params(key, val):
     elif val.type_surface in (MS.TX, MS.TY, MS.TZ, MS.T):
         type_surface, param, transform = convert_torus(val)
     else:
-        msg = 'Unrecognized surface type: {}'.format(val.type_surface)
+        msg = f'Unrecognized surface type: {val.type_surface}'
         raise SurfaceConversionError(msg)
 
     surf = SurfaceT4(type_surface, param, transform=transform)
@@ -255,5 +255,5 @@ def convert_cone(key, val):
         type_surface = T4S.PLANE
         param = [u_x, u_y, u_z, pos]
     plane = SurfaceT4(type_surface, param,
-                      ['aux plane for cone {}'.format(key)])
+                      [f'aux plane for cone {key}'])
     return SurfaceCollection([(cone, 1), (plane, -int(nappe))])

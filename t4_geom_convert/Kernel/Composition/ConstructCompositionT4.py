@@ -93,12 +93,11 @@ def rescale_fractions(fractions, concentration):
     :returns: a list of ``(isotope, concentration)`` pairs, as strings
     :rtype: list((str, str))
     '''
-    conc_fmt = '{:.15e}'
     concs = []
     total_fractions = fsum(float(normalize_float(frac))
                            for _, frac in fractions)
     for isotope, frac in fractions:
-        conc_str = conc_fmt.format(
-            float(normalize_float(frac)) * concentration / total_fractions)
+        conc = float(normalize_float(frac)) * concentration / total_fractions
+        conc_str = f'{conc:.15e}'
         concs.append((isotope, conc_str))
     return concs

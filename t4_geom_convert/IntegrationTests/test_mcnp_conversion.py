@@ -89,10 +89,10 @@ def do_test_oracle(mcnp_i, tmp_path, mcnp, oracle, oracle_zero_tolerance):
     (n_failed, n_outside, distance,
      output) = oracle.run(t4_o, mcnp_i, mcnp_ptrac, oracle_opts)
     assert 'ERROR' not in output.read_text()
-    msg = '{} failed points, max distance = {}'.format(n_failed, distance)
+    msg = f'{n_failed} failed points, max distance = {distance}'
     assert n_failed <= tolerance, msg
     if fail_if_outside:
-        msg = '{} outside points'.format(n_outside)
+        msg = f'{n_outside} outside points'
         assert n_outside == 0
 
 

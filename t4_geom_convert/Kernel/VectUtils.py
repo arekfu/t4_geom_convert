@@ -143,8 +143,8 @@ def planeParamsFromPoints(pt1, pt2, pt3):
     normal_len2 = mag2(normal)
     if normal_len2 <= 1e-10:
         raise ValueError('Cannot convert plane from three points because the '
-                         'points are collinear or almost so: {}, {}, {}'
-                         .format(pt1, pt2, pt3))
+                         'points are collinear or almost so: '
+                         f'{pt1}, {pt2}, {pt3}')
     unit_normal = renorm(normal)
     pos = scal(unit_normal, pt1)
 
@@ -181,8 +181,8 @@ def planeParamsFromPoints(pt1, pt2, pt3):
 
     # What are we even doing here?
     raise ValueError('Cannot convert plane from three points because the '
-                     'points are collinear or almost so: {}, {}, {}'
-                     .format(pt1, pt2, pt3))
+                     'points are collinear or almost so: '
+                     f'{pt1}, {pt2}, {pt3}')
 
 
 def planeParamsFromNormalAndPoint(normal, point):

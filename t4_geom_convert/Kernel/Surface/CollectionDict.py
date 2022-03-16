@@ -122,7 +122,7 @@ class CollectionDict(MutableMapping):
             return (args.surface, args.sub)
         if not isinstance(args, tuple) or len(args) != 2:
             raise IndexError('expecting 1 int, 2 ints or a Surface as key in '
-                             'CollectionDict, got {}'.format(args))
+                             f'CollectionDict, got {args}')
         if not isinstance(args[0], int) or not isinstance(args[1], int):
             raise TypeError('expecting int indices as keys in '
                             'CollectionDict')
@@ -138,8 +138,8 @@ class CollectionDict(MutableMapping):
         if key[1] is None:
             return item
         if key[1] <= 0 or key[1] > len(item):
-            raise IndexError('out of range subsurface (allowed range: [1, {}])'
-                             .format(len(item)))
+            raise IndexError('out of range subsurface (allowed range: [1, '
+                             f'{len(item)}])')
         return [item[key[1] - 1]]
 
     def __setitem__(self, key, value):
@@ -159,8 +159,8 @@ class CollectionDict(MutableMapping):
             return
         item = self.dic[key[0]]
         if key[1] <= 0 or key[1] > len(item):
-            raise IndexError('out of range subsurface (allowed range: [1, {}])'
-                             .format(len(item)))
+            raise IndexError('out of range subsurface (allowed range: [1, '
+                             f'{len(item)}])')
         item[key[1] - 1:key[1]] = value
 
     def __delitem__(self, item):

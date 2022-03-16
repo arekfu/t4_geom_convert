@@ -64,14 +64,10 @@ class CellMCNP:
                         self.idorigin.copy())
 
     def __repr__(self):
-        return ('CellMCNP({!r}, {!r}, {!r},\n'
-                '    {!r}, {!r}, {!r},\n'
-                '    {!r}, {!r}, {!r},\n'
-                '    {!r})'
-                .format(self.materialID, self.density, self.geometry,
-                        self.importance, self.universe, self.fillid,
-                        self.filltr, self.lattice, self.trcl,
-                        self.idorigin))
+        return (f'CellMCNP({self.materialID!r}, {self.density!r}, '
+                f'{self.geometry!r}, {self.importance!r}, {self.universe!r}, '
+                f'{self.fillid!r}, {self.filltr!r}, {self.lattice!r}, '
+                f'{self.trcl!r}, {self.idorigin!r})')
 
 
 class CellRef:
@@ -79,7 +75,7 @@ class CellRef:
         self.cell = cell
 
     def __str__(self):
-        return 'CellRef({})'.format(self.cell)
+        return f'CellRef({self.cell})'
 
     def __repr__(self):
-        return 'CellRef({!r})'.format(self.cell)
+        return f'CellRef({self.cell!r})'

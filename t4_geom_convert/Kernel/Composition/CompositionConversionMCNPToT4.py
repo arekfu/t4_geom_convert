@@ -40,8 +40,7 @@ def compositionConversionMCNPToT4(mcnp_parser):
             elif positive_fraction != atom_fracs:
                 raise ValueError('All isotope abundances in a material must '
                                  'have the same sign (atomic or weight '
-                                 'fractions) in M{}'
-                                 .format(key))
+                                 f'fractions) in M{key}')
 
             atomic_number, mass_number = convert_isotope(isotope_id)
             atomic_number_t4 = EIsotopeNameElement(atomic_number.value)

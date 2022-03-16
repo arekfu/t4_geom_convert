@@ -47,13 +47,14 @@ def writeT4Composition(mcnp_parser, mcnp_new_dict, ofile):
                                                for name, abd in list_isotope)
                     p_material_name = mat.material + '_' + density
                     if typ == 'POINT_WISE':
-                        ofile.write("{} {:d} {} {:d}\n  {}\n"
-                                    .format(typ, temperature, p_material_name,
-                                            p_number_of_isotope, isotopes_str))
+                        ofile.write(f'{typ} {temperature:d} {p_material_name} '
+                                    f'{p_number_of_isotope:d}\n  '
+                                    f'{isotopes_str}\n')
                     else:
-                        ofile.write("{} {:d} {} {} {} {:d}\n  {}\n"
-                                    .format(typ, temperature,
-                                            p_material_name, str_fabs(density),
-                                            'NB_ATOM' if mat.nb_atom else '',
-                                            p_number_of_isotope, isotopes_str))
+                        s_density = str_fabs(density)
+                        nb_atom = 'NB_ATOM' if mat.nb_atom else ''
+                        ofile.write(f'{typ} {temperature:d} {p_material_name} '
+                                    f'{s_density} {nb_atom} '
+                                    f'{p_number_of_isotope:d}\n  '
+                                    f'{isotopes_str}\n')
     ofile.write("POINT_WISE 300 m0 1\n  HE4 1E-30\n\nEND_COMPOSITION\n")

@@ -282,7 +282,7 @@ class CellConversion:
         # here operator == ':'
         if operator != ':':
             raise CellConversionError('Converting cell with unexpected '
-                                      'operator: {}'.format(operator))
+                                      f'operator: {operator}')
         largest = largestPureIntersectionNode(args)
         if largest is None:
             arg_ids = [self.pot_to_t4_cell(arg, idorigin, matching, union_ids)
@@ -366,9 +366,9 @@ class CellConversion:
 
         if p_tree.sub is not None:
             if p_tree.sub > len(t4_ids):
-                msg = ('found facet {0} of surface {1} in a cell definition, '
-                       'but surface {1} does not have enough facets ({2})'
-                       .format(p_tree.sub, p_tree.surface, len(t4_ids)))
+                msg = (f'found facet {p_tree.sub} of surface {p_tree.surface} '
+                       f'in a cell definition, but surface {p_tree.surface} '
+                       f'does not have enough facets ({len(t4_ids)})')
                 raise CellConversionError(msg)
             sub_surf = t4_ids[p_tree.sub - 1]
             return sub_surf if p_tree.surface > 0 else -sub_surf
@@ -424,25 +424,24 @@ class CellConversion:
             elif cell.lattice == 2:
                 lat_base_vectors = hexLatticeBaseVectors(surfaces)
         except LatticeError as err:
-            raise LatticeError('{} (in cell {})'.format(err, key)) from None
+            raise LatticeError(f'{err} (in cell {key})') from None
 
         # compute the base vectors of the lattice
         domain = cell.fillid
         if len(lat_base_vectors) != len(domain.bounds):
             if len(lat_base_vectors) != domain.bounds.dims():
-                msg = ('Problem of domain definition for lattice; expected {} '
-                       'non-trivial bounds, got {}'
-                       .format(len(lat_base_vectors), domain.bounds.dims()))
+                msg = ('Problem of domain definition for lattice; expected '
+                       f'{len(lat_base_vectors)} non-trivial bounds, got '
+                       f'{domain.bounds.dims()}')
                 raise LatticeError(msg)
             n_missing_bounds = len(lat_base_vectors) - len(domain.bounds)
             for i in range(n_missing_bounds):
                 range_ = domain.bounds[-1 - i]
                 if range_[0] != range_[1]:
                     msg = ('Problem of domain definition for lattice; '
-                           'expected {} non-trivial bounds, but the {}:{} '
-                           'bound is not trivial'
-                           .format(len(lat_base_vectors), range_[0],
-                                   range_[1]))
+                           f'expected {len(lat_base_vectors)} non-trivial '
+                           f'bounds, but the {range_[0]}:{range_[1]} bound is '
+                           'not trivial')
                     raise LatticeError(msg)
 
         for index, universe in domain.items():

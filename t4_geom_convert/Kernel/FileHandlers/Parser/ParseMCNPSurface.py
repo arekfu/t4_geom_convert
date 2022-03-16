@@ -78,8 +78,7 @@ def to_surface_mcnp(key, bound_cond,  # pylint: disable=too-many-arguments
         if len(compl_params) == 2 or len(compl_params) == 4:
             compl_params = (*compl_params, None)
         elif len(compl_params) != 3 and len(compl_params) != 5:
-            msg = ('Unexpected number of parameters for cone: {}'
-                    .format(compl_params))
+            msg = f'Unexpected number of parameters for cone: {compl_params}'
             raise ValueError(msg)
     surf = SurfaceMCNP(bound_cond, enum_surface, params,
                        compl_params, idorigin)
@@ -114,8 +113,8 @@ def to_surfaces_macro(key, bound_cond,  # pylint: disable=too-many-arguments
     elif enum_surface == MS.ARB:
         parts = MB.arb(params)
     else:
-        raise NotImplementedError('Macrobody {} is not implemented yet'
-                                  .format(enum_surface))
+        raise NotImplementedError(f'Macrobody {enum_surface} is not '
+                                  'implemented yet')
     mcnp_surfs = [(to_surface_mcnp(key, bound_cond, transform_id, type_,
                                    params, transform_parsed), side)
                   for type_, params, side in parts]

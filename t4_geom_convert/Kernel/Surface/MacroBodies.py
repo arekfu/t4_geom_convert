@@ -31,8 +31,8 @@ class MacroBodyError(Exception):
     the expected number.'''
 
     def __init__(self, type_, expected, params):
-        super().__init__('Wrong number of parameters for {} (expected {}): '
-                         '{}'.format(type_, expected, params))
+        super().__init__(f'Wrong number of parameters for {type_} '
+                         f'(expected {expected}): {params}')
 
 
 def check_params_length(type_, expected, params):

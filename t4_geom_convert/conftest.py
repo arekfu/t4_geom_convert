@@ -148,15 +148,14 @@ class MCNPRunner:  # pylint: disable=too-few-public-methods
         '''
         run_name = 'run_' + input_file.name
         cli = [str(self.path),
-               'inp={}'.format(input_file),
-               'name={}'.format(run_name)]
+               f'inp={input_file}',
+               f'name={run_name}']
         output = self.work_path / (run_name + 'o')
         ptrac = self.work_path / (run_name + 'p')
         try:
             sub.check_call(cli, cwd=str(self.work_path))
         except sub.CalledProcessError:
-            msg = 'MCNP run failed. The output is here: {}'.format(str(output))
-            raise ValueError(msg)
+            raise ValueError(f'MCNP run failed. The output is here: {output}')
         return output, ptrac
 
 

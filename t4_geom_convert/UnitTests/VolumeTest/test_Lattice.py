@@ -45,7 +45,7 @@ def lattices(draw):
         for j, other in enumerate(vecs[i + 1:]):
             cosangle = fabs(scal(vec, other)) / sqrt(scal(vec, vec)
                                                      * scal(other, other))
-            note('cos(angle {}^{}) = {}'.format(i, j + i + 1, cosangle))
+            note(f'cos(angle {i}^{j+i+1}) = {cosangle}')
             assume(cosangle < 1 - 1e-5)
     if len(vecs) == 3:
         # check that the vectors are not coplanar
@@ -54,7 +54,7 @@ def lattices(draw):
                                  * scal(vecs[1], vecs[1])
                                  * scal(vecs[2], vecs[2])))
         assume(rel_volume > 1e-5)
-        note('volume of the parallelepiped / cube = {}'.format(rel_volume))
+        note(f'volume of the parallelepiped / cube = {rel_volume}')
     return vecs
 
 
@@ -63,7 +63,7 @@ def latticeReciprocalTest(vecs):
     vectors it returns has the same length as the argument.'''
     recs = latticeReciprocal(vecs)
     assert len(recs) == len(vecs)
-    note('reciprocal lattice: {}'.format(recs))
+    note(f'reciprocal lattice: {recs}')
     return recs
 
 
@@ -77,12 +77,12 @@ def test_bravais_property(lattice):
 
         v_i \cdot r_j = delta_{ij}, i,j=1,2,3
     '''
-    event('lattice dimension = {}'.format(len(lattice)))
+    event(f'lattice dimension = {len(lattice)}')
     rec_lattice = latticeReciprocalTest(lattice)
     for i, lhs in enumerate(lattice):
         for j, rhs in enumerate(rec_lattice):
             scalar = scal(lhs, rhs)
             expected = 1.0 if i == j else 0.0
-            msg = ('Bravais property failed for vecs {} vs. {}: scalar = {}'
-                   .format(i, j, scalar))
+            msg = (f'Bravais property failed for vecs {i} vs. {j}: '
+                   f'scalar = {scalar}')
             assert isclose(expected, scalar, abs_tol=1e-5), msg

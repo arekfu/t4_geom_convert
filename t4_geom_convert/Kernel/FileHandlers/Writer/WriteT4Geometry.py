@@ -44,17 +44,17 @@ def convertMCNPGeometry(mcnp_parser, lattice_params, args):
     else:
         try:
             with t4_surf_cache_path.open('rb') as dicfile:
-                print('reading surfaces from file {}...'
-                      .format(t4_surf_cache_path.resolve()), end='',
-                      flush=True)
+                abspath = t4_surf_cache_path.resolve()
+                print(f'reading surfaces from file {abs_path}...',
+                      end='', flush=True)
                 surf_conv = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
             surf_conv = construct_surface_t4(mcnp_parser)
             with t4_surf_cache_path.open('wb') as dicfile:
-                print('writing surfaces to file {}...'
-                      .format(t4_surf_cache_path.resolve()), end='',
-                      flush=True)
+                abspath = t4_surf_cache_path.resolve()
+                print(f'writing surfaces to file {abspath}...',
+                      end='', flush=True)
                 pickle.dump(surf_conv, dicfile)
                 print(' done', flush=True)
     dic_surface_t4, dic_surface_mcnp = surf_conv
@@ -70,8 +70,9 @@ def convertMCNPGeometry(mcnp_parser, lattice_params, args):
     else:
         try:
             with t4_vol_cache_path.open('rb') as dicfile:
-                print('reading TRIPOLI-4 volumes from file {}...'
-                      .format(t4_vol_cache_path.resolve()), end='', flush=True)
+                abspath = t4_vol_cache_path.resolve()
+                print(f'reading TRIPOLI-4 volumes from file {abspath}...',
+                      end='', flush=True)
                 vol_conv = pickle.load(dicfile)
                 print(' done', flush=True)
         except:
@@ -83,8 +84,9 @@ def convertMCNPGeometry(mcnp_parser, lattice_params, args):
                                            args.always_inline_filling,
                                            args.max_inline_score)
             with t4_vol_cache_path.open('wb') as dicfile:
-                print('writing cells to file {}...'
-                      .format(t4_vol_cache_path.resolve()), end='', flush=True)
+                abspath = t4_vol_cache_path.resolve()
+                print(f'writing cells to file {abspath}...',
+                      end='', flush=True)
                 pickle.dump(vol_conv, dicfile)
                 print(' done', flush=True)
 
@@ -114,11 +116,10 @@ def writeT4Geometry(dic_surface_t4, dic_volume, skipped_cells, ofile):
             transform = surf.transform_block()
             transform_kw = ''
             if transform is not None:
-                ofile.write("TRANSFORM {} MATRIX {}\n"
-                            .format(key, transform))
-                transform_kw = 'TRANSFORM {} '.format(key)
-            ofile.write("SURF {} {}{}{}\n".format(key, transform_kw, surf,
-                                                  surf.comment()))
+                ofile.write(f"TRANSFORM {key} MATRIX {transform}\n")
+                transform_kw = f'TRANSFORM {key} '
+            comment = surf.comment()
+            ofile.write(f"SURF {key} {transform_kw}{surf}{comment}\n")
         ofile.write("\n")
 
     with Progress('writing out volume',
@@ -127,7 +128,8 @@ def writeT4Geometry(dic_surface_t4, dic_volume, skipped_cells, ofile):
             progress.update(i, key)
             if key in skipped_cells:
                 continue
-            ofile.write('VOLU {} {} ENDV{}\n'.format(key, val, val.comment()))
+            comment = val.comment()
+            ofile.write(f'VOLU {key} {val} ENDV{comment}\n')
     ofile.write("\n")
     ofile.write("ENDG")
     ofile.write("\n")

@@ -46,9 +46,9 @@ class VolumeT4:
         return ' '.join(str(param) for param in str_params)
 
     def __repr__(self):
-        return ('VolumeT4(pluses={}, minuses={}, ops={}, idorigin={}, '
-                'fictive={})'.format(self.pluses, self.minuses, self.ops,
-                                     self.idorigin, self.fictive))
+        return (f'VolumeT4(pluses={self.pluses}, minuses={self.minuses}, '
+                f'ops={self.ops}, idorigin={self.idorigin}, '
+                f'fictive={self.fictive})')
 
     def copy(self):
         '''Return a copy of `self`.'''

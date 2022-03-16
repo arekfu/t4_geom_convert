@@ -117,9 +117,9 @@ def normalize_matrix(matrix):  # pylint: disable=too-many-return-statements
             return normalize_matrix6(matrix9)
         # two columns were defined; transpose, normalize and transpose back
         return transpose(normalize_matrix6(transpose(matrix9)))
-    raise TransformationError('Malformed matrix {} has {} non-None elements; '
-                              '0, 3, 5, 6 or 9 elements are expected'
-                              .format(matrix, n_values))
+    raise TransformationError(f'Malformed matrix {matrix} has {n_values} '
+                              'non-None elements; 0, 3, 5, 6 or 9 elements '
+                              'are expected')
 
 
 def adjust_matrix(matrix):

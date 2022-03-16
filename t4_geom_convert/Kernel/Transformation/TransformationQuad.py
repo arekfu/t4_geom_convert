@@ -60,6 +60,6 @@ def transformation_quad(params, trans):
                          a_trans_mat.item(3, 3)]
         return params_transf
     except np.linalg.LinAlgError as err:
-        msg = ('Numpy error while transforming quadric {} with matrix {}: {}'
-               .format(params, m_mat, err))
+        msg = (f'Numpy error while transforming quadric {params} with matrix '
+               f'{m_mat}: {err}')
         raise TransformationError(msg) from None

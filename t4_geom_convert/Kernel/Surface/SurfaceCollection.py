@@ -38,11 +38,6 @@ class SurfaceCollection(Sequence):
             raise SurfaceConversionError('need a non-empty list of surfaces '
                                          'in SurfaceCollection')
         self.surfs = tuple(surfs)
-        # if self.surfs[0][1] != 1:
-        #     msg = ('At least one surface of the surface collection must be '
-        #            'oriented in the same way as the collection itself: {}'
-        #            .format(surfs))
-        #     raise SurfaceConversionError(msg)
 
     @classmethod
     def join(cls, surf_colls):
@@ -54,7 +49,7 @@ class SurfaceCollection(Sequence):
         return cls(surfs)
 
     def __repr__(self):
-        return 'SurfaceCollection({!r})'.format(self.surfs)
+        return f'SurfaceCollection({self.surfs!r})'
 
     def __iter__(self):
         yield from self.surfs

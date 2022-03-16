@@ -38,6 +38,6 @@ class SurfaceMCNP:
         self.idorigin = tuple(idorigin) if idorigin is not None else ()
 
     def __repr__(self):
-        return ('SurfaceMCNP({!r}, {!r}, {!r}, {!r}, {!r})'
-                .format(self.boundary_cond, self.type_surface,
-                        self.param_surface, self.compl_param, self.idorigin))
+        return (f'SurfaceMCNP({self.boundary_cond!r}, {self.type_surface!r}, '
+                f'{self.param_surface!r}, {self.compl_param!r}, '
+                f'{self.idorigin!r})')

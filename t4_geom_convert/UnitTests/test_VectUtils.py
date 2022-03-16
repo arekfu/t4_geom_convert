@@ -36,7 +36,7 @@ def is_in_plane(point, plane):
     '''Returns `True` if the point lies in the given plane.'''
     pl_pt, norm = plane
     dist = scal(vdiff(point, pl_pt), norm)
-    note('dist: {}'.format(dist))
+    note(f'{dist=}')
     return isclose(dist, 0., abs_tol=1e-8)
 
 
@@ -44,8 +44,8 @@ def is_parallel(vector1, vector2):
     '''Returns `True` if the vectors are parallel'''
     scal_prod = scal(vector1, vector2)
     mag_prod = mag(vector1)*mag(vector2)
-    note('scal_prod: {}'.format(scal_prod))
-    note('mag_prod: {}'.format(mag_prod))
+    note(f'{scal_prod=}')
+    note(f'{mag_prod=}')
     return isclose(scal_prod, mag_prod)
 
 

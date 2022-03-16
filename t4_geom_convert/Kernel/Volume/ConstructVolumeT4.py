@@ -86,9 +86,8 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
                     conv.pot_fill(key, dict_universe, inline_filled,
                                   inline_filling)
                 except SurfaceConversionError as err:
-                    raise SurfaceConversionError('{} (while converting cell '
-                                                 '{})'
-                                                 .format(err, key)) from None
+                    raise SurfaceConversionError(f'{err} (while converting '
+                                                 f'cell {key})') from None
 
     # consider inlining cells
     inline_cells(mcnp_dict, max_inline_score)
@@ -115,8 +114,8 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
             try:
                 j = conv.pot_convert(val, matching, union_ids)
             except CellConversionError as err:
-                raise CellConversionError('{} (while converting cell {})'
-                                          .format(err, key)) from None
+                raise CellConversionError(f'{err} (while converting cell '
+                                          f'{key})') from None
             if j is None:
                 # the converted cell is empty
                 continue

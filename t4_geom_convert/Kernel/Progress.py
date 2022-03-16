@@ -24,13 +24,11 @@ class Progress:  # pylint: disable=too-few-public-methods
 
     def __init__(self, message, n_items, longest_item):
         self.n_items = n_items
-        self.fmt_string = ('\r{message} {{:{max_item_width}d}} '
-                           '({{:{n_items_width}d}}/{n_items:d}, '
-                           '{{:3d}}%)...'
-                           .format(message=message,
-                                   n_items=n_items,
-                                   max_item_width=len(str(longest_item)),
-                                   n_items_width=len(str(n_items))))
+        max_item_width = len(f'{longest_item}')
+        n_items_width = len(f'{n_items}')
+        self.fmt_string = (f'\r{message} {{:{max_item_width}d}} '
+                           f'({{:{n_items_width}d}}/{n_items:d}, '
+                           f'{{:3d}}%)...')
         self.prev_percent = -1
 
     def update(self, iteration, item):

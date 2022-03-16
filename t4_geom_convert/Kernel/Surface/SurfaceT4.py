@@ -52,10 +52,8 @@ class SurfaceT4:
         return as_str
 
     def __repr__(self):
-        return 'SurfaceT4({!r}, {!r}, {!r}, {!r})'.format(self.type_surface,
-                                                          self.param_surface,
-                                                          self.idorigin,
-                                                          self.transform)
+        return (f'SurfaceT4({self.type_surface!r}, {self.param_surface!r}, '
+                f'{self.idorigin!r}, {self.transform!r})')
 
 
     def transform_block(self):

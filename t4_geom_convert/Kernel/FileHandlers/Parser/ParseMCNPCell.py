@@ -78,10 +78,10 @@ class ParseMCNPCell:
                        for card in importance_cards.values()]
         lens = [len(importance) for importance in importances]
         if any(len_ != lens[0] for len_ in lens):
-            diagn = ('\n'.join('{}: {}'.format(card, len_)
+            diagn = ('\n'.join(f'{card}: {len_}'
                                for card, len_ in zip(importance_cards, lens)))
             msg = ('All the importance cards (`IMP:*\') must have the same '
-                   'number of elements.\n{}'.format(diagn))
+                   f'number of elements.\n{diagn}')
             raise ParseMCNPCellError(msg)
         if len(lens) == 1:
             return importances[0]
@@ -100,15 +100,15 @@ class ParseMCNPCell:
         else:
             try:
                 with self.cell_cache_path.open('rb') as dicfile:
-                    print('reading MCNP cells from file {}...'
-                          .format(self.cell_cache_path.resolve()), end='')
+                    abspath = self.cell_cache_path.resolve()
+                    print(f'reading MCNP cells from file {abspath}...', end='')
                     dict_cell, skipped_cells = pickle.load(dicfile)
                     print(' done')
             except IOError:
                 dict_cell, skipped_cells = self.parse_all_cells()
                 with self.cell_cache_path.open('wb') as dicfile:
-                    print('writing MCNP cells to file {}...'
-                          .format(self.cell_cache_path.resolve()), end='')
+                    abspath = self.cell_cache_path.resolve()
+                    print(f'writing MCNP cells to file {abspath}...', end='')
                     pickle.dump((dict_cell, skipped_cells), dicfile)
                     print(' done')
         return dict_cell, skipped_cells
@@ -127,13 +127,13 @@ class ParseMCNPCell:
                     cell = self.parse_one_cell(parsed_cells, rank, lat_opt,
                                                parsed_cell)
                 except ParseMCNPCellError as err:
-                    msg = '{} (in cell {})'.format(err, key)
+                    msg = f'{err} (in cell {key})'
                     raise ParseMCNPCellError(msg) from None
                 except MissingLatticeOptError as err:
-                    msg = '{} for cell {}'.format(err, key)
+                    msg = f'{err} for cell {key}'
                     raise MissingLatticeOptError(msg) from None
                 except tatsu.exceptions.ParseException as err:
-                    msg = ('TatSu parsing failed for cell {}. Check the '
+                    msg = (f'TatSu parsing failed for cell {key}. Check the '
                            'syntax of this cell.'.format(key))
                     raise ParseMCNPCellError(msg) from err
                 if cell.importance == 0:
@@ -269,8 +269,8 @@ class ParseMCNPCell:
                                                       expected=bounds.size(),
                                                       dtype='int')
             except ValueError:
-                msg = ('expected {} universe specifications after FILL '
-                       'keyword'.format(bounds.size()))
+                msg = (f'expected {bounds.size()} universe specifications '
+                       'after FILL keyword')
                 raise ParseMCNPCellError(msg) from None
             del kw_list[-consumed:]  # remove the last `consumed` elements
             fillid_bounds = bounds
@@ -307,11 +307,11 @@ class ParseMCNPCell:
         try:
             lattice = int(lat_opt)
         except ValueError:
-            msg = ('expected an integer in lattice specifications, found {}'
-                   .format(lat_opt))
+            msg = ('expected an integer in lattice specifications, found '
+                   f'{lat_opt}')
             raise ParseMCNPCellError(msg) from None
         if lattice not in (1, 2):
-            msg = 'Invalid value for LAT option (LAT={})'.format(lattice)
+            msg = f'Invalid value for LAT option (LAT={lattice})'
             raise ParseMCNPCellError(msg)
         return lattice
 

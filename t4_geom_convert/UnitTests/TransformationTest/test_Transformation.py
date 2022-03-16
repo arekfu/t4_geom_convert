@@ -165,8 +165,8 @@ def test_normalized(mats):
     full_mat = np.array(full_mat).reshape(3, 3)
     norm_mat = np.array(norm_mat).reshape(3, 3)
     trunc_mat = np.array(trunc_mat).reshape(3, 3)
-    note('norm_mat: {}'.format(norm_mat))
-    note('trunc_mat: {}'.format(trunc_mat))
+    note(f'norm_mat: {norm_mat}')
+    note(f'trunc_mat: {trunc_mat}')
 
     prod = norm_mat.T.dot(norm_mat)
     assert np.allclose(prod, np.identity(3), atol=1e-5)
@@ -174,7 +174,7 @@ def test_normalized(mats):
     assert np.allclose(prod, np.identity(3), atol=1e-5)
 
     mask = np.not_equal(trunc_mat, None)
-    note('mask: {}'.format(mask))
+    note(f'mask: {mask}')
     assert np.allclose(norm_mat[mask],
                        trunc_mat[mask].astype(norm_mat.dtype),
                        atol=1e-5)
