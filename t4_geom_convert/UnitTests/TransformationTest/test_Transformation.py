@@ -202,16 +202,29 @@ def test_trans_composition(trans1, trans2, vec):
     assert np.allclose(vec2, vec12)
 
 
+def determinant(m):
+    '''Return the determinant of the given matrix.'''
+    return np.linalg.det(np.array(m).reshape(3, 3))
+
+
 @given(matrix=matrices())
 def test_adjust_matrix(matrix):
     '''Test that :func:`adjust_matrix` always returns orthogonal matrices'''
     rows = matrix_rows(matrix)
+    assume(determinant(matrix) > 1e-10)
     assume(mag(rows[0]) > 1e-10)
     assume(mag(rows[1]) > 1e-10)
     assume(mag(rows[2]) > 1e-10)
-    assume(abs(scal(rows[0], rows[1]) - mag(rows[0])*mag(rows[1])) > 1e-10)
-    assume(abs(scal(rows[1], rows[2]) - mag(rows[1])*mag(rows[2])) > 1e-10)
-    assume(abs(scal(rows[2], rows[0]) - mag(rows[2])*mag(rows[0])) > 1e-10)
+    assume(abs(abs(scal(rows[0], rows[1]))
+               - mag(rows[0])*mag(rows[1])) > 1e-10)
+    assume(abs(abs(scal(rows[1], rows[2]))
+               - mag(rows[1])*mag(rows[2])) > 1e-10)
+    assume(abs(abs(scal(rows[2], rows[0]))
+               - mag(rows[2])*mag(rows[0])) > 1e-10)
+    assume(abs(scal(rows[0], rows[1])) > 1e-10)
+    assume(abs(scal(rows[1], rows[2])) > 1e-10)
+    assume(abs(scal(rows[2], rows[0])) > 1e-10)
+    assume(determinant(matrix) > 1e-10)
     with pytest.warns(UserWarning, match='is not orthogonal'):
         orth = adjust_matrix(matrix)
     orows = matrix_rows(orth)
