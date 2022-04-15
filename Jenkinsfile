@@ -97,11 +97,6 @@ pipeline {
           sh """#!/bin/bash
               . "${VENV}/bin/activate"
               pylint -f parseable t4_geom_convert/ | tee pylint.out || true
-              # flake8 returns 1 in case of warnings and that would stop the
-              # build
-              flake8 --tee --output-file flake8.out t4_geom_convert/ || true
-              # avoid empty flake8.out files, Jenkins complains 
-              echo "end of flake8 file" >> flake8.out
               """
         }
       }
@@ -151,10 +146,8 @@ pipeline {
     }
     always {
       dir("${SRC}") {
-        recordIssues enabledForFailure: true, tool: pep8(pattern: '**/flake8.out', reportEncoding: 'UTF-8')
         recordIssues enabledForFailure: true, tool: pyLint(pattern: '**/pylint.out', reportEncoding: 'UTF-8')
       }
-      archiveArtifacts artifacts: "**/flake8.out", fingerprint: true
       archiveArtifacts artifacts: "**/pylint.out", fingerprint: true
       archiveArtifacts artifacts: "**/pytest.out", fingerprint: true
       junit "**/pytest.xml"

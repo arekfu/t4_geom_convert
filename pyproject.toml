@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "t4_geom_convert"
-version = "0.6.0-alpha.0"
+version = "0.6.0-alpha.1"
 description = "A tool to convert MCNP geometries into the TRIPOLI-4 format"
 authors = [
   "Davide Mancusi <davide.mancusi@cea.fr>",
@@ -46,21 +46,21 @@ Documentation = "https://t4-geom-convert.readthedocs.io/"
 t4_geom_convert = "t4_geom_convert.main:main"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=3.6.2, <4"
 tatsu = "^4.4"
 numpy = "^1.19"
-importlib-metadata = {version = "^1.0", python = "<3.8"}
+importlib-metadata = "^4.4"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2"
-pytest-cov = "^2.11"
-hypothesis = "^6.8"
-flake8 = "^3.9"
-pylint = "^2.7"
-Sphinx = "^3.5"
-sphinx-rtd-theme = "^0.5"
+pytest = "^7.0"
+pytest-cov = "^3.0"
+hypothesis = "^6.31"
+pylint = "^2.13"
+Sphinx = "^4.5"
+sphinx-rtd-theme = "^1.0"
 recommonmark = "^0.7"
-autopep8 = "^1.5"
+autopep8 = "^1.6"
+urllib3 = "^1.26"
 
 [tool.pytest.ini_options]
 addopts = "-v -s -ra --doctest-modules --doctest-continue-on-failure --hypothesis-show-statistics --durations=50 --strict-markers"
