@@ -46,9 +46,9 @@ Documentation = "https://t4-geom-convert.readthedocs.io/"
 t4_geom_convert = "t4_geom_convert.main:main"
 
 [tool.poetry.dependencies]
-python = ">=3.6.2, <4"
-tatsu = "^4.4"
-numpy = "^1.19"
+python = ">=3.8, <4"
+tatsu = "^5.6"
+numpy = "^1.23"
 importlib-metadata = "^4.4"
 
 [tool.poetry.dev-dependencies]
