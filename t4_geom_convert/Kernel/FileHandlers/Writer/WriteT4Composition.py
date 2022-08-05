@@ -34,7 +34,7 @@ def writeT4Composition(mcnp_parser, mcnp_new_dict, ofile):
 
     if dic_composition:
         n_compos = len(dic_composition)
-        with Progress('converting composition MCNP surface',
+        with Progress('converting composition',
                       n_compos, max(dic_composition)) as progress:
             for j, (key, mats) in enumerate(dic_composition.items()):
                 progress.update(j, key)
