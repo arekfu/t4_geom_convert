@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v0.6.0
+------
+
+* Python 3.8 required.
+* Implement torus rotations (fixes `issue #34
+  <https://github.com/arekfu/t4_geom_convert/issues/34>`_).
+* Fix adjustment of imprecise rotation matrices.
+
 v0.5.0
 ------
 
