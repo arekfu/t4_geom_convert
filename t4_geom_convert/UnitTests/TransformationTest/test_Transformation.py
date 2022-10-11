@@ -210,8 +210,9 @@ def determinant(m):
 @given(matrix=matrices())
 def test_adjust_matrix(matrix):
     '''Test that :func:`adjust_matrix` always returns orthogonal matrices'''
+    assume(abs(determinant(matrix)) > 1e-10)
+    note(f'determinant={determinant(matrix)}')
     rows = matrix_rows(matrix)
-    assume(determinant(matrix) > 1e-10)
     assume(mag(rows[0]) > 1e-10)
     assume(mag(rows[1]) > 1e-10)
     assume(mag(rows[2]) > 1e-10)
@@ -224,7 +225,6 @@ def test_adjust_matrix(matrix):
     assume(abs(scal(rows[0], rows[1])) > 1e-10)
     assume(abs(scal(rows[1], rows[2])) > 1e-10)
     assume(abs(scal(rows[2], rows[0])) > 1e-10)
-    assume(determinant(matrix) > 1e-10)
     with pytest.warns(UserWarning, match='is not orthogonal'):
         orth = adjust_matrix(matrix)
     orows = matrix_rows(orth)
