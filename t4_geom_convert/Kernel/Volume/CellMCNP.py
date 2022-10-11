@@ -55,7 +55,7 @@ class CellMCNP:
 
     def copy(self):
         if hasattr(self.geometry, 'copy'):
-            geom_copy = self.geometry.copy() 
+            geom_copy = self.geometry.copy()
         else:
             geom_copy = self.geometry
         return CellMCNP(self.materialID, self.density, geom_copy,
