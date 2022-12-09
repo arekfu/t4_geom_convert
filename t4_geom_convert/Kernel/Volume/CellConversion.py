@@ -120,7 +120,13 @@ class CellConversion:
             new_cell.materialID = element_cell.materialID
             new_cell.density = element_cell.density
             new_cell.idorigin = element_cell.idorigin.copy()
-            new_cell.idorigin.append((element, key))
+
+            new_cell.idorigin.append(
+                (element_cell.idorigin[0][0]
+                 if element_cell.idorigin else element,
+                 cell.idorigin[0][0] if cell.idorigin else key)
+            )
+
             cache = not inline_filling
             new_elt_key = element
             # the MCNP logic seems to be that if a cell contains a FILL with a
