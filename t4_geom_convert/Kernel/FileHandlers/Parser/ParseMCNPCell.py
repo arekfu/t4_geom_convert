@@ -291,6 +291,7 @@ class ParseMCNPCell:
                             0., 1., 0.,
                             0., 0., 1.]
         elif '*' in elt:
+            fill_params = [float(x) for x in fill_params]
             fill_params[3:] = list(map(to_cos, fill_params[3:12]))
             fill_params = normalize_transform(fill_params)
         elif fill_params:
@@ -333,5 +334,6 @@ class ParseMCNPCell:
                             0., 1., 0.,
                             0., 0., 1.]
         elif '*' in elt:
+            trcl_params = [float(x) for x in trcl_params]
             trcl_params[3:] = list(map(to_cos, trcl_params[3:12]))
         return tuple(trcl_params)
