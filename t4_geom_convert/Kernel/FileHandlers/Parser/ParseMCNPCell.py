@@ -160,8 +160,10 @@ class ParseMCNPCell:
 
         ast_mcnp = get_ast(geometry)
 
-        kw_list = list(reversed(option.lower().replace('(', ' ')
-                                .replace(')', ' ').replace('=', ' ').split()))
+        option = re.sub(' *: *', ':', option)
+        option = (option.lower().replace('(', ' ').replace(')', ' ')
+                  .replace('=', ' '))
+        kw_list = list(reversed(option.split()))
         kws = self.parse_keywords(kw_list)
 
         # replace some missing values with the defaults
