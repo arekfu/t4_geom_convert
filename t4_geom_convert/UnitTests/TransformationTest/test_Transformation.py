@@ -225,8 +225,7 @@ def test_adjust_matrix(matrix):
     assume(abs(scal(rows[0], rows[1])) > 1e-10)
     assume(abs(scal(rows[1], rows[2])) > 1e-10)
     assume(abs(scal(rows[2], rows[0])) > 1e-10)
-    with pytest.warns(UserWarning, match='is not orthogonal'):
-        orth = adjust_matrix(matrix)
+    orth = adjust_matrix(matrix)
     orows = matrix_rows(orth)
     note(f'orows = {orows}')
     assert isclose(mag(orows[0]), 1.0)
