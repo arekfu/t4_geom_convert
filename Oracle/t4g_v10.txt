@@ -1,3 +1,0 @@
-cd /home/tripoli4.10/tripoli4.10.2/CODE/lin-x86-64-cen7/
-source source_me.sh
-/home/tripoli4.10/tripoli4.10.2/CODE/lin-x86-64-cen7/bin/static_visutripoli4-root-enabled 0_ITERSDR.t4 -l 0
