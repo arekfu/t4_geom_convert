@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "t4_geom_convert"
-version = "0.6.3"
+version = "0.6.4"
 description = "A tool to convert MCNP geometries into the TRIPOLI-4 format"
 authors = [
   "Davide Mancusi <davide.mancusi@cea.fr>",
