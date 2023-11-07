@@ -17,14 +17,20 @@
 #
 # vim: set fileencoding=utf-8 :
 
+from warnings import warn
+
+from MIP.geom.main import extract_surfaces_list
+
 from ..Progress import Progress
 from ..FileHandlers.Parser.ParseMCNPCell import ParseMCNPCell
 from ..Surface.SurfaceT4 import SurfaceT4
 from ..Surface.ESurfaceTypeT4 import ESurfaceTypeT4 as T4S
 from ..Surface.SurfaceConversionError import SurfaceConversionError
+from ..Transformation.Transformation import transformation
 from .DictVolumeT4 import DictVolumeT4
 from .CellConversion import CellConversion
 from .CellConversionError import CellConversionError
+from ..Surface.ConversionSurfaceMCNPToT4 import convert_mcnp_surface
 from .ByUniverse import by_universe
 from .CellInlining import inline_cells
 
@@ -37,6 +43,23 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
     dic_vol_t4 = DictVolumeT4()
     mcnp_dict, skipped_cells = ParseMCNPCell(mcnp_parser, cell_cache_path,
                                              lattice_params).parse()
+
+    tr_surf_ids = extract_tr_surf_ids(mcnp_dict) - set(dic_surface_mcnp)
+    if tr_surf_ids:
+        with Progress('generating implicitly defined surface',
+                      len(tr_surf_ids), max(tr_surf_ids)) as progress:
+            for i, tr_surf_id in enumerate(tr_surf_ids):
+                progress.update(i, tr_surf_id)
+                surf_id = tr_surf_id % 1000
+                cell_id = tr_surf_id // 1000
+                trs = mcnp_dict[cell_id].trcl
+                tr_surfs = dic_surface_mcnp[surf_id]
+                for tr in trs:
+                    tr_surfs = [(transformation(tr, surf), side)
+                                for surf, side in tr_surfs]
+                dic_surface_mcnp[tr_surf_id] = tr_surfs
+                t4_tr_surfs = convert_mcnp_surface(tr_surf_id, tr_surfs)
+                dic_surface_t4[tr_surf_id] = t4_tr_surfs
 
     free_key = max(int(k) for k in mcnp_dict) + 1
     free_surf_key = max(max(int(k) for k in dic_surface_mcnp) + 1,
@@ -123,6 +146,20 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
             dic_vol_t4[key].fictive = False
 
     return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells
+
+
+def extract_tr_surf_ids(mcnp_dict):
+    '''Return the list of MCNP surface IDs above 1000.
+
+    Surface IDs above 1000 are interpreted by MCNP as (surf_id + 1000*cell_id),
+    where cell_id indicates a cell with a trcl card. The surface is modified by
+    applying the trcl card of the cell.
+    '''
+    tr_surf_ids = []
+    for value in mcnp_dict.values():
+        surfs = extract_surfaces_list(value.geometry)
+        tr_surf_ids.extend(abs(int(surf)) for surf in surfs if surf >= 1000)
+    return set(tr_surf_ids)
 
 
 def remove_empty_volumes(dic_volume):

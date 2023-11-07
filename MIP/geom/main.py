@@ -24,6 +24,9 @@ def extract_surfaces(ast):
         return set()
 
     s = set()
+    if ast[0] == '^':
+        return s
+
     if isinstance(ast[1], tuple):
         s.update(extract_surfaces(ast[1]))
     else:
@@ -45,6 +48,9 @@ def extract_surfaces_list(ast):
         return []
 
     l = []
+    if ast[0] == '^':
+        return l
+
     if isinstance(ast[1], tuple):
         l.extend(extract_surfaces_list(ast[1]))
     else:
