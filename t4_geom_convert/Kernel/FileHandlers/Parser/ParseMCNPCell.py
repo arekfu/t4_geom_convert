@@ -64,10 +64,10 @@ class ParseMCNPCell:
                                           'are not supported yet')
 
     def parse_importance_cards(self):
-        '''Parse any importance cards and return the minimum importance value
+        '''Parse any importance cards and return the maximum importance value
         for each cell.
 
-        :returns: the minimum importances.
+        :returns: the maximum importances.
         :rtype: list(float)
         '''
         importance_cards = get_cell_importances(self.mcnp_parser)
@@ -85,8 +85,8 @@ class ParseMCNPCell:
             raise ParseMCNPCellError(msg)
         if len(lens) == 1:
             return importances[0]
-        min_importances = [min(*values) for values in zip(*importances)]
-        return min_importances
+        max_importances = [max(*values) for values in zip(*importances)]
+        return max_importances
 
     def parse(self):
         '''
@@ -232,7 +232,7 @@ class ParseMCNPCell:
             if elt.startswith('imp'):
                 importance = float(kw_list.pop())
                 if 'importance' in keywords:
-                    keywords['importance'] = min(importance,
+                    keywords['importance'] = max(importance,
                                                  keywords['importance'])
                 else:
                     keywords['importance'] = importance
