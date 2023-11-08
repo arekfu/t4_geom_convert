@@ -1,6 +1,20 @@
 Changelog
 =========
 
+v1.0.0
+------
+
+* Handle surface IDs >= 1000 as implicitly defined, if not given in the input
+  file.
+
+  Surface IDs >= 1000 have a special meaning in MCNP. They are interpreted as
+  (surf_id + 1000*cell_id), where cell_id refers to a cell card and surf_id
+  refers to another surface card. For example, surface ID 123456 refers to cell
+  123 and surface 456. The meaning of this syntax is that surface 123456 is
+  obtained by applying the transformation defined in the TRCL card of cell 123
+  to surface 456.
+* Print the real MCNP cell number in the T4 comments whenever possible.
+
 v0.6.0
 ------
 
