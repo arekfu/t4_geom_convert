@@ -19,8 +19,8 @@ from t4_geom_convert import __version__
 # -- Project information -----------------------------------------------------
 
 project = 't4_geom_convert'
-copyright = '2019-2021, Davide Mancusi, Martin Maurey, Jonathan Faustin'
-author = 'Davide Mancusi, Martin Maurey, Jonathan Faustin'
+copyright = '2019-2024, French Alternative Energies and Atomic Energy Commission'
+author = 'Davide Mancusi, François-Xavier Hugot, Martin Maurey, Jonathan Faustin'
 
 # The full version, including alpha/beta/rc tags
 release = __version__

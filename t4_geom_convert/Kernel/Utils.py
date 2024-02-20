@@ -1,4 +1,4 @@
-# Copyright 2019-2021 Davide Mancusi, Martin Maurey, Jonathan Faustin
+# Copyright 2019-2024 French Alternative Energies and Atomic Energy Commission
 #
 # This file is part of t4_geom_convert.
 #
