@@ -145,7 +145,7 @@ def construct_volume_t4(mcnp_parser, lattice_params, cell_cache_path,
             dic_vol_t4[key] = dic_vol_t4[j].copy()
             dic_vol_t4[key].fictive = False
 
-    return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells
+    return dic_vol_t4, mcnp_dict, t4_surf_numbering, skipped_cells, union_ids
 
 
 def extract_tr_surf_ids(mcnp_dict):
@@ -162,17 +162,31 @@ def extract_tr_surf_ids(mcnp_dict):
     return set(tr_surf_ids)
 
 
-def remove_empty_volumes(dic_volume):
+def remove_empty_volumes(dic_volume, union_ids):
     '''Remove cells that are patently empty.'''
     removed = set()
-    to_remove = [key for key, val in dic_volume.items()
-                 if val.empty() and (val.ops is None or val.ops[0] != 'UNION')]
+    to_remove = [key for key, val in dic_volume.items() if val.empty()]
 
     while to_remove:
+        removed_at_this_step = set()
         for key in to_remove:
-            del dic_volume[key]
-        removed |= set(to_remove)
+            val = dic_volume[key]
+            if val.ops is None or val.ops[0] != 'UNION':
+                # This volume is just an intersection with an empty volume, so we can
+                # remove it
+                del dic_volume[key]
+                removed_at_this_step.add(key)
+                continue
 
+            # Here val is patently empty, but it also contains a union with other
+            # volumes, so it may not be empty after all. So we replace the surface
+            # definitions with an empty volume
+            val.pluses = set([union_ids[0]])
+            val.minuses = set([union_ids[1]])
+
+        removed |= removed_at_this_step
+
+        # update the list of volumes that must be removed
         to_remove = []
         for key, val in dic_volume.items():
             if val.ops is None:

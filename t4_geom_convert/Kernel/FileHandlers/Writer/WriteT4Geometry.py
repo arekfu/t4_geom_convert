@@ -90,12 +90,12 @@ def convertMCNPGeometry(mcnp_parser, lattice_params, args):
                 pickle.dump(vol_conv, dicfile)
                 print(' done', flush=True)
 
-    dic_volume, mcnp_new_dict, dic_surface_t4, skipped_cells = vol_conv
+    dic_volume, mcnp_new_dict, dic_surface_t4, skipped_cells, union_ids = vol_conv
     if not args.skip_deduplication:
         dic_surface_t4, renumber = remove_duplicate_surfaces(dic_surface_t4)
         dic_volume = renumber_surfaces(dic_volume, renumber)
 
-    remove_empty_volumes(dic_volume)
+    remove_empty_volumes(dic_volume, union_ids)
     remove_unused_volumes(dic_volume)
 
     return (dic_surface_mcnp, dic_surface_t4, dic_volume, mcnp_new_dict,
