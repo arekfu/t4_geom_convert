@@ -1,6 +1,19 @@
 Changelog
 =========
 
+v1.1.0
+------
+
+* Avoid emitting any patently empty volume, because TRIPOLI-4 chokes on them. A
+  patently empty volume is defined a volume where the same surface appears in
+  both the PLUS list and the MINUS list. Such volumes may not be empty if they
+  are followed by a UNION operator. Since TRIPOLI-4 does not like patently
+  empty volumes, we replace their definition with the intersection of two
+  disjoint half-spaces.
+
+  Fixes issue #48.
+
+
 v1.0.0
 ------
 
