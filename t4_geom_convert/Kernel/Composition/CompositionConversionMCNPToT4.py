@@ -31,6 +31,8 @@ def compositionConversionMCNPToT4(mcnp_parser):
     d_composition_t4 = OrderedDict()
     dict_compo_mcnp = CDictCompositionMCNP(mcnp_parser).d_compositionMCNP
     for key, val in dict_compo_mcnp.items():
+        if key == 0:
+            continue
         atom_fracs = None
         l_composition_t4 = []
         for isotope_id, fraction in val.materialCompositionParameters:
